@@ -48,7 +48,7 @@ Configuracao manual equivalente:
 
 ```txt
 Root Directory: vazio
-Build Command: npx --yes pnpm@9.0.0 install --frozen-lockfile && npx --yes pnpm@9.0.0 --filter @portfolio/api build
+Build Command: npx --yes pnpm@9.0.0 install --frozen-lockfile --prod=false && npx --yes pnpm@9.0.0 --filter @portfolio/api build
 Start Command: node apps/api/dist/main.js
 ```
 

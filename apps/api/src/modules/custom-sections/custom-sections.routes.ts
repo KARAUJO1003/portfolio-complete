@@ -1,0 +1,10 @@
+import { Router } from "express";
+import { authenticate } from "../../shared/auth/authenticate";
+import { requirePermission } from "../../shared/permissions/require-permission";
+import * as controller from "./custom-sections.controller";
+import { CUSTOM_SECTIONS_PERMISSIONS as permissions } from "./custom-sections.permissions";
+export const customSectionsRoutes = Router();
+customSectionsRoutes.get("/", authenticate, requirePermission(permissions.view), controller.listSections);
+customSectionsRoutes.post("/", authenticate, requirePermission(permissions.create), controller.createSection);
+customSectionsRoutes.put("/:id", authenticate, requirePermission(permissions.update), controller.updateSection);
+customSectionsRoutes.delete("/:id", authenticate, requirePermission(permissions.delete), controller.deleteSection);

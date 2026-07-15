@@ -1,0 +1,10 @@
+import { Router } from "express";
+import { authenticate } from "../../shared/auth/authenticate";
+import { requirePermission } from "../../shared/permissions/require-permission";
+import * as controller from "./{{MODULE}}.controller";
+import { {{PASCAL}}Permissions as permissions } from "./{{MODULE}}.permissions";
+export const {{CAMEL}}Routes = Router();
+{{CAMEL}}Routes.get("/", authenticate, requirePermission(permissions.view), controller.list);
+{{CAMEL}}Routes.post("/", authenticate, requirePermission(permissions.create), controller.create);
+{{CAMEL}}Routes.put("/:id", authenticate, requirePermission(permissions.update), controller.update);
+{{CAMEL}}Routes.delete("/:id", authenticate, requirePermission(permissions.delete), controller.remove);
