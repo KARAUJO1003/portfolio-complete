@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "build": "pnpm build:packages && pnpm --filter @portfolio/api build && pnpm --filter @portfolio/web build",
+    "build:packages": "pnpm --filter @portfolio/config build && pnpm --filter @portfolio/contracts build && pnpm --filter @portfolio/feature-flags build && pnpm --filter @portfolio/http-client build && pnpm --filter @portfolio/permissions build",
+    "web": "pnpm --filter @portfolio/web",
+    "api": "pnpm --filter @portfolio/api"
+  }
+}

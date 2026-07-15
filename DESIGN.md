@@ -1,0 +1,93 @@
+# Design System - Portfolio Platform
+
+## Direcao Visual
+
+O produto deve parecer minimalista, moderno e premium, mantendo a identidade dark/dev do portfolio atual, mas com mais maturidade visual.
+
+Palavras-guia:
+
+- minimalista;
+- tecnico;
+- premium;
+- preciso;
+- escuro;
+- editorial no portfolio publico;
+- produtivo e denso no admin.
+
+## Superficies
+
+### Portfolio Publico
+
+Registro: brand surface.
+
+Objetivo: causar boa primeira impressao para recrutadores, clientes e outros desenvolvedores. A landing pode ter mais respiro, composicao editorial, motion sutil e cards visuais.
+
+### Admin
+
+Registro: product surface.
+
+Objetivo: permitir criar, revisar e publicar conteudo com clareza. Deve ser mais denso, previsivel e operacional que a landing publica.
+
+## Tokens Base
+
+### Background
+
+- `--background`: fundo principal.
+- `--background-subtle`: fundo com leve variacao para areas extensas.
+- `--surface`: superficie de cards e paineis.
+- `--surface-raised`: superficie elevada para headers, popovers e paineis destacados.
+- `--surface-muted`: superficie secundaria.
+
+### Foreground
+
+- `--foreground`: texto principal.
+- `--foreground-muted`: texto secundario.
+- `--foreground-subtle`: texto de baixa prioridade.
+
+### Brand
+
+- `--primary`: acao principal.
+- `--primary-foreground`: texto sobre primary.
+- `--primary-tint`: fundo suave da marca.
+- `--primary-accent`: acento visual para detalhes e foco.
+- `--secondary`: acao/estado secundario.
+- `--secondary-foreground`: texto sobre secondary.
+
+### Feedback
+
+- `--danger`: erro/remocao.
+- `--success`: confirmacao/publicado.
+- `--warning`: atencao/rascunho.
+
+## Motion
+
+Usar Motion for React para microinteracoes, nao para distrair.
+
+Padroes:
+
+- entradas curtas entre 160ms e 260ms;
+- escala pequena em toggles e botoes iconicos;
+- `layout` para transicoes de contagem/estado;
+- respeitar `prefers-reduced-motion` quando houver animacoes mais fortes;
+- nada de animacao infinita decorativa sem funcao clara.
+
+### Regras De Animacao
+
+- Antes de criar ou alterar uma tela, verificar referencias de blocks/componentes quando fizer sentido: Coss Particles, Animate UI, Kibo UI, beUI e Impeccable.
+- Preferir criar componentes animados reutilizaveis em `components/ds` quando a animacao puder aparecer em mais de uma area.
+- Variantes de animacao devem ser nomeadas e reaproveitaveis, por exemplo `fade-up`, `scale-in`, `blur-in`, `stagger`, `scroll-progress`.
+- Portfolio publico pode combinar diferentes estilos de animacao: entrada por viewport, hover premium, scroll-linked animation, parallax sutil e futuramente GSAP ScrollTrigger.
+- Admin deve usar motion com mais contencao: feedback de estado, transicao de paineis, tabelas e drawers.
+- Sempre avaliar `prefers-reduced-motion`.
+
+## Componentes
+
+Manter:
+
+- `components/ui`: base atualizavel, sem regra visual de produto.
+- `components/ds`: wrappers e componentes de produto.
+- `features/*/components`: composicoes especificas de feature.
+
+Futuro:
+
+- criar `/admin/design-system` com tokens, tipografia, grids, cards, formularios, tabelas, estados, motion e exemplos de composicao.

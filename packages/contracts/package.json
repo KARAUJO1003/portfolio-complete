@@ -1,0 +1,13 @@
+{
+  "name": "@portfolio/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "pnpm --dir ../../apps/api exec tsc -p ../../packages/contracts/tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "^4.0.0"
+  }
+}

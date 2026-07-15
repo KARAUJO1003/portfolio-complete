@@ -1,0 +1,45 @@
+# Dependencies and package-manager cache
+node_modules/
+.pnpm-store/
+
+# Production and framework output
+.next/
+dist/
+out/
+coverage/
+*.tsbuildinfo
+
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Logs and process files
+*.log
+*.pid
+*.pid.lock
+pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime uploads; keep only the directory placeholder
+storage/tmp/*
+!storage/tmp/uploads/
+storage/tmp/uploads/*
+!storage/tmp/uploads/.gitkeep
+
+# Local audits and generated deliverables
+work/
+outputs/
+
+# Operating system and editor-local files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*.local
+.vercel/
+.turbo/

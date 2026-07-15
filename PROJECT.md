@@ -1,0 +1,282 @@
+# Portfolio/Admin Integrado
+
+## Resumo
+
+Este projeto sera um monorepo para um portfolio pessoal administravel, integrado a um builder de curriculo. O objetivo e permitir editar dados uma vez, escolher onde cada informacao aparece, publicar alteracoes imediatamente e gerar curriculos em PDF compativeis com ATS/leitura por IA.
+
+O projeto deve ser construido por partes testaveis, mantendo este arquivo como fonte principal de retomada quando o contexto da conversa estourar.
+
+## Referencia Do Portfolio Atual
+
+Site atual: https://portfolio.kaesyo.com
+
+Esta referencia deve orientar o primeiro design publico e a migracao inicial de conteudo. O site atual usa uma identidade dark/dev com:
+
+- navegacao `Inicio`, `Sobre`, `Habilidades`, `Projetos`, `Contato`;
+- hero com destaque `software developer`;
+- copy principal `Welcome to the Dark Side of Coding! celebrating the elegance of dark mode.`;
+- CTA para curriculo;
+- links sociais para Instagram, GitHub e LinkedIn;
+- secao "Sobre" com resumo pessoal;
+- secao "Habilidades" com cards contendo nome, data e descricao;
+- secao "Projetos" com cards visuais, tags de tecnologias e CTA `ver projeto`;
+- secao "Contato" com chamada para WhatsApp/redes sociais.
+
+O novo projeto pode evoluir o design, mas deve preservar esse conteudo como base inicial e manter o modo dark como padrao.
+
+## Escopo Geral Do Produto
+
+Status: `pending`, `in-progress`, `done`.
+
+| Funcionalidade | Status | Observacoes |
+| --- | --- | --- |
+| Documentacao base do projeto | done | `PROJECT.md`, `AGENTS.md`, `docs/*` e skills locais |
+| Scaffold inicial do monorepo | done | Estrutura de `apps/`, `packages/`, `docs/`, `.agents/`, `storage/` |
+| Portfolio publico dinamico | done | Renderiza a versao publicada, ordem, secoes, itens, GitHub e conteudo customizado |
+| Admin com login por credenciais | done | Login, cookie, me, logout, redirect e guards validados; bypass permanece disponivel por env |
+| Perfil editavel | done | CRUD com dados pessoais, contatos, objetivo, Markdown simples e upload de avatar |
+| Projetos editaveis | done | CRUD, capa por upload, visibilidade, status, tags e curtidas |
+| Skills editaveis | done | CRUD com categoria, data, ordem e visibilidade |
+| Experiencias, formacao, certificacoes e links | done | CRUD unificado consumido por portfolio e curriculo |
+| Paginas publicas customizadas | done | CRUD, navegacao e rota publica por slug |
+| Seed inicial com dados do portfolio atual | done | `pnpm api seed:initial` popula perfil, skills, projetos, experiencias e pagina publica |
+| Secoes customizadas | done | CRUD livre com Markdown simples e destino portfolio/curriculo |
+| Multiplas versoes de portfolio | done | Rascunho, publicada, arquivada e troca da versao ativa |
+| Multiplas versoes de curriculo | done | Versoes independentes com template e selecao de conteudo |
+| Controle de exibicao por item/secao | done | Ordem, secao ativa, todos os itens ou selecao explicita por versao |
+| Builder de curriculo | done | Salva/publica versoes, preview, selecao granular e download |
+| Builder de portfolio | done | Salva/publica versoes e reflete imediatamente na landing |
+| PDF de curriculo no backend | done | PDF usa a versao escolhida e preserva texto selecionavel |
+| Templates PDF ATS-friendly | done | `classic-ats` e `compact-ats` funcionais |
+| Upload local com Multer/fs | done | Integrado ao avatar e capa, banco/front usam path relativo |
+| Curtidas anonimas em projetos | done | Toggle curtir/descurtir com hash, contador e estado otimista |
+| Toggle de curtida estilo Instagram | done | Curtir/descurtir com mesmo botao, contador sincronizado e microinteracao com Motion |
+| Integracao GitHub inicial | done | Perfil, repositorios, estatisticas e atividade com cache e token opcional |
+| Estrutura preparada para i18n futuro | done | Locale e mensagens centralizados em `core/i18n`; MVP permanece pt-BR |
+| Dark mode padrao, light mode possivel | done | ThemeProvider e toggle no admin e portfolio |
+| Design system flexivel | in-progress | `components/ui` base, `components/ds` extensoes; primeira passada visual sem mexer em `components/ui` |
+| Design system premium documentado | in-progress | `DESIGN.md`, `docs/design-system.md`, tokens premium e MCPs/skills de design adicionados |
+| Motion for React | done | Dependencia `motion` instalada no front e usada no toggle de curtida |
+| Sistema de animacoes premium | in-progress | `components/ds/motion`, scroll progress, reveal/stagger/hover variants e docs |
+| MCPs/skills de design | done | Coss, Coss Particles e Impeccable instalados; configs locais MCP criadas |
+| Vitrine do design system | in-progress | Tela inicial criada em `/admin/design-system` |
+| Auditoria funcional | done | `docs/functional-audit.md`; CRUDs, rotas, likes e upload testados manualmente |
+| Gerador de feature front | done | Interativo/pipe, templates separados, CRUD Query/Table/Form e rota admin |
+| Gerador de modulo back | done | Interativo/pipe, templates separados, CRUD modular e registro de rota |
+| Build de producao do monorepo | done | Packages compartilhados, API e 15 rotas Next compilados sem erros de TypeScript |
+| Preparacao Git inicial | done | `.gitignore` na raiz, web e API protege dependencias, builds, secrets, logs e uploads temporarios |
+| Deploy gratuito inicial | done | Blueprint Render e guia Vercel/Atlas em `docs/deployment.md`; upload persistente permanece pendente |
+
+## MVP Por Fases
+
+### Prioridade Atual - Fechar Funcional Antes Do Polimento Visual
+
+Status: `done` para o escopo funcional do MVP. O proximo ciclo e polimento visual e expansao do design system.
+
+Auditoria funcional registrada em `docs/functional-audit.md`.
+
+Ordem definida:
+
+1. Base de versoes: `portfolioVersions` e `resumeVersions`.
+2. Publicacao real do portfolio usando versao publicada.
+3. Curriculo real usando `visibility.resume` e versoes salvas.
+4. PDF ATS `classic-ats` no backend.
+5. Upload integrado em formularios.
+6. Auth real com `AUTH_ENABLED=true`.
+7. GitHub API/cache.
+8. Hardening de erros, loading, empty states e validacoes.
+
+### Fase 1 - Documentacao Base
+
+Status: `done`.
+
+- Criar este arquivo principal.
+- Criar regras em `AGENTS.md`.
+- Criar docs de arquitetura, roadmap, permissoes, feature flags, geradores e referencias.
+- Criar skills locais para features, design system e padroes de referencia.
+
+Checkpoint: outro agente consegue retomar lendo `PROJECT.md`.
+
+### Fase 2 - Scaffold Do Monorepo
+
+Status: `done`.
+
+- Criar `apps/web`, `apps/api` e `packages/*`.
+- Criar `pnpm-workspace.yaml`.
+- Criar `.env.example` para web e api.
+- Criar placeholders de estrutura.
+
+Checkpoint: estrutura existe e segue o desenho definido.
+
+### Fase 3 - API Base
+
+Status: `done`.
+
+- Express, env, CORS, error handler e healthcheck.
+- Conexao MongoDB/Mongoose.
+- Modulos base: `auth`, `users`, `uploads`.
+- `requirePermission` e `requireFeature`.
+- Auth por credenciais iniciado com admin via env.
+- Upload local iniciado com Multer/fs e path relativo.
+
+Checkpoint: API responde `/health`, conecta no Mongo e protege rotas.
+
+### Fase 4 - Web Base
+
+Status: `done`.
+
+- Next app.
+- Providers: theme, TanStack Query, Nuqs, auth e modal.
+- Axios instance.
+- `AuthGuard`, `Can`, `Feature` e `isFeatureEnabled`.
+- Layout admin e publico minimos.
+- Login form inicial com React Hook Form + Zod.
+- Dashboard admin inicial autenticado.
+
+Checkpoint: login/admin protegido e pagina publica acessivel.
+
+### Fase 5 - CRUDs Principais
+
+Status: `done`.
+
+- Features: `profile`, `projects`, `skills`, `experiences`, `pages`.
+- Cada feature deve ter schema, form, table, queries, mutations, permissions e flags.
+- `profile` iniciado como fatia vertical base.
+- `projects` iniciado com CRUD, visibilidade e tabela TanStack simples.
+- `skills` iniciado com CRUD, categoria, data de inicio e visibilidade.
+- `experiences` iniciado como CRUD unificado para experiencia, formacao, certificacao e links.
+- `pages` iniciado com CRUD e rota publica por slug.
+- Seed inicial criado em `apps/api/scripts/seed-initial-portfolio.ts` replicando dados base do portfolio atual.
+
+Checkpoint: admin edita o conteudo principal.
+
+### Fase 6 - Versoes E Publicacao
+
+Status: `done`.
+
+- `portfolioVersions`.
+- `resumeVersions`.
+- Selecionar e ordenar secoes.
+- Status: `draft`, `published`, `archived`.
+- MVP visual iniciado com `/admin/portfolio-builder`.
+- MVP visual iniciado com `/admin/resume-builder`.
+
+Checkpoint: publicar no admin reflete imediatamente no portfolio publico.
+
+### Fase 6.1 - Portfolio Publico Inicial
+
+Status: `done` funcional; identidade visual final permanece em evolucao.
+
+- API publica `/public/portfolio`.
+- Home publica renderiza profile, skills, projects, experiences e pages publicadas.
+- Enquanto nao houver dados cadastrados, usa fallback inspirado em `portfolio.kaesyo.com`.
+- Primeira passada visual aplicada para aproximar hero, sobre, skills, projetos e contato do portfolio atual.
+
+### Fase 7 - Curriculo E PDF
+
+Status: `done` funcional.
+
+- Builder de curriculo.
+- Template inicial `classic-ats`.
+- PDF textual e selecionavel gerado pelo backend.
+- Analise do PDF antigo registrada em `docs/resume-source-analysis.md`.
+- Perfil ampliado com objetivo, endereco, nascimento e CNH.
+- Seed atualizado com historico profissional, competencias pessoais, conquistas, certificacoes e formacao academica.
+- Rota `POST /resume-pdf/classic-ats` criada.
+- Botao `Baixar PDF` habilitado em `/admin/resume-builder`.
+
+Checkpoint: gerar PDF da versao escolhida.
+
+### Fase 8 - Uploads, Likes E GitHub
+
+Status: `done`.
+
+- Upload local com path normalizado.
+- Likes anonimos com hash iniciados em `/public/projects/:projectId/like`.
+- Curtida publica agora funciona como toggle: curtir/descurtir no mesmo botao.
+- GitHub inicial por API publica e cache.
+
+Checkpoint: projeto publico exibe imagem, likes e dados basicos de repo.
+
+### Fase 9 - Geradores
+
+Status: `done`.
+
+- `pnpm web generate:feature`.
+- `pnpm api generate:module`.
+- Cada gerador pergunta dados essenciais e cria CRUD no padrao.
+
+Checkpoint: novo modulo nasce funcional e documentado.
+
+### Fase 10 - Design System Base
+
+Status: `in-progress`.
+
+- Criar componentes `Page*`, `Section*`, `Ds*`.
+- Manter visual simples no MVP.
+- Evitar investimento alto na aparencia agora.
+- Admin shell e dashboard receberam uma primeira camada visual para melhorar acompanhamento do MVP.
+- `DESIGN.md` criado como fonte de direcao visual.
+- `docs/design-system.md` criado para tokens, componentes, motion e futura tela `/admin/design-system`.
+- `docs/design-mcp-and-skills.md` criado para MCPs, registries e skills.
+- `docs/animation-system.md` criado para padronizar motion, variants e scroll animations.
+- Tokens premium iniciais adicionados em `apps/web/src/themes/globals.css`.
+- Skill Coss e Coss Particles instaladas em `.agents/skills`.
+- Impeccable instalado em `.agents`.
+- Configs MCP locais criadas em `.mcp.json`, `.cursor/mcp.json` e `.vscode/mcp.json`.
+- Componentes de motion criados em `apps/web/src/components/ds/motion.tsx`.
+- Landing publica recebeu scroll progress, reveal por viewport, stagger e hover lift.
+- Tela inicial `/admin/design-system` criada para documentar tokens, componentes e motion patterns.
+
+Checkpoint: base pronta para redesign sem refatoracao pesada.
+
+## Decisoes Tecnicas
+
+- Monorepo com `apps/web` e `apps/api` separados desde o inicio.
+- Frontend em Next.js.
+- Dev web padronizado em `http://localhost:3004` para nao disputar a porta 3000 quando ela ja estiver ocupada.
+- Backend em Express/Node.
+- Banco inicial: MongoDB/Mongoose, inspecionavel via Mongo Compass.
+- Upload local no MVP com Multer/fs.
+- Banco salva path relativo de arquivos.
+- Front concatena `NEXT_PUBLIC_BASE_URL_FILES` com o path salvo.
+- Front usa `features/`, nunca `modules/`.
+- Back usa `modules/`.
+- `components/ui` e camada base shadcn, nao deve receber customizacao de produto.
+- Customizacoes de produto ficam em `components/ds`.
+- Usar composition pattern para pages, sections, cards, builders e layouts.
+- Usar Axios Instance.
+- Usar TanStack Query para server state.
+- Usar TanStack Table para tabelas.
+- Usar Nuqs para estado de URL.
+- Usar React Hook Form + Zod em formularios.
+- Front controla UX de permissao; backend valida seguranca real.
+- Feature flags devem existir como componente, funcao JS/TS e middleware backend.
+- Auth fica desligada no dev por `AUTH_ENABLED=false` e `NEXT_PUBLIC_AUTH_ENABLED=false` para facilitar testes visuais. Reativar antes de validar seguranca.
+- Mudancas visuais devem seguir `DESIGN.md`.
+- Motion deve ser usado para microinteracoes objetivas, especialmente feedback de estado, entrada/saida curta e transicoes de layout.
+- Portfolio publico e brand surface; admin e product surface.
+- Ao criar ou modificar telas no front, verificar referencias de blocks/componentes em Coss, Animate UI, Kibo UI, beUI e Impeccable quando aplicavel.
+- Animacoes repetiveis devem virar componentes/variants em `components/ds`, evitando configs duplicadas nas features.
+- Portfolio publico pode misturar reveal, hover premium, scroll-linked animation, parallax sutil e futuramente GSAP ScrollTrigger.
+
+## Regras De Retomada
+
+Quando continuar este projeto:
+
+1. Leia este `PROJECT.md`.
+2. Leia `AGENTS.md`.
+3. Veja a proxima fase `pending`.
+4. Leia o doc especifico em `docs/`.
+5. Execute somente a proxima parte testavel.
+6. Ao finalizar uma parte, atualize o status neste arquivo.
+
+## Nao Fazer Sem Pedido Explicito
+
+- Nao rodar build.
+- Nao rodar typecheck.
+- Nao rodar Biome.
+- Nao rodar lint.
+- Nao instalar dependencias sem confirmar.
+- Nao modificar `components/ui` para customizacoes do app.
+- Nao alterar visual final profundamente nesta etapa inicial.

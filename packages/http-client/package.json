@@ -1,0 +1,10 @@
+{
+  "name": "@portfolio/http-client",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "pnpm --dir ../../apps/api exec tsc -p ../../packages/http-client/tsconfig.json"
+  }
+}

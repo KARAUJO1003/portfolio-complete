@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: portfolio-platform-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npx --yes pnpm@9.0.0 install --frozen-lockfile && npx --yes pnpm@9.0.0 --filter @portfolio/api build
+    startCommand: node apps/api/dist/main.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 24.14.1
+      - key: APP_URL
+        sync: false
+      - key: WEB_URL
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: AUTH_COOKIE_NAME
+        value: portfolio_token
+      - key: ADMIN_NAME
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: AUTH_ENABLED
+        value: true
+      - key: UPLOADS_ROOT
+        value: ../../storage/tmp/uploads
+      - key: FILES_BASE_PATH
+        value: /files
