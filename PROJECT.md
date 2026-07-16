@@ -234,6 +234,9 @@ Atualizacao: portfolio publico recebeu layout premium com sidebar fixa no deskto
 - Tecnologias receberam badges com logos adaptativos por tema; GitHub recebeu contribution graph, cards enriquecidos e atividade recente; contato recebeu CTA final mais forte.
 - Atividade recente do GitHub recebeu visual inspirado no "Contribution activity": agrupamento por mes, trilho vertical, icones por evento, barras de commits e cards internos para PRs/issues, usando somente dados publicos.
 - "Ver mais projetos" recebeu disclosure animado para expandir/recolher a lista com altura, opacidade e controle rotacionando.
+- Loading publico recebeu experiencia "Interface Blueprint": linhas SVG desenhando wireframes, passos animados e cards de interface para evitar tela parcial/estranha durante reload e fetch dinamico.
+- Portfolio publico recebeu overlay de entrada com tempo minimo de 1,8s para que o loading seja perceptivel mesmo quando a API responde rapido.
+- Reveals/scroll stacks foram suavizados para reduzir blur e manter conteudo legivel em reload direto por ancora.
 - Cards principais receberam glow hover inspirado em componentes premium/animados da Aceternity UI.
 - Tela inicial `/admin/design-system` criada para documentar tokens, componentes e motion patterns.
 

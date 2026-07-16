@@ -117,5 +117,6 @@ Padroes adicionados:
 - logos de tecnologias com marca escura/clara devem ser adaptativos para manter contraste nos temas dark e light;
 - GitHub com contribution graph, cards enriquecidos e atividade recente no formato timeline inspirado no "Contribution activity" do GitHub, sem expor dados privados;
 - blocos de "ver mais" devem expandir/recolher com motion de altura, opacidade e rotacao do controle, respeitando `prefers-reduced-motion`;
+- carregamentos publicos devem usar uma experiencia visual propria, nao spinner generico: blueprint de interface, linhas SVG desenhando wireframes, passos curtos e motion leve que remeta a front-end/design em construcao; no portfolio publico, manter um tempo minimo curto de exibicao para que a animacao seja percebida antes da tela final;
 - cards principais com glow hover inspirado em Aceternity UI, sem copiar codigo externo;
 - fechamento de contato com CTA mais forte e visual menos generico.

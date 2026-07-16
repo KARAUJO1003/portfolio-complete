@@ -13,6 +13,7 @@ import { ThemeToggle } from "@/components/ds/theme-toggle";
 import { PublicShell } from "@/components/layout/public-shell";
 import { resolveFileUrl } from "@/core/files/file-url";
 import { AnimatedDisclosure } from "@/features/portfolio/components/animated-disclosure";
+import { PortfolioEntryOverlay } from "@/features/portfolio/components/portfolio-entry-overlay";
 import { PortfolioFloatingMenu } from "@/features/portfolio/components/portfolio-floating-menu";
 import { ProjectLikeButton } from "@/features/portfolio/components/project-like-button";
 import type { ExperienceDto, ProjectDto, PublicPortfolioDto, SkillDto } from "@portfolio/contracts";
@@ -107,6 +108,7 @@ export function PortfolioHome({ portfolio }: PortfolioHomeProps) {
 
   return (
     <PublicShell>
+      <PortfolioEntryOverlay />
       <PortfolioBackground />
       <div className="mx-auto grid w-full max-w-6xl gap-14 px-6 py-10 sm:py-16 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-x-28 lg:py-24">
         <PortfolioSidebar profile={portfolioProfile} sections={sections} />

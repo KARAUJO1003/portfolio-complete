@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const revealVariants = {
   "fade-up": {
-    hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
+    hidden: { opacity: 0, y: 24, filter: "blur(4px)" },
     visible: { opacity: 1, y: 0, filter: "blur(0px)" },
   },
   "fade-in": {
@@ -16,15 +16,15 @@ const revealVariants = {
     visible: { opacity: 1 },
   },
   "scale-in": {
-    hidden: { opacity: 0, scale: 0.96, filter: "blur(8px)" },
+    hidden: { opacity: 0, scale: 0.97, filter: "blur(4px)" },
     visible: { opacity: 1, scale: 1, filter: "blur(0px)" },
   },
   "slide-left": {
-    hidden: { opacity: 0, x: 32, filter: "blur(8px)" },
+    hidden: { opacity: 0, x: 28, filter: "blur(4px)" },
     visible: { opacity: 1, x: 0, filter: "blur(0px)" },
   },
   "slide-right": {
-    hidden: { opacity: 0, x: -32, filter: "blur(8px)" },
+    hidden: { opacity: 0, x: -28, filter: "blur(4px)" },
     visible: { opacity: 1, x: 0, filter: "blur(0px)" },
   },
 } as const satisfies Record<string, Variants>;
@@ -40,7 +40,7 @@ const staggerVariants = {
 } satisfies Variants;
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 18, filter: "blur(6px)" },
+  hidden: { opacity: 0, y: 16, filter: "blur(3px)" },
   visible: {
     opacity: 1,
     y: 0,
@@ -49,7 +49,9 @@ const itemVariants = {
   },
 } satisfies Variants;
 
-type MotionDivProps = ComponentProps<typeof motion.div>;
+type MotionDivProps = Omit<ComponentProps<typeof motion.div>, "children"> & {
+  children?: ReactNode;
+};
 
 type MotionRevealProps = MotionDivProps & {
   delay?: number;
@@ -163,7 +165,7 @@ export function MotionHoverCard({
 }
 
 export function MotionScrollReveal({
-  blur = 2,
+  blur = 1,
   children,
   className,
   style,
@@ -181,7 +183,7 @@ export function MotionScrollReveal({
     damping: 24,
     mass: 0.45,
   });
-  const opacity = useTransform(smoothProgress, [0, 0.32], [0.18, 1]);
+  const opacity = useTransform(smoothProgress, [0, 0.32], [0.36, 1]);
   const translateY = useTransform(smoothProgress, [0, 0.32], [y, 0]);
   const scale = useTransform(smoothProgress, [0, 0.32], [0.975, 1]);
   const filter = useTransform(
@@ -282,7 +284,7 @@ function MotionScrollStackItem({
   const normalizedStagger = total > 8 ? Math.min(stagger, 0.045) : stagger;
   const start = Math.min(index * normalizedStagger, 0.72);
   const end = Math.min(start + visibleWindow, 0.96);
-  const opacity = useTransform(progress, [start, end], [0.12, 1]);
+  const opacity = useTransform(progress, [start, end], [0.28, 1]);
   const translateY = useTransform(progress, [start, end], [y, 0]);
   const scale = useTransform(progress, [start, end], [0.965, 1]);
   const filter = useTransform(progress, [start, end], [`blur(${blur}px)`, "blur(0px)"]);
