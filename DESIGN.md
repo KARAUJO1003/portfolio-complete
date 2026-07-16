@@ -30,6 +30,29 @@ Objetivo: permitir criar, revisar e publicar conteudo com clareza. Deve ser mais
 
 O admin deve evoluir por padroes reutilizaveis antes de telas isoladas. Formularios, tabelas, builders, login, usuarios e permissoes devem seguir `docs/admin-ux-roadmap.md`, e toda nova decisao visual/componente deve aparecer em `/admin/design-system`.
 
+## Consulta Obrigatoria De Referencias
+
+Antes de criar ou refatorar qualquer componente de UI, consultar os particles do Coss UI.
+
+1. Usar a skill local `coss-particles`, que indexa 484 particles em 52 tipos de componente.
+2. Localizar o particle equivalente e ler o codigo em `https://coss.com/ui/r/<nome>.json`.
+3. Extrair o padrao. Nao copiar o codigo.
+4. Adaptar para o stack deste projeto.
+
+Motivo da adaptacao: os particles usam primitivos coss sobre Base UI (`@base-ui/react`); este projeto usa shadcn sobre Radix. Instalar `@base-ui/react` criaria um segundo sistema de componentes em paralelo e exige decisao explicita do usuario.
+
+Ordem de consulta: Coss Particles primeiro; depois Animate UI, Kibo UI, beUI e Impeccable.
+
+Referencias ja adotadas:
+
+- `p-table-8` (CardFrame + TanStack Table + ordenacao + paginacao) e o alvo do `DataTableFrame`. Ver `docs/admin-visual-references.md`.
+
+## Identidade Visual Do Admin
+
+As referencias visuais do admin e os principios derivados delas estao em `docs/admin-visual-references.md`. Ler antes de qualquer trabalho visual no admin.
+
+Resumo: separacao por borda de 1px e nao por sombra; densidade alta; numero como protagonista; monocromia por padrao com cor apenas como sinal; mono para valor tecnico; botao primario solido e raro; empty state sempre com icone, titulo e uma linha.
+
 ## Tokens Base
 
 ### Background
@@ -76,7 +99,7 @@ Padroes:
 
 ### Regras De Animacao
 
-- Antes de criar ou alterar uma tela, verificar referencias de blocks/componentes quando fizer sentido: Coss Particles, Animate UI, Kibo UI, beUI e Impeccable.
+- Antes de criar ou alterar uma tela, verificar referencias de blocks/componentes: Coss Particles primeiro, depois Animate UI, Kibo UI, beUI e Impeccable. Ver `## Consulta Obrigatoria De Referencias`.
 - Preferir criar componentes animados reutilizaveis em `components/ds` quando a animacao puder aparecer em mais de uma area.
 - Variantes de animacao devem ser nomeadas e reaproveitaveis, por exemplo `fade-up`, `scale-in`, `blur-in`, `stagger`, `scroll-progress`.
 - Portfolio publico pode combinar diferentes estilos de animacao: entrada por viewport, hover premium, scroll-linked animation, parallax sutil e futuramente GSAP ScrollTrigger.

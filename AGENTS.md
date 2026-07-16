@@ -23,6 +23,12 @@
 - Nao rode suites globais de teste.
 - Nao instale dependencias sem confirmacao.
 
+## UI
+
+- Antes de criar ou refatorar qualquer componente de UI, consultar os particles do Coss via skill `coss-particles`.
+- Extrair o padrao do particle e adaptar ao stack shadcn/Radix. Nao copiar o codigo nem instalar `@base-ui/react`.
+- Ler `docs/admin-visual-references.md` antes de trabalho visual no admin.
+
 ## Estrutura
 
 - Front usa `features/`.

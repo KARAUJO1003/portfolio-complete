@@ -62,7 +62,7 @@ export function FormActions({ className, ...props }: React.HTMLAttributes<HTMLDi
   );
 }
 
-export function FormAside({ className, ...props }: React.HTMLAttributes<HTMLAsideElement>) {
+export function FormAside({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   return (
     <aside
       className={cn("rounded-xl border border-border bg-surface-muted/60 p-4 text-sm leading-6", className)}

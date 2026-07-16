@@ -1,9 +1,13 @@
 "use client";
 
+import { FolderPlusIcon, Trash2Icon } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ds/badge";
 import {
   ActionBar,
   EmptyState,
+  ErrorState,
+  LoadingState,
   PageFrame,
   PageFrameContent,
   PageFrameDescription,
@@ -11,6 +15,8 @@ import {
   PageFrameTitle,
   Toolbar,
 } from "@/components/ds/admin-primitives";
+import { ConfirmDialog } from "@/components/ds/confirm-dialog";
+import { Stat, StatGrid } from "@/components/ds/stat-grid";
 import { DataTableFrame } from "@/components/ds/data-table-frame";
 import { FormActions, FormAside, FormPreviewFrame, FormSection, FormStep } from "@/components/ds/form";
 import { MotionHoverCard, MotionItem, MotionReveal, MotionStagger } from "@/components/ds/motion";
@@ -42,6 +48,8 @@ const motionPatterns = [
 ];
 
 export function DesignSystemFeature() {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   return (
     <>
       <MotionReveal>
@@ -192,6 +200,78 @@ export function DesignSystemFeature() {
             As tabelas reais usam TanStack Table dentro deste frame.
           </div>
         </DataTableFrame>
+      </Section>
+
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Metricas</SectionTitle>
+        </SectionHeader>
+        <SectionContent className="grid gap-3">
+          <StatGrid>
+            <Stat label="Projetos publicados" value="12" delta="+2 no mes" deltaTone="success" />
+            <Stat label="Rascunhos" value="3" delta="aguardando revisao" />
+            <Stat label="Versao publica" value="v4" delta="ha 6 dias" />
+          </StatGrid>
+          <p className="text-[13px] leading-5 text-muted-foreground">
+            O numero e o protagonista e o rotulo se apaga. Cor so entra no delta quando carrega
+            significado. Ver `docs/admin-visual-references.md`.
+          </p>
+        </SectionContent>
+      </Section>
+
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Estados</SectionTitle>
+        </SectionHeader>
+        <div className="grid gap-4 lg:grid-cols-3">
+          <EmptyState
+            icon={FolderPlusIcon}
+            title="Nenhum projeto ainda"
+            description="Cadastre o primeiro projeto para ele aparecer no portfolio publico."
+            action={<Button>Novo projeto</Button>}
+          />
+          <LoadingState label="Carregando projetos..." />
+          <ErrorState
+            title="Nao foi possivel carregar"
+            description="A API nao respondeu. Verifique a conexao e tente novamente."
+            action={
+              <Button variant="outline">Tentar novamente</Button>
+            }
+          />
+        </div>
+      </Section>
+
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Dialogs</SectionTitle>
+        </SectionHeader>
+        <PageFrame>
+          <PageFrameHeader>
+            <div>
+              <PageFrameTitle>ConfirmDialog</PageFrameTitle>
+              <PageFrameDescription>
+                Caminho unico para acao destrutiva. Foco preso, ESC e aria vem do Radix; a descricao
+                da consequencia e obrigatoria.
+              </PageFrameDescription>
+            </div>
+          </PageFrameHeader>
+          <PageFrameContent>
+            <Toolbar>
+              <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
+                <Trash2Icon className="size-4" />
+                Remover projeto
+              </Button>
+            </Toolbar>
+            <ConfirmDialog
+              open={confirmOpen}
+              onOpenChange={setConfirmOpen}
+              onConfirm={() => setConfirmOpen(false)}
+              title="Remover projeto?"
+              description="O projeto sai do portfolio publico imediatamente. Esta acao nao pode ser desfeita."
+              confirmLabel="Remover"
+            />
+          </PageFrameContent>
+        </PageFrame>
       </Section>
 
       <Section>

@@ -34,7 +34,7 @@ export function AsyncImageFrame({
 
   return (
     <div className={cn("relative overflow-hidden", className)}>
-      {canRenderImage ? (
+      {canRenderImage && src ? (
         <Image
           alt={alt}
           className={cn(

@@ -25,6 +25,8 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-surface: var(--surface);
@@ -51,6 +53,8 @@
   --muted: #18181b;
   --muted-foreground: #a1a1aa;
   --border: #27272a;
+  --input: #2b2b31;
+  --ring: #8fb7ff;
   --card: #0f0f12;
   --card-foreground: #fafafa;
   --surface: #101014;
@@ -77,6 +81,8 @@
   --muted: #e8ebef;
   --muted-foreground: #52525b;
   --border: #d8dce2;
+  --input: #cbd0d8;
+  --ring: #2563eb;
   --card: #eef0f3;
   --card-foreground: #09090b;
   --surface: #eceff3;
@@ -212,6 +218,78 @@ body {
 
 .text-danger {
   color: var(--danger);
+}
+
+/*
+ * Motion de dialog escrito na mao: o projeto nao usa tailwindcss-animate,
+ * entao utilitarias como `animate-in`/`zoom-in-95` nao existem aqui.
+ * Duracoes seguem a faixa de 160-260ms definida em DESIGN.md.
+ */
+@keyframes ds-overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ds-overlay-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ds-dialog-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes ds-dialog-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+}
+
+.ds-dialog-overlay[data-state="open"] {
+  animation: ds-overlay-in 160ms ease-out;
+}
+
+.ds-dialog-overlay[data-state="closed"] {
+  animation: ds-overlay-out 140ms ease-in;
+}
+
+.ds-dialog-content[data-state="open"] {
+  animation: ds-dialog-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ds-dialog-content[data-state="closed"] {
+  animation: ds-dialog-out 140ms ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-dialog-overlay[data-state],
+  .ds-dialog-content[data-state] {
+    animation: none;
+  }
 }
 
 .brand-logo-adaptive {
