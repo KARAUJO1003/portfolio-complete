@@ -16,6 +16,16 @@ export type GitHubActivityDto = {
   type: string;
   repository: string;
   createdAt: string;
+  action?: string;
+  count?: number;
+  title?: string;
+  url?: string;
+};
+
+export type GitHubContributionDayDto = {
+  count: number;
+  date: string;
+  level: number;
 };
 
 export type GitHubSnapshotDto = {
@@ -27,5 +37,7 @@ export type GitHubSnapshotDto = {
   publicRepositories: number;
   repositories: GitHubRepositoryDto[];
   activity: GitHubActivityDto[];
+  contributions: GitHubContributionDayDto[];
+  contributionsTotal: number;
   cachedAt: string;
 };

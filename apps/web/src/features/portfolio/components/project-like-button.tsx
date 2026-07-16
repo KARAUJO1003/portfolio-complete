@@ -8,11 +8,12 @@ const visitorStorageKey = "portfolio.visitorId";
 const likedStoragePrefix = "portfolio.projectLiked.";
 
 type ProjectLikeButtonProps = {
+  compact?: boolean;
   initialLikesCount: number;
   projectId: string;
 };
 
-export function ProjectLikeButton({ initialLikesCount, projectId }: ProjectLikeButtonProps) {
+export function ProjectLikeButton({ compact = false, initialLikesCount, projectId }: ProjectLikeButtonProps) {
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [liked, setLiked] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -53,7 +54,11 @@ export function ProjectLikeButton({ initialLikesCount, projectId }: ProjectLikeB
     <motion.button
       aria-label={label}
       aria-pressed={liked}
-      className="inline-flex min-h-9 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs text-muted-foreground transition-colors hover:text-foreground disabled:cursor-wait disabled:opacity-80"
+      className={
+        compact
+          ? "inline-flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/45 text-xs text-white shadow-sm backdrop-blur-md transition-colors hover:bg-black/70 disabled:cursor-wait disabled:opacity-80"
+          : "inline-flex min-h-9 items-center gap-2 rounded-md border border-border bg-background px-3 text-xs text-muted-foreground transition-colors hover:text-foreground disabled:cursor-wait disabled:opacity-80"
+      }
       disabled={isPending}
       title={label}
       type="button"
@@ -65,26 +70,44 @@ export function ProjectLikeButton({ initialLikesCount, projectId }: ProjectLikeB
           <motion.span
             key={liked ? "liked" : "idle"}
             animate={{ opacity: 1, scale: 1 }}
-            className={liked ? "text-rose-500" : "text-muted-foreground"}
+            className={liked ? "text-rose-500" : compact ? "text-white" : "text-muted-foreground"}
             exit={{ opacity: 0, scale: 0.45 }}
             initial={{ opacity: 0, scale: liked ? 0.4 : 0.8 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
           >
-            {liked ? "♥" : "♡"}
+            <HeartIcon filled={liked} />
           </motion.span>
         </AnimatePresence>
       </span>
-      <span>{liked ? "Curtido" : "Curtir"}</span>
-      <motion.span
-        key={likesCount}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded bg-muted px-1.5 py-0.5"
-        initial={{ opacity: 0, y: liked ? -4 : 4 }}
-        transition={{ duration: 0.16 }}
-      >
-        {likesCount}
-      </motion.span>
+      {compact ? null : (
+        <>
+          <span>{liked ? "Curtido" : "Curtir"}</span>
+          <motion.span
+            key={likesCount}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded bg-muted px-1.5 py-0.5"
+            initial={{ opacity: 0, y: liked ? -4 : 4 }}
+            transition={{ duration: 0.16 }}
+          >
+            {likesCount}
+          </motion.span>
+        </>
+      )}
     </motion.button>
+  );
+}
+
+function HeartIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg aria-hidden="true" className="size-4" fill={filled ? "currentColor" : "none"} viewBox="0 0 24 24">
+      <path
+        d="M20.8 4.6c-1.7-1.6-4.4-1.6-6.1.1L12 7.4 9.3 4.7C7.6 3 4.9 3 3.2 4.6c-1.8 1.8-1.8 4.7 0 6.5L12 20l8.8-8.9c1.8-1.8 1.8-4.7 0-6.5Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
   );
 }
 

@@ -29,6 +29,7 @@ export async function getGitHubSnapshot(profileUrl: string): Promise<GitHubSnaps
     const profile = await profileResponse.json() as Record<string, unknown>;
     const repositories = await reposResponse.json() as Array<Record<string, unknown>>;
     const activity = await activityResponse.json() as Array<Record<string, unknown>>;
+    const contributions = await getContributions(username);
     const value: GitHubSnapshotDto = {
       username,
       avatarUrl: String(profile.avatar_url ?? ""),
@@ -48,18 +49,60 @@ export async function getGitHubSnapshot(profileUrl: string): Promise<GitHubSnaps
         topics: Array.isArray(repo.topics) ? repo.topics.map(String) : [],
         updatedAt: String(repo.updated_at ?? ""),
       })),
-      activity: activity.map((event) => ({
-        id: String(event.id ?? ""),
-        type: String(event.type ?? "Activity"),
-        repository: String((event.repo as Record<string, unknown> | undefined)?.name ?? ""),
-        createdAt: String(event.created_at ?? ""),
-      })),
+      activity: activity.map((event) => {
+        const payload = objectValue(event.payload);
+        const repo = objectValue(event.repo);
+        const pullRequest = objectValue(payload?.pull_request);
+        const issue = objectValue(payload?.issue);
+        const commits = Array.isArray(payload?.commits) ? payload.commits : [];
+        const repository = String(repo?.name ?? "");
+
+        return {
+          id: String(event.id ?? ""),
+          type: String(event.type ?? "Activity"),
+          repository,
+          createdAt: String(event.created_at ?? ""),
+          action: String(payload?.action ?? ""),
+          count: commits.length,
+          title: String(pullRequest?.title ?? issue?.title ?? payload?.ref ?? ""),
+          url: String(pullRequest?.html_url ?? issue?.html_url ?? (repository ? `https://github.com/${repository}` : "")),
+        };
+      }),
+      contributions: contributions.days,
+      contributionsTotal: contributions.total,
       cachedAt: new Date().toISOString(),
     };
     cache.set(username, { expiresAt: Date.now() + cacheTtlMs, value });
     return value;
   } catch {
     return cached?.value ?? null;
+  }
+}
+
+async function getContributions(username: string) {
+  try {
+    const response = await fetch(`https://github-contributions-api.jogruber.de/v4/${username}`);
+    if (!response.ok) return { days: [], total: 0 };
+
+    const data = await response.json() as {
+      contributions?: Array<{ count?: number; date?: string; level?: number }>;
+      total?: Record<string, number>;
+    };
+    const currentYear = String(new Date().getFullYear());
+    const days = (data.contributions ?? [])
+      .filter((item) => String(item.date ?? "").startsWith(currentYear))
+      .map((item) => ({
+        count: Number(item.count ?? 0),
+        date: String(item.date ?? ""),
+        level: Number(item.level ?? 0),
+      }));
+
+    return {
+      days,
+      total: Number(data.total?.[currentYear] ?? days.reduce((sum, item) => sum + item.count, 0)),
+    };
+  } catch {
+    return { days: [], total: 0 };
   }
 }
 
@@ -70,4 +113,10 @@ function getUsername(value: string) {
   } catch {
     return value.replace(/^@/, "").trim();
   }
+}
+
+function objectValue(value: unknown) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : undefined;
 }

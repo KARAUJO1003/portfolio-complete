@@ -37,6 +37,7 @@ Objetivo: permitir criar, revisar e publicar conteudo com clareza. Deve ser mais
 - `--surface`: superficie de cards e paineis.
 - `--surface-raised`: superficie elevada para headers, popovers e paineis destacados.
 - `--surface-muted`: superficie secundaria.
+- No modo claro, o fundo principal deve ser cinza frio sutil em vez de branco puro; cards e superficies podem permanecer mais claros para preservar hierarquia.
 
 ### Foreground
 
@@ -110,4 +111,11 @@ Padroes adicionados:
 - background em camadas com glows sutis e vinheta, sem grid decorativo dominante;
 - hover de cards e badges com acento visual controlado;
 - scroll-trigger reversivel com `MotionScrollReveal` e `MotionScrollStack` para dar mais profundidade aos projetos, skills e conteudos secundarios;
-- timeline em `MotionStickyStack`, com cards legiveis e empilhamento progressivo inspirado em referencias narrativas de scroll.
+- cards de projeto compactos, com acoes sobre o preview visual em vez de footer pesado;
+- timeline com trilho vertical, marcadores e cards editoriais;
+- tecnologias com badges visuais e logos de marca em componente local inspirado no padrao Elements;
+- logos de tecnologias com marca escura/clara devem ser adaptativos para manter contraste nos temas dark e light;
+- GitHub com contribution graph, cards enriquecidos e atividade recente no formato timeline inspirado no "Contribution activity" do GitHub, sem expor dados privados;
+- blocos de "ver mais" devem expandir/recolher com motion de altura, opacidade e rotacao do controle, respeitando `prefers-reduced-motion`;
+- cards principais com glow hover inspirado em Aceternity UI, sem copiar codigo externo;
+- fechamento de contato com CTA mais forte e visual menos generico.

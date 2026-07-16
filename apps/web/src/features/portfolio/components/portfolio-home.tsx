@@ -1,13 +1,18 @@
 import {
   MotionHoverCard,
+  MotionItem,
   MotionReveal,
   MotionScrollReveal,
   MotionScrollStack,
-  MotionStickyStack,
+  MotionStagger,
 } from "@/components/ds/motion";
+import { BrandLogo } from "@/components/ds/brand-logo";
+import { GitHubContributionGraph } from "@/components/ds/github-contribution-graph";
 import { RichText } from "@/components/ds/rich-text";
+import { ThemeToggle } from "@/components/ds/theme-toggle";
 import { PublicShell } from "@/components/layout/public-shell";
 import { resolveFileUrl } from "@/core/files/file-url";
+import { AnimatedDisclosure } from "@/features/portfolio/components/animated-disclosure";
 import { PortfolioFloatingMenu } from "@/features/portfolio/components/portfolio-floating-menu";
 import { ProjectLikeButton } from "@/features/portfolio/components/project-like-button";
 import type { ExperienceDto, ProjectDto, PublicPortfolioDto, SkillDto } from "@portfolio/contracts";
@@ -65,7 +70,7 @@ type PortfolioHomeProps = {
 };
 
 type PortfolioProject = Pick<ProjectDto, "title" | "summary" | "technologies"> &
-  Partial<Pick<ProjectDto, "id" | "coverPath" | "demoUrl" | "likesCount">>;
+  Partial<Pick<ProjectDto, "id" | "coverPath" | "demoUrl" | "likesCount" | "repoUrl">>;
 
 type PortfolioProfile = {
   name: string;
@@ -150,8 +155,8 @@ function PortfolioSidebar({ profile, sections }: { profile: PortfolioProfile; se
 
   return (
     <aside className="hidden lg:block">
-      <div className="sticky top-24 flex flex-col gap-10">
-        <MotionReveal className="flex flex-col gap-10" variant="slide-right">
+      <div className="sticky top-24 flex min-h-[calc(100dvh-7rem)] flex-col gap-10">
+        <MotionReveal className="flex min-h-[calc(100dvh-7rem)] flex-col gap-10" variant="slide-right">
           <section id="hero" className="flex flex-col gap-5">
             <div className="flex items-start gap-4">
               <img alt={profile.name} className="size-[76px] rounded-full border border-border bg-muted object-cover ring-4 ring-muted/40" src={profile.avatarUrl} />
@@ -170,7 +175,7 @@ function PortfolioSidebar({ profile, sections }: { profile: PortfolioProfile; se
 
           <SocialDock profile={profile} />
 
-          <nav aria-label="Navegacao principal" className="grid gap-3 text-muted-foreground">
+          <nav aria-label="Navegacao principal" className="mt-auto grid gap-3 text-muted-foreground">
             {navSections.map((section) => (
               <SidebarNavLink href={`#${sectionToAnchor(section)}`} key={section}>
                 {sectionToLabel(section)}
@@ -186,22 +191,23 @@ function PortfolioSidebar({ profile, sections }: { profile: PortfolioProfile; se
 function SocialDock({ profile }: { profile: PortfolioProfile }) {
   return (
     <div className="flex w-fit items-center gap-1.5 rounded-full border border-border bg-card/90 p-2 backdrop-blur-2xl">
-      <DockLink href={profile.github}>GH</DockLink>
-      <DockLink href={profile.linkedin}>IN</DockLink>
-      <DockLink href={profile.instagram}>IG</DockLink>
-      <DockLink href="/admin/resume-builder" internal>CV</DockLink>
+      <DockLink href={profile.github} label="GitHub"><GitHubIcon /></DockLink>
+      <DockLink href={profile.linkedin} label="LinkedIn"><LinkedInIcon /></DockLink>
+      <DockLink href={profile.instagram} label="Instagram"><InstagramIcon /></DockLink>
+      <DockLink href="/admin/resume-builder" internal label="Curriculo"><DocumentIcon /></DockLink>
+      <ThemeToggle className="border border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground" />
     </div>
   );
 }
 
-function DockLink({ children, href, internal }: { children: ReactNode; href: string; internal?: boolean }) {
+function DockLink({ children, href, internal, label }: { children: ReactNode; href: string; internal?: boolean; label: string }) {
   const className = "grid size-9 place-items-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
   if (internal) {
-    return <Link className={className} href={href}>{children}</Link>;
+    return <Link aria-label={label} className={className} href={href} title={label}>{children}</Link>;
   }
 
-  return <a className={className} href={href} rel="noreferrer" target="_blank">{children}</a>;
+  return <a aria-label={label} className={className} href={href} rel="noreferrer" target="_blank" title={label}>{children}</a>;
 }
 
 function MobileIntro({ profile }: { profile: PortfolioProfile }) {
@@ -230,23 +236,21 @@ function ProjectsSection({ projects }: { projects: PortfolioProject[] }) {
         description="Uma selecao curta dos projetos que melhor mostram produto, interface e engenharia fullstack."
         title="Projetos selecionados"
       />
-      <MotionScrollStack className="mt-8 grid gap-4 md:grid-cols-2" itemClassName="h-full" stagger={0.12} visibleWindow={0.34} y={46}>
+      <MotionStagger className="mt-8 grid gap-4 md:grid-cols-2">
         {visibleProjects.map((project, index) => (
-          <ProjectCard index={index} key={project.title} project={project} />
+          <MotionItem className="h-full" key={project.title}>
+            <ProjectCard index={index} project={project} />
+          </MotionItem>
         ))}
-      </MotionScrollStack>
+      </MotionStagger>
       {hiddenProjects.length ? (
-        <details className="group mt-4 overflow-hidden rounded-2xl border border-border bg-card/70">
-          <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-            Ver mais projetos
-            <span className="transition-transform group-open:rotate-45">+</span>
-          </summary>
+        <AnimatedDisclosure className="mt-4 overflow-hidden rounded-2xl border border-border bg-card/70" label="Ver mais projetos">
           <div className="grid gap-px border-t border-border bg-border">
             {hiddenProjects.map((project, index) => (
               <ProjectRow index={visibleProjects.length + index} key={project.title} project={project} />
             ))}
           </div>
-        </details>
+        </AnimatedDisclosure>
       ) : null}
     </section>
   );
@@ -257,15 +261,30 @@ function ProjectCard({ index, project }: { index: number; project: PortfolioProj
 
   return (
     <MotionHoverCard className="h-full">
-      <article className="group h-full overflow-hidden rounded-2xl border border-border bg-card/80 transition-colors hover:border-primary-accent/40">
+      <article className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card/80 transition-colors before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_0%,rgba(143,183,255,0.16),transparent_42%)] before:opacity-0 before:transition-opacity hover:border-primary-accent/40 hover:before:opacity-100">
+        <div className="relative">
+          <ProjectVisual coverPath={project.coverPath} index={index} title={project.title} />
+          <div className="absolute right-3 top-3 flex items-center gap-2">
+            {project.demoUrl ? (
+              <ProjectActionButton href={project.demoUrl} label="Abrir deploy">
+                <ExternalIcon />
+              </ProjectActionButton>
+            ) : null}
+            {project.repoUrl ? (
+              <ProjectActionButton href={project.repoUrl} label="Abrir repositorio">
+                <CodeIcon />
+              </ProjectActionButton>
+            ) : null}
+            {project.id ? <ProjectLikeButton compact initialLikesCount={project.likesCount ?? 0} projectId={project.id} /> : null}
+          </div>
+        </div>
         <Link
           className="block"
           href={project.demoUrl || "#contato"}
           rel={isExternal ? "noreferrer" : undefined}
           target={isExternal ? "_blank" : undefined}
         >
-          <ProjectVisual coverPath={project.coverPath} index={index} title={project.title} />
-          <div className="flex flex-col gap-4 p-5">
+          <div className="flex flex-col gap-4 p-5 transition-colors hover:bg-surface-raised/45">
             <div className="flex items-center justify-between gap-3">
               <TechPill>{project.technologies[0] || "projeto"}</TechPill>
               <span className="text-[11px] text-foreground-subtle">0{index + 1}</span>
@@ -276,12 +295,23 @@ function ProjectCard({ index, project }: { index: number; project: PortfolioProj
             </div>
           </div>
         </Link>
-        <div className="flex items-center justify-between gap-3 border-t border-border px-5 py-4">
-          <ProjectLink project={project} />
-          {project.id ? <ProjectLikeButton initialLikesCount={project.likesCount ?? 0} projectId={project.id} /> : null}
-        </div>
       </article>
     </MotionHoverCard>
+  );
+}
+
+function ProjectActionButton({ children, href, label }: { children: ReactNode; href: string; label: string }) {
+  return (
+    <a
+      aria-label={label}
+      className="grid size-9 place-items-center rounded-full border border-white/10 bg-black/45 text-white shadow-sm backdrop-blur-md transition-colors hover:bg-black/70"
+      href={href}
+      rel="noreferrer"
+      target="_blank"
+      title={label}
+    >
+      {children}
+    </a>
   );
 }
 
@@ -339,38 +369,52 @@ function TimelineSection({ experiences }: { experiences: ExperienceDto[] }) {
 
 function TimelineList({ experiences, startIndex = 0 }: { experiences: ExperienceDto[]; startIndex?: number }) {
   return (
-    <MotionStickyStack className="grid gap-5" itemClassName="rounded-2xl border border-border bg-card/95 p-5 shadow-[0_10px_28px_rgba(0,0,0,0.18)] backdrop-blur-sm" topOffset="104px">
-      {experiences.map((experience, index) => (
-        <article className="grid gap-4 md:grid-cols-[120px_minmax(0,1fr)]" key={experience.id}>
-          <div className="flex items-start justify-between gap-3 md:block">
-            <span className="font-mono text-xs text-foreground-subtle">0{startIndex + index + 1}</span>
-            <time className="text-xs text-foreground-subtle" dateTime={experience.startDate || undefined}>
-              {experience.startDate ? formatDate(experience.startDate) : "Marco"}
-            </time>
-          </div>
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-primary-accent">{experience.type}</p>
-            <h3 className="mt-2 text-lg font-semibold tracking-[-0.02em]">{experience.title}</h3>
+    <div className="relative">
+      <div aria-hidden="true" className="absolute bottom-6 left-[18px] top-6 w-px bg-gradient-to-b from-transparent via-primary-accent/45 to-transparent" />
+      <MotionScrollStack className="grid gap-5" itemClassName="relative pl-12" stagger={0.08} visibleWindow={0.36} y={34}>
+        {experiences.map((experience, index) => (
+          <article className="group relative overflow-hidden rounded-2xl border border-border bg-card/90 p-5 transition-colors before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_20%_0%,rgba(143,183,255,0.14),transparent_38%)] before:opacity-0 before:transition-opacity hover:border-primary-accent/35 hover:before:opacity-100" key={experience.id}>
+            <span className="absolute -left-[39px] top-6 grid size-9 place-items-center rounded-full border border-primary-accent/30 bg-background text-[10px] font-semibold text-primary-accent shadow-[0_0_0_8px_var(--background)]">
+              {startIndex + index + 1}
+            </span>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="rounded-full border border-primary-accent/20 bg-primary-accent/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-primary-accent">
+                {formatExperienceType(experience.type)}
+              </span>
+              <time className="font-mono text-xs text-foreground-subtle" dateTime={experience.startDate || undefined}>
+                {experience.startDate ? formatDate(experience.startDate) : "Marco"}
+              </time>
+            </div>
+            <h3 className="mt-4 text-lg font-semibold tracking-[-0.02em]">{experience.title}</h3>
             <p className="mt-1 text-sm text-muted-foreground">{experience.organization}</p>
-            {experience.description ? <p className="mt-3 text-pretty text-sm leading-7 text-muted-foreground">{experience.description}</p> : null}
-          </div>
-        </article>
-      ))}
-    </MotionStickyStack>
+            {experience.description ? <p className="mt-4 text-pretty text-sm leading-7 text-muted-foreground">{experience.description}</p> : null}
+          </article>
+        ))}
+      </MotionScrollStack>
+    </div>
   );
 }
 
 function SkillsSection({ skills }: { skills: Array<Pick<SkillDto, "title" | "startedAt" | "description">> }) {
   return (
     <PortfolioSection id="habilidades" title="Tecnologias">
-      <MotionScrollStack className="mt-6 flex flex-wrap gap-2" stagger={0.045} visibleWindow={0.24} y={22}>
+      <MotionStagger className="mt-6 flex flex-wrap gap-2.5">
         {skills.slice(0, 18).map((skill) => (
-          <span className="inline-flex rounded-full border border-border bg-card/80 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary-accent/50 hover:text-foreground" key={skill.title} title={skill.description}>
-            {skill.title}
-          </span>
+          <MotionItem key={skill.title}>
+            <SkillBadge skill={skill} />
+          </MotionItem>
         ))}
-      </MotionScrollStack>
+      </MotionStagger>
     </PortfolioSection>
+  );
+}
+
+function SkillBadge({ skill }: { skill: Pick<SkillDto, "title" | "description"> }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary-accent/50 hover:text-foreground" title={skill.description}>
+      <BrandLogo name={skill.title} />
+      {skill.title}
+    </span>
   );
 }
 
@@ -390,15 +434,114 @@ function GitHubSection({ github }: { github: NonNullable<PublicPortfolioDto["git
         <span>{github.followers} seguidores</span>
         <a className="text-foreground hover:text-primary-accent" href={github.profileUrl} rel="noreferrer" target="_blank">@{github.username}</a>
       </div>
+      <GitHubContributionGraph className="mt-6" contributions={github.contributions ?? []} total={github.contributionsTotal ?? 0} username={github.username} />
       <MotionScrollStack className="mt-6 grid gap-3 md:grid-cols-2" itemClassName="h-full" stagger={0.1} visibleWindow={0.3} y={36}>
         {github.repositories.slice(0, 4).map((repository) => (
-          <a className="block h-full rounded-2xl border border-border bg-card/80 p-4 transition-colors hover:border-primary-accent/40" href={repository.url} key={repository.id} rel="noreferrer" target="_blank">
-            <span className="text-sm font-medium">{repository.name}</span>
+          <a className="relative block h-full overflow-hidden rounded-2xl border border-border bg-card/80 p-4 transition-colors before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_15%_0%,rgba(143,183,255,0.13),transparent_44%)] before:opacity-0 before:transition-opacity hover:border-primary-accent/40 hover:bg-surface-raised/55 hover:before:opacity-100" href={repository.url} key={repository.id} rel="noreferrer" target="_blank">
+            <span className="flex items-start justify-between gap-3">
+              <span className="text-sm font-medium">{repository.name}</span>
+              <span className="text-xs text-primary-accent">-&gt;</span>
+            </span>
             <p className="mt-2 max-h-12 overflow-hidden text-xs leading-6 text-muted-foreground">{repository.description || "Repositorio publico no GitHub."}</p>
+            <span className="mt-4 flex flex-wrap gap-3 text-[11px] text-foreground-subtle">
+              {repository.language ? <span>{repository.language}</span> : null}
+              <span>{repository.stars} estrelas</span>
+              <span>{repository.forks} forks</span>
+            </span>
           </a>
         ))}
       </MotionScrollStack>
+      <GitHubActivityTimeline activity={github.activity} />
     </PortfolioSection>
+  );
+}
+
+type GitHubActivityItem = NonNullable<PublicPortfolioDto["github"]>["activity"][number];
+
+function GitHubActivityTimeline({ activity }: { activity: GitHubActivityItem[] }) {
+  const visibleActivity = activity.slice(0, 6);
+  if (!visibleActivity.length) return null;
+
+  const groups = visibleActivity.reduce<Array<{ label: string; items: GitHubActivityItem[] }>>((acc, item) => {
+    const label = formatGitHubMonth(item.createdAt);
+    const current = acc.find((group) => group.label === label);
+
+    if (current) current.items.push(item);
+    else acc.push({ label, items: [item] });
+
+    return acc;
+  }, []);
+
+  return (
+    <div className="mt-10">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="text-sm font-semibold tracking-[-0.01em]">Atividade recente</h3>
+        <span className="text-xs text-foreground-subtle">Eventos publicos</span>
+      </div>
+      <div className="mt-5 space-y-8">
+        {groups.map((group) => (
+          <div key={group.label}>
+            <div className="mb-5 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4">
+              <p className="text-xs font-medium text-foreground-muted">{group.label}</p>
+              <span className="h-px bg-border" />
+            </div>
+            <div className="relative pl-11">
+              <span className="absolute bottom-0 left-[15px] top-2 w-px bg-border" />
+              <div className="space-y-7">
+                {group.items.map((item) => (
+                  <GitHubActivityRow activity={item} key={item.id} />
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function GitHubActivityRow({ activity }: { activity: GitHubActivityItem }) {
+  const summary = getActivitySummary(activity);
+  const repoUrl = activity.url || (activity.repository ? `https://github.com/${activity.repository}` : "");
+  const count = Number(activity.count ?? 0);
+
+  return (
+    <div className="relative">
+      <span className="absolute -left-11 top-0 flex size-8 items-center justify-center rounded-full border border-border bg-surface-raised text-foreground-muted shadow-[0_0_0_6px_var(--background)]">
+        <ActivityIcon type={activity.type} />
+      </span>
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold leading-6 text-foreground">
+            {summary}{" "}
+            {activity.repository ? (
+              <a className="underline decoration-border underline-offset-4 transition-colors hover:text-primary-accent" href={repoUrl} rel="noreferrer" target="_blank">
+                {activity.repository}
+              </a>
+            ) : null}
+          </p>
+          {activity.title ? (
+            <a className="mt-3 block rounded-xl border border-border bg-card/75 p-4 transition-colors hover:border-primary-accent/40 hover:bg-surface-raised/60" href={repoUrl} rel="noreferrer" target="_blank">
+              <span className="flex items-start gap-3">
+                <span className="mt-0.5 text-primary-accent"><ActivityIcon type={activity.type} /></span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold leading-6 text-foreground">{activity.title}</span>
+                  <span className="mt-1 block text-xs leading-5 text-foreground-subtle">{formatActivityType(activity.type)} publico no GitHub.</span>
+                </span>
+              </span>
+            </a>
+          ) : null}
+        </div>
+        <div className="flex items-center gap-3 text-xs text-foreground-subtle">
+          {activity.type === "PushEvent" && count > 0 ? (
+            <span className="hidden h-2 w-24 overflow-hidden rounded-full bg-muted sm:block">
+              <span className="block h-full rounded-full bg-success" style={{ width: `${Math.min(100, Math.max(18, count * 18))}%` }} />
+            </span>
+          ) : null}
+          <span>{formatShortDate(activity.createdAt)}</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -423,8 +566,11 @@ function PagesSection({ pages }: { pages: NonNullable<PublicPortfolioDto["naviga
     <PortfolioSection id="pages" title="Paginas">
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {pages.slice(0, 4).map((page) => (
-          <Link className="rounded-2xl border border-border bg-card/80 p-4 text-sm transition-colors hover:border-primary-accent/40" href={`/p/${page.slug}`} key={page.id}>
-            {page.title}
+          <Link className="group rounded-2xl border border-border bg-card/80 p-4 text-sm transition-colors hover:border-primary-accent/40 hover:bg-surface-raised/55" href={`/p/${page.slug}`} key={page.id}>
+            <span className="flex items-center justify-between gap-3">
+              <span>{page.title}</span>
+              <span className="text-muted-foreground transition-transform group-hover:translate-x-1">-&gt;</span>
+            </span>
           </Link>
         ))}
       </div>
@@ -435,17 +581,31 @@ function PagesSection({ pages }: { pages: NonNullable<PublicPortfolioDto["naviga
 function ContactSection({ profile }: { profile: PortfolioProfile }) {
   return (
     <section className="scroll-mt-16 py-16" id="contato">
-      <MotionReveal className="rounded-2xl border border-border bg-card/80 p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em]">Vamos conversar</h2>
-        <p className="mt-3 max-w-xl text-sm leading-7 text-muted-foreground">
-          Estou aberto a conversar sobre projetos, oportunidades e produtos web que precisem de uma boa experiencia.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <a className="text-sm font-medium hover:text-primary-accent" href={profile.linkedin} rel="noreferrer" target="_blank">LinkedIn</a>
-          <a className="text-sm font-medium hover:text-primary-accent" href={profile.github} rel="noreferrer" target="_blank">GitHub</a>
+      <MotionReveal className="relative overflow-hidden rounded-2xl border border-border bg-card/85 p-7">
+        <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-accent/70 to-transparent" />
+        <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+          <div>
+            <p className="text-sm text-primary-accent">Disponivel para projetos e oportunidades</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.035em]">Vamos conversar</h2>
+            <p className="mt-4 max-w-xl text-pretty text-sm leading-7 text-muted-foreground">
+              Se voce esta construindo um produto web, precisa evoluir uma interface ou quer conversar sobre uma vaga fullstack, meus canais principais estao aqui.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <ContactButton href={profile.linkedin}><LinkedInIcon /> LinkedIn</ContactButton>
+            <ContactButton href={profile.github}><GitHubIcon /> GitHub</ContactButton>
+          </div>
         </div>
       </MotionReveal>
     </section>
+  );
+}
+
+function ContactButton({ children, href }: { children: ReactNode; href: string }) {
+  return (
+    <a className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-background px-4 text-sm font-medium transition-colors hover:border-primary-accent/50 hover:text-primary-accent" href={href} rel="noreferrer" target="_blank">
+      {children}
+    </a>
   );
 }
 
@@ -479,25 +639,10 @@ function ProjectVisual({ coverPath, index, title }: { coverPath?: string; index:
   return (
     <div className="flex aspect-[1.45] items-center justify-center bg-[linear-gradient(135deg,#0b0f17,#111827_52%,#151923)] p-6">
       <div className="flex aspect-video w-full max-w-xs flex-col justify-between rounded-xl border border-white/10 bg-black/30 p-4">
-        <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">case 0{index + 1}</span>
+        <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">projeto 0{index + 1}</span>
         <span className="text-lg font-semibold tracking-[-0.03em] text-white">{title}</span>
       </div>
     </div>
-  );
-}
-
-function ProjectLink({ project }: { project: PortfolioProject }) {
-  const isExternal = Boolean(project.demoUrl);
-
-  return (
-    <Link
-      className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary-accent"
-      href={project.demoUrl || "#contato"}
-      rel={isExternal ? "noreferrer" : undefined}
-      target={isExternal ? "_blank" : undefined}
-    >
-      Ver projeto <span aria-hidden="true">-&gt;</span>
-    </Link>
   );
 }
 
@@ -514,13 +659,102 @@ function SidebarNavLink({ children, href }: { children: ReactNode; href: string 
   );
 }
 
-function LogoMark() {
+function GitHubIcon() {
   return (
-    <svg aria-hidden="true" className="size-6 text-foreground" fill="none" viewBox="0 0 37 32">
-      <path
-        className="fill-current"
-        d="M14.7266 0.590907L6.28906 31.9375H0.306108L8.74361 0.590907H14.7266ZM17.9034 20.4318V14.2955L36.9261 6.67614V13.1193L24.8068 17.3125L25.0114 17.0057V17.7216L24.8068 17.4148L36.9261 21.608V28.0511L17.9034 20.4318Z"
-      />
+    <svg aria-hidden="true" className="size-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 0 1.6 1.1 1.6 1.1.9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.7-1.3-2.2-.2-4.5-1.1-4.5-4.9 0-1.1.4-2 1.1-2.7-.1-.3-.5-1.3.1-2.7 0 0 .9-.3 2.8 1.1A9.5 9.5 0 0 1 12 6c.9 0 1.7.1 2.5.3 1.9-1.4 2.8-1.1 2.8-1.1.6 1.4.2 2.4.1 2.7.7.7 1.1 1.6 1.1 2.7 0 3.8-2.3 4.7-4.5 4.9.4.3.7.9.7 1.8V21c0 .3.2.6.7.5A10 10 0 0 0 12 2Z" />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M6.8 8.8H3.7V20h3.1V8.8ZM5.2 4C4.2 4 3.5 4.7 3.5 5.6s.7 1.6 1.7 1.6 1.7-.7 1.7-1.6S6.2 4 5.2 4Zm15.3 9.6c0-3.2-1.7-5.1-4.3-5.1-1.7 0-2.7.9-3.2 1.8V8.8H9.9V20H13v-6.1c0-1.6.9-2.6 2.2-2.6 1.2 0 2 .8 2 2.5V20h3.3v-6.4Z" />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <rect height="15" rx="4" stroke="currentColor" strokeWidth="1.8" width="15" x="4.5" y="4.5" />
+      <circle cx="12" cy="12" r="3.2" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="16.6" cy="7.4" fill="currentColor" r="1" />
+    </svg>
+  );
+}
+
+function DocumentIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="M7 3h7l4 4v14H7V3Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.8" />
+      <path d="M14 3v5h4M9.5 12h5M9.5 15h5M9.5 18h3" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function ExternalIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="M8 16 16 8M10 8h6v6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function CodeIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="m8.5 9-3 3 3 3M15.5 9l3 3-3 3M13 7l-2 10" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function ActivityIcon({ type }: { type: string }) {
+  if (type === "PullRequestEvent") return <PullRequestIcon />;
+  if (type === "CreateEvent" || type === "ReleaseEvent") return <RepositoryIcon />;
+  if (type === "IssuesEvent" || type === "IssueCommentEvent") return <MessageIcon />;
+  if (type === "WatchEvent") return <StarIcon />;
+
+  return <CommitIcon />;
+}
+
+function CommitIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="M7 12h10M7 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm16 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function PullRequestIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="M7 6a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5 8v8a2 2 0 1 0 2 2M17 6h2a2 2 0 0 1 2 2v4M17 6l3-3m-3 3 3 3M19 16a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function RepositoryIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="M6 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Zm1 14h12M8 7h7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function MessageIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="M5 5h14v10H9l-4 4V5Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function StarIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path d="m12 3 2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7L6.8 19l1-5.8-4.2-4.1 5.8-.8L12 3Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
     </svg>
   );
 }
@@ -549,6 +783,77 @@ function sectionToLabel(section: string) {
   };
 
   return labels[section] ?? section;
+}
+
+function formatExperienceType(value: string) {
+  const labels: Record<string, string> = {
+    certification: "Certificacao",
+    education: "Formacao",
+    experience: "Experiencia",
+    link: "Marco",
+  };
+
+  return labels[value.toLowerCase()] ?? value;
+}
+
+function formatActivityType(value: string) {
+  const labels: Record<string, string> = {
+    CreateEvent: "Criacao",
+    DeleteEvent: "Remocao",
+    ForkEvent: "Fork",
+    IssueCommentEvent: "Comentario",
+    IssuesEvent: "Issue",
+    PullRequestEvent: "Pull request",
+    PushEvent: "Commit",
+    ReleaseEvent: "Release",
+    WatchEvent: "Star",
+  };
+
+  return labels[value] ?? "Atividade";
+}
+
+function getActivitySummary(activity: GitHubActivityItem) {
+  const action = activity.action ? activity.action.toLowerCase() : "";
+  const count = Number(activity.count ?? 0);
+
+  if (activity.type === "PushEvent") {
+    const commits = count > 1 ? "commits" : "commit";
+    return `Criou ${Math.max(count, 1)} ${commits} em`;
+  }
+
+  if (activity.type === "CreateEvent") return "Criou item publico em";
+  if (activity.type === "ReleaseEvent") return "Publicou release em";
+  if (activity.type === "WatchEvent") return "Marcou com estrela";
+  if (activity.type === "IssueCommentEvent") return "Comentou uma issue em";
+
+  if (activity.type === "PullRequestEvent") {
+    if (action === "closed") return "Fechou pull request em";
+    if (action === "reopened") return "Reabriu pull request em";
+    return "Abriu pull request em";
+  }
+
+  if (activity.type === "IssuesEvent") {
+    if (action === "closed") return "Fechou issue em";
+    if (action === "reopened") return "Reabriu issue em";
+    return "Atualizou issue em";
+  }
+
+  return `${formatActivityType(activity.type)} em`;
+}
+
+function formatGitHubMonth(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Atividades recentes";
+
+  const label = date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+function formatShortDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", "");
 }
 
 function normalizeHeadline(value: string) {

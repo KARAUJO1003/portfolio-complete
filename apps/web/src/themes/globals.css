@@ -59,8 +59,8 @@
 
 .light {
   color-scheme: light;
-  --background: #ffffff;
-  --background-subtle: #f8fafc;
+  --background: #f4f4f5;
+  --background-subtle: #eceff3;
   --foreground: #09090b;
   --foreground-muted: #52525b;
   --foreground-subtle: #71717a;
@@ -202,4 +202,12 @@ body {
 
 .text-danger {
   color: var(--danger);
+}
+
+.brand-logo-adaptive {
+  filter: invert(1);
+}
+
+.light .brand-logo-adaptive {
+  filter: none;
 }
