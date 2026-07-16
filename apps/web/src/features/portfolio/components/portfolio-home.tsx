@@ -1,8 +1,9 @@
 import {
   MotionHoverCard,
-  MotionItem,
   MotionReveal,
-  MotionStagger,
+  MotionScrollReveal,
+  MotionScrollStack,
+  MotionStickyStack,
 } from "@/components/ds/motion";
 import { RichText } from "@/components/ds/rich-text";
 import { PublicShell } from "@/components/layout/public-shell";
@@ -11,10 +12,11 @@ import { PortfolioFloatingMenu } from "@/features/portfolio/components/portfolio
 import { ProjectLikeButton } from "@/features/portfolio/components/project-like-button";
 import type { ExperienceDto, ProjectDto, PublicPortfolioDto, SkillDto } from "@portfolio/contracts";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 const fallbackProfile = {
   name: "Kaesyo Felix",
-  headline: "software developer",
+  headline: "Desenvolvedor de software",
   summary:
     "Desenvolvedor fullstack focado em interfaces modernas, produtos web e sistemas integrados com boa experiencia de uso.",
   about:
@@ -85,7 +87,7 @@ export function PortfolioHome({ portfolio }: PortfolioHomeProps) {
   const projects = hasPublishedVersion ? portfolio?.projects ?? [] : portfolio?.projects?.length ? portfolio.projects : fallbackProjects;
   const portfolioProfile: PortfolioProfile = {
     name: profile?.name || fallbackProfile.name,
-    headline: profile?.headline || fallbackProfile.headline,
+    headline: normalizeHeadline(profile?.headline || fallbackProfile.headline),
     summary: profile?.summary || fallbackProfile.summary,
     about: profile?.objective || profile?.summary || fallbackProfile.about,
     github: profile?.github || fallbackProfile.github,
@@ -162,7 +164,7 @@ function PortfolioSidebar({ profile, sections }: { profile: PortfolioProfile; se
           </section>
 
           <section className="flex flex-col gap-3">
-            <h2 className="text-base font-semibold tracking-[-0.02em]">About</h2>
+            <h2 className="text-base font-semibold tracking-[-0.02em]">Sobre</h2>
             <p className="max-w-[270px] text-pretty text-sm leading-7 text-muted-foreground">{profile.about}</p>
           </section>
 
@@ -192,7 +194,7 @@ function SocialDock({ profile }: { profile: PortfolioProfile }) {
   );
 }
 
-function DockLink({ children, href, internal }: { children: React.ReactNode; href: string; internal?: boolean }) {
+function DockLink({ children, href, internal }: { children: ReactNode; href: string; internal?: boolean }) {
   const className = "grid size-9 place-items-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
   if (internal) {
@@ -208,7 +210,7 @@ function MobileIntro({ profile }: { profile: PortfolioProfile }) {
       <div className="flex items-center gap-4">
         <img alt={profile.name} className="size-[76px] rounded-full border border-border bg-muted object-cover ring-4 ring-muted/40" src={profile.avatarUrl} />
         <div>
-          <h1 className="text-xl font-semibold tracking-[-0.03em]">Hi, sou {profile.name}</h1>
+          <h1 className="text-xl font-semibold tracking-[-0.03em]">Ola, sou {profile.name}</h1>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">{profile.headline}</p>
         </div>
       </div>
@@ -228,13 +230,11 @@ function ProjectsSection({ projects }: { projects: PortfolioProject[] }) {
         description="Uma selecao curta dos projetos que melhor mostram produto, interface e engenharia fullstack."
         title="Projetos selecionados"
       />
-      <MotionStagger className="mt-8 grid gap-4 md:grid-cols-2">
+      <MotionScrollStack className="mt-8 grid gap-4 md:grid-cols-2" itemClassName="h-full" stagger={0.12} visibleWindow={0.34} y={46}>
         {visibleProjects.map((project, index) => (
-          <MotionItem key={project.title}>
-            <ProjectCard index={index} project={project} />
-          </MotionItem>
+          <ProjectCard index={index} key={project.title} project={project} />
         ))}
-      </MotionStagger>
+      </MotionScrollStack>
       {hiddenProjects.length ? (
         <details className="group mt-4 overflow-hidden rounded-2xl border border-border bg-card/70">
           <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
@@ -267,7 +267,7 @@ function ProjectCard({ index, project }: { index: number; project: PortfolioProj
           <ProjectVisual coverPath={project.coverPath} index={index} title={project.title} />
           <div className="flex flex-col gap-4 p-5">
             <div className="flex items-center justify-between gap-3">
-              <TechPill>{project.technologies[0] || "case study"}</TechPill>
+              <TechPill>{project.technologies[0] || "projeto"}</TechPill>
               <span className="text-[11px] text-foreground-subtle">0{index + 1}</span>
             </div>
             <div>
@@ -318,7 +318,7 @@ function TimelineSection({ experiences }: { experiences: ExperienceDto[] }) {
     <section className="scroll-mt-16 py-16" id="timeline">
       <SectionIntro
         description="Uma linha do tempo curta com experiencias, estudos e marcos que ajudam a explicar minha evolucao profissional."
-        title="The journey so far"
+        title="Trajetoria"
       />
       <div className="mt-8">
         <TimelineList experiences={visible} />
@@ -339,45 +339,44 @@ function TimelineSection({ experiences }: { experiences: ExperienceDto[] }) {
 
 function TimelineList({ experiences, startIndex = 0 }: { experiences: ExperienceDto[]; startIndex?: number }) {
   return (
-    <div className="grid gap-8">
+    <MotionStickyStack className="grid gap-5" itemClassName="rounded-2xl border border-border bg-card/95 p-5 shadow-[0_10px_28px_rgba(0,0,0,0.18)] backdrop-blur-sm" topOffset="104px">
       {experiences.map((experience, index) => (
-        <MotionReveal className="grid gap-3 border-l border-border pl-5 md:grid-cols-[150px_minmax(0,1fr)] md:pl-6" key={experience.id}>
-          <time className="text-xs text-foreground-subtle" dateTime={experience.startDate || undefined}>
-            {experience.startDate ? formatDate(experience.startDate) : `Item ${startIndex + index + 1}`}
-          </time>
-          <article>
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-primary-accent">{experience.type}</p>
+        <article className="grid gap-4 md:grid-cols-[120px_minmax(0,1fr)]" key={experience.id}>
+          <div className="flex items-start justify-between gap-3 md:block">
+            <span className="font-mono text-xs text-foreground-subtle">0{startIndex + index + 1}</span>
+            <time className="text-xs text-foreground-subtle" dateTime={experience.startDate || undefined}>
+              {experience.startDate ? formatDate(experience.startDate) : "Marco"}
+            </time>
+          </div>
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-primary-accent">{experience.type}</p>
             <h3 className="mt-2 text-lg font-semibold tracking-[-0.02em]">{experience.title}</h3>
             <p className="mt-1 text-sm text-muted-foreground">{experience.organization}</p>
-            {experience.description ? (
-              <p className="mt-3 text-pretty text-sm leading-7 text-muted-foreground">{experience.description}</p>
-            ) : null}
-          </article>
-        </MotionReveal>
+            {experience.description ? <p className="mt-3 text-pretty text-sm leading-7 text-muted-foreground">{experience.description}</p> : null}
+          </div>
+        </article>
       ))}
-    </div>
+    </MotionStickyStack>
   );
 }
 
 function SkillsSection({ skills }: { skills: Array<Pick<SkillDto, "title" | "startedAt" | "description">> }) {
   return (
-    <PortfolioSection id="habilidades" title="Skills">
-      <MotionStagger className="mt-6 flex flex-wrap gap-2">
+    <PortfolioSection id="habilidades" title="Tecnologias">
+      <MotionScrollStack className="mt-6 flex flex-wrap gap-2" stagger={0.045} visibleWindow={0.24} y={22}>
         {skills.slice(0, 18).map((skill) => (
-          <MotionItem key={skill.title}>
-            <span className="inline-flex rounded-full border border-border bg-card/80 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary-accent/50 hover:text-foreground" title={skill.description}>
-              {skill.title}
-            </span>
-          </MotionItem>
+          <span className="inline-flex rounded-full border border-border bg-card/80 px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary-accent/50 hover:text-foreground" key={skill.title} title={skill.description}>
+            {skill.title}
+          </span>
         ))}
-      </MotionStagger>
+      </MotionScrollStack>
     </PortfolioSection>
   );
 }
 
 function AboutSection({ profile }: { profile: PortfolioProfile }) {
   return (
-    <PortfolioSection id="sobre" title="About">
+    <PortfolioSection id="sobre" title="Sobre">
       <p className="mt-5 max-w-2xl text-pretty text-sm leading-7 text-muted-foreground">{profile.about}</p>
     </PortfolioSection>
   );
@@ -391,14 +390,14 @@ function GitHubSection({ github }: { github: NonNullable<PublicPortfolioDto["git
         <span>{github.followers} seguidores</span>
         <a className="text-foreground hover:text-primary-accent" href={github.profileUrl} rel="noreferrer" target="_blank">@{github.username}</a>
       </div>
-      <div className="mt-6 grid gap-3 md:grid-cols-2">
+      <MotionScrollStack className="mt-6 grid gap-3 md:grid-cols-2" itemClassName="h-full" stagger={0.1} visibleWindow={0.3} y={36}>
         {github.repositories.slice(0, 4).map((repository) => (
-          <a className="rounded-2xl border border-border bg-card/80 p-4 transition-colors hover:border-primary-accent/40" href={repository.url} key={repository.id} rel="noreferrer" target="_blank">
+          <a className="block h-full rounded-2xl border border-border bg-card/80 p-4 transition-colors hover:border-primary-accent/40" href={repository.url} key={repository.id} rel="noreferrer" target="_blank">
             <span className="text-sm font-medium">{repository.name}</span>
             <p className="mt-2 max-h-12 overflow-hidden text-xs leading-6 text-muted-foreground">{repository.description || "Repositorio publico no GitHub."}</p>
           </a>
         ))}
-      </div>
+      </MotionScrollStack>
     </PortfolioSection>
   );
 }
@@ -437,7 +436,7 @@ function ContactSection({ profile }: { profile: PortfolioProfile }) {
   return (
     <section className="scroll-mt-16 py-16" id="contato">
       <MotionReveal className="rounded-2xl border border-border bg-card/80 p-6">
-        <h2 className="text-2xl font-semibold tracking-[-0.03em]">Get in touch</h2>
+        <h2 className="text-2xl font-semibold tracking-[-0.03em]">Vamos conversar</h2>
         <p className="mt-3 max-w-xl text-sm leading-7 text-muted-foreground">
           Estou aberto a conversar sobre projetos, oportunidades e produtos web que precisem de uma boa experiencia.
         </p>
@@ -450,12 +449,12 @@ function ContactSection({ profile }: { profile: PortfolioProfile }) {
   );
 }
 
-function PortfolioSection({ children, id, title }: { children: React.ReactNode; id: string; title: string }) {
+function PortfolioSection({ children, id, title }: { children: ReactNode; id: string; title: string }) {
   return (
     <section className="scroll-mt-16 py-12" id={id}>
-      <MotionReveal>
+      <MotionScrollReveal>
         <h2 className="text-xl font-bold tracking-[-0.03em]">{title}</h2>
-      </MotionReveal>
+      </MotionScrollReveal>
       {children}
     </section>
   );
@@ -463,10 +462,10 @@ function PortfolioSection({ children, id, title }: { children: React.ReactNode; 
 
 function SectionIntro({ description, title }: { description: string; title: string }) {
   return (
-    <MotionReveal className="flex flex-col gap-3">
+    <MotionScrollReveal className="flex flex-col gap-3" y={52}>
       <h2 className="text-2xl font-bold tracking-[-0.035em] sm:text-3xl">{title}</h2>
       <p className="max-w-2xl text-pretty text-sm leading-7 text-muted-foreground">{description}</p>
-    </MotionReveal>
+    </MotionScrollReveal>
   );
 }
 
@@ -502,11 +501,11 @@ function ProjectLink({ project }: { project: PortfolioProject }) {
   );
 }
 
-function TechPill({ children }: { children: React.ReactNode }) {
+function TechPill({ children }: { children: ReactNode }) {
   return <span className="rounded-md border border-primary-accent/25 bg-primary-accent/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-primary-accent">{children}</span>;
 }
 
-function SidebarNavLink({ children, href }: { children: React.ReactNode; href: string }) {
+function SidebarNavLink({ children, href }: { children: ReactNode; href: string }) {
   return (
     <Link className="group flex items-center gap-3 text-xs font-medium transition-colors hover:text-foreground" href={href}>
       <span className="h-px w-8 bg-border transition-all duration-200 group-hover:w-12 group-hover:bg-foreground" />
@@ -542,14 +541,23 @@ function sectionToAnchor(section: string) {
 function sectionToLabel(section: string) {
   const labels: Record<string, string> = {
     about: "Sobre",
-    skills: "Skills",
+    skills: "Tecnologias",
     projects: "Projetos",
-    experiences: "Timeline",
+    experiences: "Trajetoria",
     github: "GitHub",
     contact: "Contato",
   };
 
   return labels[section] ?? section;
+}
+
+function normalizeHeadline(value: string) {
+  const normalized = value.trim().toLowerCase();
+
+  if (normalized === "software developer") return "Desenvolvedor de software";
+  if (normalized === "fullstack developer" || normalized === "full stack developer") return "Desenvolvedor fullstack";
+
+  return value;
 }
 
 function formatDate(value: string) {

@@ -57,7 +57,7 @@ Status: `pending`, `in-progress`, `done`.
 | Design system flexivel | in-progress | `components/ui` base, `components/ds` extensoes; portfolio publico agora usa composicao premium sem mexer em `components/ui` |
 | Design system premium documentado | in-progress | `DESIGN.md`, `docs/design-system.md`, tokens premium e MCPs/skills de design adicionados |
 | Motion for React | done | Dependencia `motion` instalada no front e usada no toggle de curtida |
-| Sistema de animacoes premium | in-progress | `components/ds/motion`, scroll progress, reveal/stagger/hover variants, menu flutuante mobile e docs |
+| Sistema de animacoes premium | in-progress | `components/ds/motion`, scroll progress, reveal/stagger/hover variants, scroll-trigger reversivel, stacks animados, sticky stack, menu flutuante mobile e docs |
 | MCPs/skills de design | done | Coss, Coss Particles e Impeccable instalados; configs locais MCP criadas |
 | Vitrine do design system | in-progress | Tela inicial criada em `/admin/design-system` |
 | Auditoria funcional | done | `docs/functional-audit.md`; CRUDs, rotas, likes e upload testados manualmente |
@@ -228,6 +228,8 @@ Atualizacao: portfolio publico recebeu layout premium com sidebar fixa no deskto
 - Configs MCP locais criadas em `.mcp.json`, `.cursor/mcp.json` e `.vscode/mcp.json`.
 - Componentes de motion criados em `apps/web/src/components/ds/motion.tsx`.
 - Landing publica recebeu scroll progress, reveal por viewport, stagger e hover lift.
+- Landing publica recebeu scroll-trigger reversivel por progresso real do scroll em projetos, skills, GitHub e headings.
+- Timeline recebeu sticky stack para efeito de empilhamento legivel durante scroll.
 - Tela inicial `/admin/design-system` criada para documentar tokens, componentes e motion patterns.
 
 Checkpoint: base pronta para redesign sem refatoracao pesada.

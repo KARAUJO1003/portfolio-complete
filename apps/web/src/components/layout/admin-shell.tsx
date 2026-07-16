@@ -12,7 +12,7 @@ const adminLinks = [
   { href: "/admin", label: "Inicio" },
   { href: "/admin/profile", label: "Perfil" },
   { href: "/admin/projects", label: "Projetos" },
-  { href: "/admin/skills", label: "Skills" },
+  { href: "/admin/skills", label: "Habilidades" },
   { href: "/admin/experiences", label: "Experiencias" },
   { href: "/admin/pages", label: "Paginas" },
   { href: "/admin/custom-sections", label: "Secoes" },

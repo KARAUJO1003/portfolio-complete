@@ -10,7 +10,9 @@ type PublicCustomPageProps = {
   }>;
 };
 
-export default async function PublicCustomPage({ params }: PublicCustomPageProps) {
+export default async function PublicCustomPage({
+  params,
+}: PublicCustomPageProps) {
   const { slug } = await params;
 
   try {
@@ -24,7 +26,7 @@ export default async function PublicCustomPage({ params }: PublicCustomPageProps
         </PageHeader>
 
         <Section>
-          <SectionContent className="whitespace-pre-wrap text-foreground">
+          <SectionContent className="text-foreground whitespace-pre-wrap">
             {page.content}
           </SectionContent>
         </Section>

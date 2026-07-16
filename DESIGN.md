@@ -77,6 +77,10 @@ Padroes:
 - Preferir criar componentes animados reutilizaveis em `components/ds` quando a animacao puder aparecer em mais de uma area.
 - Variantes de animacao devem ser nomeadas e reaproveitaveis, por exemplo `fade-up`, `scale-in`, `blur-in`, `stagger`, `scroll-progress`.
 - Portfolio publico pode combinar diferentes estilos de animacao: entrada por viewport, hover premium, scroll-linked animation, parallax sutil e futuramente GSAP ScrollTrigger.
+- Animacoes de scroll no portfolio devem ser reversiveis quando possivel: ao descer, o bloco entra em foco; ao subir, o mesmo movimento deve desfazer naturalmente pelo progresso do scroll.
+- Blur nunca deve deixar conteudo parado ilegivel durante o scroll. Use blur minimo apenas como suavizacao de entrada, priorizando opacity, translate e escala leve.
+- Scroll motion deve ser perceptivel no portfolio publico: deslocamento, escala leve e stagger precisam ser visiveis, mas sem comprometer leitura ou performance.
+- Para listas editoriais, cards de projeto, timeline e badges, usar stacks animados por progresso de scroll em vez de reveals isolados. Quando a lista tiver narrativa sequencial, usar sticky stack para que um item segure posicao ate o proximo chegar.
 - Admin deve usar motion com mais contencao: feedback de estado, transicao de paineis, tabelas e drawers.
 - Sempre avaliar `prefers-reduced-motion`.
 
@@ -104,4 +108,6 @@ Padroes adicionados:
 - experiencias em timeline editorial;
 - skills compactas em badges para nao competir com projetos;
 - background em camadas com glows sutis e vinheta, sem grid decorativo dominante;
-- hover de cards e badges com acento visual controlado.
+- hover de cards e badges com acento visual controlado;
+- scroll-trigger reversivel com `MotionScrollReveal` e `MotionScrollStack` para dar mais profundidade aos projetos, skills e conteudos secundarios;
+- timeline em `MotionStickyStack`, com cards legiveis e empilhamento progressivo inspirado em referencias narrativas de scroll.
