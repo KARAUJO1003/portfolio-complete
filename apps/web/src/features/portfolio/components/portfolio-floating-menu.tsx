@@ -59,7 +59,7 @@ export function PortfolioFloatingMenu({ items }: PortfolioFloatingMenuProps) {
       <button
         aria-expanded={open}
         aria-label={open ? "Fechar menu" : "Abrir menu"}
-        className="grid size-12 place-items-center rounded-full border border-primary-accent/50 bg-primary text-primary-foreground shadow-[0_12px_34px_rgba(217,70,239,0.28)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-accent/60"
+        className="grid size-12 place-items-center rounded-full border border-primary-accent/50 bg-primary text-primary-foreground shadow-[0_12px_34px_rgba(143,183,255,0.24)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-accent/60"
         onClick={() => setOpen((current) => !current)}
         type="button"
       >
