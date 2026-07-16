@@ -8,6 +8,7 @@ export type CustomPageDocument = {
   slug: string;
   excerpt: string;
   content: string;
+  contentFormat: "html" | "markdown";
   status: PublicationStatus;
   order: number;
   showInNavigation: boolean;
@@ -22,6 +23,7 @@ const customPageSchema = new Schema<CustomPageDocument>(
     slug: { type: String, required: true, index: true },
     excerpt: { type: String, default: "" },
     content: { type: String, default: "" },
+    contentFormat: { type: String, enum: ["html", "markdown"], default: "html" },
     status: {
       type: String,
       enum: ["draft", "published", "archived"],

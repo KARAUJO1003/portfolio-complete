@@ -60,12 +60,19 @@ Status: `pending`, `in-progress`, `done`.
 | Sistema de animacoes premium | in-progress | `components/ds/motion`, scroll progress, reveal/stagger/hover variants, scroll-trigger reversivel, stacks animados, sticky stack, menu flutuante mobile e docs |
 | MCPs/skills de design | done | Coss, Coss Particles e Impeccable instalados; configs locais MCP criadas |
 | Vitrine do design system | in-progress | Tela inicial criada em `/admin/design-system` |
+| Roadmap admin UX/forms/tables/builders | done | Plano em `docs/admin-ux-roadmap.md` e skill local `admin-ux-system` |
+| Redesign do admin e login | in-progress | AdminShell com navegacao superior agrupada e login redesenhado; ainda falta aplicar refinamento fino em todas as telas |
+| Sistema avancado de formularios admin | in-progress | DS inicial criado com `DsForm`, secoes, steps, preview, number stepper, switches e piloto em projetos; Tiptap/autocomplete ficam para fase seguinte |
+| Tabelas admin padronizadas | in-progress | `DataTableFrame` criado e piloto em projetos com busca, filtro e ordenacao; falta replicar nos demais CRUDs |
+| Builders com preview real e drag and drop | pending | Portfolio/curriculo com preview antes de salvar, dnd-kit e versoes melhoradas |
+| Usuarios, profile e recuperacao de senha | pending | Usuarios, cadastro/convite, esqueci senha, roles e permissoes integradas |
 | Auditoria funcional | done | `docs/functional-audit.md`; CRUDs, rotas, likes e upload testados manualmente |
 | Gerador de feature front | done | Interativo/pipe, templates separados, CRUD Query/Table/Form e rota admin |
 | Gerador de modulo back | done | Interativo/pipe, templates separados, CRUD modular e registro de rota |
 | Build de producao do monorepo | done | Packages compartilhados, API e 15 rotas Next compilados sem erros de TypeScript |
 | Preparacao Git inicial | done | `.gitignore` na raiz, web e API protege dependencias, builds, secrets, logs e uploads temporarios |
 | Deploy gratuito inicial | done | Blueprint Render e guia Vercel/Atlas em `docs/deployment.md`; upload persistente permanece pendente |
+| Conteudo rico em paginas/secoes | in-progress | `contentFormat` iniciado com default `html`; editor Tiptap, import Markdown e blocos padronizados ficam para proximas fases |
 
 ## MVP Por Fases
 

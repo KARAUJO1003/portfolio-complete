@@ -2,9 +2,14 @@
 
 import type { ProjectDto } from "@portfolio/contracts";
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  PageFrame,
+  PageFrameContent,
+  PageFrameDescription,
+  PageFrameHeader,
+  PageFrameTitle,
+} from "@/components/ds/admin-primitives";
 import { PageDescription, PageHeader, PageTitle } from "@/components/ds/page";
-import { Section, SectionContent, SectionHeader, SectionTitle } from "@/components/ds/section";
 import { ProjectForm } from "@/features/projects/forms/project-form";
 import { ProjectsTable } from "@/features/projects/components/projects-table";
 
@@ -20,26 +25,21 @@ export function ProjectsFeature() {
         </PageDescription>
       </PageHeader>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{editingProject ? "Editar projeto" : "Novo projeto"}</CardTitle>
-          <CardDescription>
-            Use paths relativos para imagens; o front concatena com `NEXT_PUBLIC_BASE_URL_FILES`.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      <PageFrame>
+        <PageFrameHeader>
+          <div>
+            <PageFrameTitle>{editingProject ? "Editar projeto" : "Novo projeto"}</PageFrameTitle>
+            <PageFrameDescription>
+              Organize conteudo, imagem, links e publicacao com preview antes de salvar.
+            </PageFrameDescription>
+          </div>
+        </PageFrameHeader>
+        <PageFrameContent>
           <ProjectForm project={editingProject} onDone={() => setEditingProject(null)} />
-        </CardContent>
-      </Card>
+        </PageFrameContent>
+      </PageFrame>
 
-      <Section>
-        <SectionHeader>
-          <SectionTitle>Projetos cadastrados</SectionTitle>
-        </SectionHeader>
-        <SectionContent>
-          <ProjectsTable onEdit={setEditingProject} />
-        </SectionContent>
-      </Section>
+      <ProjectsTable onEdit={setEditingProject} />
     </>
   );
 }

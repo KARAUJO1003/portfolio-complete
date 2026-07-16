@@ -3,9 +3,13 @@
 import {
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
   type ColumnDef,
+  type SortingState,
 } from "@tanstack/react-table";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 type DataTableProps<TData> = {
   data: TData[];
@@ -18,10 +22,14 @@ export function DataTable<TData>({
   columns,
   emptyLabel = "Nenhum registro encontrado.",
 }: DataTableProps<TData>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
     data,
     columns,
+    state: { sorting },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
@@ -32,9 +40,20 @@ export function DataTable<TData>({
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th key={header.id} className="px-3 py-2 text-left font-medium">
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                  <button
+                    className={cn(
+                      "inline-flex items-center gap-2 text-left",
+                      header.column.getCanSort() && "cursor-pointer hover:text-foreground",
+                    )}
+                    type="button"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.column.getIsSorted() === "asc" && <span className="text-xs text-muted-foreground">↑</span>}
+                    {header.column.getIsSorted() === "desc" && <span className="text-xs text-muted-foreground">↓</span>}
+                  </button>
                 </th>
               ))}
             </tr>

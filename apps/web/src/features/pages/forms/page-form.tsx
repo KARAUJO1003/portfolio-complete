@@ -23,6 +23,7 @@ const defaultValues: PageFormValues = {
   slug: "",
   excerpt: "",
   content: "",
+  contentFormat: "html",
   status: "draft",
   order: 0,
   showInNavigation: false,
@@ -47,6 +48,7 @@ export function PageForm({ page, onDone }: PageFormProps) {
       slug: page.slug,
       excerpt: page.excerpt,
       content: page.content,
+      contentFormat: page.contentFormat ?? "html",
       status: page.status,
       order: page.order,
       showInNavigation: page.showInNavigation,
@@ -79,6 +81,14 @@ export function PageForm({ page, onDone }: PageFormProps) {
       <FormField>
         <FormLabel htmlFor="content">Conteudo</FormLabel>
         <Textarea id="content" className="min-h-56" {...form.register("content")} />
+      </FormField>
+
+      <FormField>
+        <FormLabel htmlFor="contentFormat">Formato do conteudo</FormLabel>
+        <select id="contentFormat" className="h-10 rounded-md border border-border bg-background px-3 text-sm" {...form.register("contentFormat")}>
+          <option value="html">HTML string</option>
+          <option value="markdown">Markdown importado</option>
+        </select>
       </FormField>
 
       <FormField>

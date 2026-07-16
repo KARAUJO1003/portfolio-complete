@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Badge } from "@/components/ds/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,10 +38,18 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Entrar</CardTitle>
-        <CardDescription>Acesse o admin do portfolio.</CardDescription>
+    <Card className="w-full max-w-md border-border bg-card/95 shadow-2xl shadow-black/10">
+      <CardHeader className="gap-4">
+        <div className="flex items-center justify-between gap-3">
+          <Badge tone="muted">Credenciais</Badge>
+          <span className="text-xs text-muted-foreground">Sessao segura</span>
+        </div>
+        <div>
+          <CardTitle className="text-2xl">Entrar no admin</CardTitle>
+          <CardDescription className="mt-2 leading-6">
+            Acesse o painel para editar portfolio, curriculo, projetos e publicacoes.
+          </CardDescription>
+        </div>
       </CardHeader>
       <CardContent>
         <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -65,11 +74,18 @@ export function LoginForm() {
             )}
           </FormField>
 
-          {serverError && <FormError>{serverError}</FormError>}
+          {serverError && (
+            <div className="rounded-lg border border-danger/30 bg-danger/10 p-3">
+              <FormError>{serverError}</FormError>
+            </div>
+          )}
 
-          <Button type="submit" disabled={form.formState.isSubmitting}>
+          <Button className="mt-2" type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "Entrando..." : "Entrar"}
           </Button>
+          <p className="text-center text-xs leading-5 text-muted-foreground">
+            Recuperacao de senha e solicitacao de acesso entram na proxima fase de usuarios.
+          </p>
         </form>
       </CardContent>
     </Card>

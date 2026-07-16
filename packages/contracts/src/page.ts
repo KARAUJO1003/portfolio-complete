@@ -6,6 +6,7 @@ export const customPageSchema = z.object({
   slug: z.string().min(1),
   excerpt: z.string().default(""),
   content: z.string().default(""),
+  contentFormat: z.enum(["html", "markdown"]).default("html"),
   status: publicationStatusSchema.default("draft"),
   order: z.coerce.number().default(0),
   showInNavigation: z.boolean().default(false),

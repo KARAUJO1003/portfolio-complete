@@ -9,6 +9,7 @@ export function toCustomPageDto(page: CustomPageDocument): CustomPageDto {
     slug: page.slug,
     excerpt: page.excerpt,
     content: page.content,
+    contentFormat: page.contentFormat ?? "html",
     status: page.status,
     order: page.order,
     showInNavigation: page.showInNavigation,

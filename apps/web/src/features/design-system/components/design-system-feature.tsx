@@ -1,6 +1,18 @@
 "use client";
 
 import { Badge } from "@/components/ds/badge";
+import {
+  ActionBar,
+  EmptyState,
+  PageFrame,
+  PageFrameContent,
+  PageFrameDescription,
+  PageFrameHeader,
+  PageFrameTitle,
+  Toolbar,
+} from "@/components/ds/admin-primitives";
+import { DataTableFrame } from "@/components/ds/data-table-frame";
+import { FormActions, FormAside, FormPreviewFrame, FormSection, FormStep } from "@/components/ds/form";
 import { MotionHoverCard, MotionItem, MotionReveal, MotionStagger } from "@/components/ds/motion";
 import { PageDescription, PageHeader, PageTitle } from "@/components/ds/page";
 import { Section, SectionContent, SectionHeader, SectionTitle } from "@/components/ds/section";
@@ -104,6 +116,82 @@ export function DesignSystemFeature() {
             </CardContent>
           </Card>
         </div>
+      </Section>
+
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Admin UX</SectionTitle>
+        </SectionHeader>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <PageFrame>
+            <PageFrameHeader>
+              <div>
+                <PageFrameTitle>PageFrame</PageFrameTitle>
+                <PageFrameDescription>Container padrao para formularios, listagens e builders.</PageFrameDescription>
+              </div>
+              <Badge tone="success">Novo</Badge>
+            </PageFrameHeader>
+            <PageFrameContent className="grid gap-3">
+              <ActionBar>
+                <span className="text-sm font-medium">Barra de acao</span>
+                <Toolbar>
+                  <Button>Salvar</Button>
+                  <Button variant="ghost">Cancelar</Button>
+                </Toolbar>
+              </ActionBar>
+              <EmptyState
+                title="Estado vazio"
+                description="Todos os CRUDs devem ter uma mensagem util e uma acao primaria quando fizer sentido."
+              />
+            </PageFrameContent>
+          </PageFrame>
+
+          <PageFrame>
+            <PageFrameHeader>
+              <div>
+                <PageFrameTitle>Formularios complexos</PageFrameTitle>
+                <PageFrameDescription>Projetos, portfolio, curriculo e paginas ricas usam secoes e preview.</PageFrameDescription>
+              </div>
+            </PageFrameHeader>
+            <PageFrameContent className="grid gap-4">
+              <div className="flex flex-wrap gap-2">
+                <FormStep active index={1} label="Conteudo" />
+                <FormStep active index={2} label="Midia" />
+                <FormStep index={3} label="Publicacao" />
+              </div>
+              <FormSection title="Secao de formulario" description="Agrupa campos relacionados e explica o impacto.">
+                <div className="h-10 rounded-md border border-input bg-background" />
+              </FormSection>
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormAside>Aside para contexto, dicas e resumo.</FormAside>
+                <FormPreviewFrame className="grid min-h-24 place-items-center text-sm text-muted-foreground">
+                  Preview
+                </FormPreviewFrame>
+              </div>
+              <FormActions className="static shadow-none">
+                <Button>Acao primaria</Button>
+                <span className="text-xs text-muted-foreground">Dirty state e erros aparecem aqui.</span>
+              </FormActions>
+            </PageFrameContent>
+          </PageFrame>
+        </div>
+      </Section>
+
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Tabelas</SectionTitle>
+        </SectionHeader>
+        <DataTableFrame
+          title="DataTableFrame"
+          description="Frame padrao para busca, filtros, ordenacao, estados e acoes."
+          search=""
+          onSearchChange={() => undefined}
+          filters={<Button variant="ghost">Filtro</Button>}
+        >
+          <div className="rounded-lg border border-border bg-background p-4 text-sm text-muted-foreground">
+            As tabelas reais usam TanStack Table dentro deste frame.
+          </div>
+        </DataTableFrame>
       </Section>
 
       <Section>

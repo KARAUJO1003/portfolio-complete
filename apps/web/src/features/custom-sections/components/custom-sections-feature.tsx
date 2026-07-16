@@ -18,6 +18,7 @@ type CustomSectionFormState = {
   title: string;
   key: string;
   content: string;
+  contentFormat: CustomSectionDto["contentFormat"];
   order: number;
   status: CustomSectionDto["status"];
   portfolio: boolean;
@@ -28,6 +29,7 @@ const empty: CustomSectionFormState = {
   title: "",
   key: "",
   content: "",
+  contentFormat: "html",
   order: 0,
   status: "draft",
   portfolio: true,
@@ -42,12 +44,12 @@ export function CustomSectionsFeature() {
 
   useEffect(() => {
     if (!editing) { setForm(empty); return; }
-    setForm({ title: editing.title, key: editing.key, content: editing.content, order: editing.order, status: editing.status, portfolio: editing.visibility.portfolio, resume: editing.visibility.resume });
+    setForm({ title: editing.title, key: editing.key, content: editing.content, contentFormat: editing.contentFormat ?? "html", order: editing.order, status: editing.status, portfolio: editing.visibility.portfolio, resume: editing.visibility.resume });
   }, [editing]);
 
   const save = useMutation({
     mutationFn: () => {
-      const input = { title: form.title, key: form.key, content: form.content, order: Number(form.order), status: form.status, visibility: { portfolio: form.portfolio, resume: form.resume } };
+      const input = { title: form.title, key: form.key, content: form.content, contentFormat: form.contentFormat, order: Number(form.order), status: form.status, visibility: { portfolio: form.portfolio, resume: form.resume } };
       return editing ? updateCustomSection(editing.id, input) : createCustomSection(input);
     },
     onSuccess: async () => { await queryClient.invalidateQueries({ queryKey: ["custom-sections"] }); setEditing(null); setForm(empty); toast.success("Secao salva."); },
@@ -70,8 +72,9 @@ export function CustomSectionsFeature() {
           <FormField><FormLabel htmlFor="section-order">Ordem</FormLabel><Input id="section-order" type="number" value={form.order} onChange={(event) => setForm((current) => ({ ...current, order: Number(event.target.value) }))} /></FormField>
         </div>
         <FormField><FormLabel htmlFor="section-content">Conteudo</FormLabel><Textarea className="min-h-40" id="section-content" value={form.content} onChange={(event) => setForm((current) => ({ ...current, content: event.target.value }))} /><FormDescription>Markdown simples: use **texto** para negrito.</FormDescription></FormField>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-4">
           <select className="h-10 rounded-md border border-input bg-background px-3 text-sm" value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as typeof current.status }))}><option value="draft">Rascunho</option><option value="published">Publicado</option><option value="archived">Arquivado</option></select>
+          <select className="h-10 rounded-md border border-input bg-background px-3 text-sm" value={form.contentFormat} onChange={(event) => setForm((current) => ({ ...current, contentFormat: event.target.value as typeof current.contentFormat }))}><option value="html">HTML string</option><option value="markdown">Markdown</option></select>
           <label className="flex items-center gap-2 text-sm"><input checked={form.portfolio} type="checkbox" onChange={(event) => setForm((current) => ({ ...current, portfolio: event.target.checked }))} />Portfolio</label>
           <label className="flex items-center gap-2 text-sm"><input checked={form.resume} type="checkbox" onChange={(event) => setForm((current) => ({ ...current, resume: event.target.checked }))} />Curriculo</label>
         </div>

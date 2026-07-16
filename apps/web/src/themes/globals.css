@@ -1,4 +1,14 @@
 @import "tailwindcss";
+@import "./typeset.css";
+
+.typeset-notes {
+  --typeset-font-body: var(--font-raleway);
+  --typeset-font-heading: var(--font-oxanium);
+  --typeset-font-mono: var(--font-geist-mono);
+  --typeset-size: 14px;
+  --typeset-leading: 1.6;
+  --typeset-flow: 1em;
+}
 
 /*
  * Registra os tokens de cor no Tailwind v4 para que as utilitarias

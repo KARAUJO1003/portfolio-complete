@@ -28,6 +28,8 @@ Registro: product surface.
 
 Objetivo: permitir criar, revisar e publicar conteudo com clareza. Deve ser mais denso, previsivel e operacional que a landing publica.
 
+O admin deve evoluir por padroes reutilizaveis antes de telas isoladas. Formularios, tabelas, builders, login, usuarios e permissoes devem seguir `docs/admin-ux-roadmap.md`, e toda nova decisao visual/componente deve aparecer em `/admin/design-system`.
+
 ## Tokens Base
 
 ### Background
@@ -93,9 +95,19 @@ Manter:
 - `components/ds`: wrappers e componentes de produto.
 - `features/*/components`: composicoes especificas de feature.
 
-Futuro:
+Admin:
 
-- criar `/admin/design-system` com tokens, tipografia, grids, cards, formularios, tabelas, estados, motion e exemplos de composicao.
+- `/admin/design-system` deve funcionar como vitrine viva de tokens, tipografia, grids, formularios, tabelas, estados, motion, drawers/dialogs, uploads, builders, permissoes e exemplos de composicao.
+- a navegacao principal do admin deve permanecer superior, agrupada por Base, Conteudo, Publicacao e Sistema, com estados ativos claros e sem sidebar fixa por enquanto.
+- login deve parecer parte do produto, com superficie premium, copy clara e sem depender da landing publica.
+- `PageFrame`, `ActionBar`, `Toolbar`, `EmptyState`, `LoadingState` e `ErrorState` sao a base para telas operacionais.
+- formularios complexos devem ter secoes, etapas, contexto, preview quando aplicavel, erro por campo e resumo de erro.
+- formularios complexos usam `DsForm`, `FormSection`, `FormStep`, `FormActions`, `FormAside` e `FormPreviewFrame`; campos padronizados seguem `FormFields`.
+- tabelas devem ser envolvidas em frame padrao com filtros, busca, ordenacao, empty/loading/error states e acoes consistentes.
+- tabelas usam `DataTableFrame` envolvendo TanStack Table; a primeira tela piloto e Projetos.
+- builders de portfolio/curriculo devem ter preview real, drag and drop, controle de versao e barra de publicacao clara.
+- paginas e secoes customizadas devem evoluir para editor rico/markdown/blocos com variaveis `{...}` e preview.
+- rich text deve persistir HTML string em `content` por padrao; Markdown e importacao entram como camada de entrada/conversao.
 
 ## Portfolio Publico - Layout Premium 2026
 

@@ -5,6 +5,7 @@ export const customSectionSchema = z.object({
   title: z.string().min(1),
   key: z.string().min(1),
   content: z.string().default(""),
+  contentFormat: z.enum(["html", "markdown"]).default("html"),
   order: z.coerce.number().default(0),
   status: publicationStatusSchema.default("draft"),
   visibility: projectVisibilitySchema.default({ portfolio: true, resume: false }),
