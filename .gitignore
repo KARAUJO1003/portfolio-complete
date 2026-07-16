@@ -34,6 +34,9 @@ storage/tmp/uploads/*
 work/
 outputs/
 
+# Link local para as skills; a fonte versionada e .agents/skills (pnpm setup:agents)
+.claude/skills
+
 # Operating system and editor-local files
 .DS_Store
 Thumbs.db
