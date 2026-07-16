@@ -91,3 +91,17 @@ Manter:
 Futuro:
 
 - criar `/admin/design-system` com tokens, tipografia, grids, cards, formularios, tabelas, estados, motion e exemplos de composicao.
+
+## Portfolio Publico - Layout Premium 2026
+
+A landing publica passou a seguir uma composicao brand com sidebar fixa no desktop e coluna principal rolavel. A sidebar concentra identidade, resumo curto, CTAs, navegacao e links sociais; a coluna principal prioriza projetos selecionados antes de stack/about para reduzir friccao de avaliacao.
+
+Padroes adicionados:
+
+- desktop com sidebar `sticky` e conteudo principal em scroll;
+- mobile com intro compacta e menu flutuante expansivel;
+- projetos como primeira area de impacto, com primeiro card destacado;
+- experiencias em timeline editorial;
+- skills compactas em badges para nao competir com projetos;
+- background em camadas com glows sutis e vinheta, sem grid decorativo dominante;
+- hover de cards e badges com acento visual controlado.
