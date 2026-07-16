@@ -37,7 +37,7 @@ Objetivo: permitir criar, revisar e publicar conteudo com clareza. Deve ser mais
 - `--surface`: superficie de cards e paineis.
 - `--surface-raised`: superficie elevada para headers, popovers e paineis destacados.
 - `--surface-muted`: superficie secundaria.
-- No modo claro, o fundo principal deve ser cinza frio sutil em vez de branco puro; cards e superficies podem permanecer mais claros para preservar hierarquia.
+- No modo claro, o fundo principal deve ser cinza frio sutil em vez de branco puro; cards e superficies tambem devem ficar em cinza claro frio, sem branco puro, para reduzir o contraste agressivo e preservar hierarquia com bordas mais definidas.
 
 ### Foreground
 
@@ -104,14 +104,19 @@ A landing publica passou a seguir uma composicao brand com sidebar fixa no deskt
 Padroes adicionados:
 
 - desktop com sidebar `sticky` e conteudo principal em scroll;
+- no desktop, sidebar deve conter apenas identidade, resumo curto, contatos e navegacao; textos completos como "Sobre" ficam no conteudo principal para evitar redundancia;
 - mobile com intro compacta e menu flutuante expansivel;
 - projetos como primeira area de impacto, com primeiro card destacado;
+- titulos de secoes da landing devem manter escala consistente; apenas hero/intro principal pode usar escala maior;
 - experiencias em timeline editorial;
 - skills compactas em badges para nao competir com projetos;
 - background em camadas com glows sutis e vinheta, sem grid decorativo dominante;
+- topo/esquerda da landing pode usar light rays animados e discretos, posicionados sobre a area de identidade/sidebar, para dar profundidade sem disputar com os cards; efeitos antigos como aurora devem ficar desativados quando competirem com a leitura;
 - hover de cards e badges com acento visual controlado;
 - scroll-trigger reversivel com `MotionScrollReveal` e `MotionScrollStack` para dar mais profundidade aos projetos, skills e conteudos secundarios;
 - cards de projeto compactos, com acoes sobre o preview visual em vez de footer pesado;
+- cards de projeto devem mostrar resumo truncado e abrir um drawer bottom de detalhes ao clicar, mantendo o grid limpo e deixando o conteudo completo, tecnologias e links no painel;
+- imagens de projeto devem sempre tratar loading, erro e ausencia de imagem com uma composicao reutilizavel, usando fallback visual consistente em cards e drawer;
 - timeline com trilho vertical, marcadores e cards editoriais;
 - tecnologias com badges visuais e logos de marca em componente local inspirado no padrao Elements;
 - logos de tecnologias com marca escura/clara devem ser adaptativos para manter contraste nos temas dark e light;

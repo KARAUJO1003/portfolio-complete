@@ -12,6 +12,7 @@ import { resolveFileUrl } from "@/core/files/file-url";
 import { deleteProject } from "@/features/projects/api/projects-api";
 import { projectsKeys, projectsListQueryOptions } from "@/features/projects/api/projects-queries";
 import { PROJECTS_PERMISSIONS } from "@/features/projects/permissions";
+import Image from "next/image";
 
 type ProjectsTableProps = {
   onEdit: (project: ProjectDto) => void;
@@ -39,7 +40,7 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
             <div className="flex min-w-64 items-center gap-3">
               <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
                 {coverUrl ? (
-                  <img alt="" className="size-full object-cover" src={coverUrl} />
+                  <Image alt="" className="size-full object-cover" height={56} src={coverUrl} unoptimized width={56} />
                 ) : (
                   <span className="text-xs text-muted-foreground">IMG</span>
                 )}

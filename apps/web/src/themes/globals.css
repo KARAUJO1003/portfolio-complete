@@ -64,14 +64,14 @@
   --foreground: #09090b;
   --foreground-muted: #52525b;
   --foreground-subtle: #71717a;
-  --muted: #f4f4f5;
+  --muted: #e8ebef;
   --muted-foreground: #52525b;
-  --border: #e4e4e7;
-  --card: #ffffff;
+  --border: #d8dce2;
+  --card: #eef0f3;
   --card-foreground: #09090b;
-  --surface: #ffffff;
-  --surface-raised: #f8fafc;
-  --surface-muted: #f4f4f5;
+  --surface: #eceff3;
+  --surface-raised: #e5e9ee;
+  --surface-muted: #e1e5eb;
   --primary: #09090b;
   --primary-foreground: #ffffff;
   --primary-tint: #f4f4f5;
@@ -210,4 +210,212 @@ body {
 
 .light .brand-logo-adaptive {
   filter: none;
+}
+
+/* Aurora mantida como referencia, mas desativada no JSX do portfolio. */
+.portfolio-top-aurora {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 220px;
+  overflow: hidden;
+  opacity: 0.82;
+  mix-blend-mode: screen;
+  mask-image: linear-gradient(to bottom, black 0%, black 44%, rgba(0, 0, 0, 0.58) 62%, transparent 100%);
+}
+
+.portfolio-top-aurora::after {
+  position: absolute;
+  inset: 58px 0 0;
+  background: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--background) 48%, transparent) 48%, var(--background) 100%);
+  content: "";
+}
+
+.portfolio-top-aurora-layer {
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  top: -96px;
+  height: 260px;
+  border-radius: 999px;
+  filter: blur(34px) saturate(1.22);
+  mask-image: radial-gradient(ellipse at center, black 0%, rgba(0, 0, 0, 0.82) 38%, transparent 78%);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.portfolio-top-aurora-layer-primary {
+  background:
+    radial-gradient(34% 80% at 18% 48%, rgba(143, 183, 255, 0.58), transparent 66%),
+    radial-gradient(32% 78% at 46% 46%, rgba(168, 85, 247, 0.54), transparent 68%),
+    radial-gradient(30% 72% at 76% 48%, rgba(52, 211, 153, 0.36), transparent 72%),
+    linear-gradient(100deg, transparent 5%, rgba(143, 183, 255, 0.22) 24%, rgba(168, 85, 247, 0.22) 52%, rgba(52, 211, 153, 0.18) 82%, transparent 100%);
+  animation: portfolio-aurora-drift 12s ease-in-out infinite alternate;
+}
+
+.portfolio-top-aurora-layer-secondary {
+  top: -74px;
+  background:
+    radial-gradient(30% 70% at 26% 45%, rgba(52, 211, 153, 0.36), transparent 70%),
+    radial-gradient(34% 78% at 62% 42%, rgba(143, 183, 255, 0.34), transparent 68%),
+    radial-gradient(28% 72% at 88% 46%, rgba(217, 70, 239, 0.42), transparent 72%),
+    linear-gradient(88deg, transparent 0%, rgba(52, 211, 153, 0.16) 28%, rgba(143, 183, 255, 0.17) 58%, rgba(217, 70, 239, 0.16) 88%, transparent 100%);
+  opacity: 0.72;
+  animation: portfolio-aurora-float 15s ease-in-out infinite alternate;
+}
+
+.light .portfolio-top-aurora {
+  opacity: 0.38;
+  mix-blend-mode: multiply;
+}
+
+@keyframes portfolio-aurora-drift {
+  0% {
+    opacity: 0.58;
+    transform: translate3d(-2%, 0, 0) scaleX(1.02) skewX(-5deg);
+  }
+
+  50% {
+    opacity: 0.78;
+    transform: translate3d(2.5%, 9px, 0) scaleX(1.08) skewX(4deg);
+  }
+
+  100% {
+    opacity: 0.66;
+    transform: translate3d(-1%, 3px, 0) scaleX(1.04) skewX(-2deg);
+  }
+}
+
+@keyframes portfolio-aurora-float {
+  0% {
+    opacity: 0.36;
+    transform: translate3d(3%, 5px, 0) scaleX(1.05) skewX(3deg);
+  }
+
+  100% {
+    opacity: 0.66;
+    transform: translate3d(-3%, -2px, 0) scaleX(1.12) skewX(-5deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-top-aurora-layer {
+    animation: none;
+  }
+}
+
+.portfolio-light-rays {
+  position: absolute;
+  left: calc(max(0px, (100vw - 72rem) / 2) - 9.75rem);
+  top: 0;
+  width: 640px;
+  height: 680px;
+  overflow: visible;
+  opacity: 0.78;
+  mix-blend-mode: screen;
+  mask-image: radial-gradient(ellipse at 57% 0%, black 0%, rgba(0, 0, 0, 0.94) 34%, rgba(0, 0, 0, 0.6) 58%, transparent 84%);
+}
+
+.portfolio-light-rays::before {
+  position: absolute;
+  inset: -145px auto auto 252px;
+  width: 210px;
+  height: 210px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.24), rgba(143, 183, 255, 0.12) 38%, transparent 72%);
+  content: "";
+  filter: blur(22px);
+}
+
+.portfolio-light-rays::after {
+  position: absolute;
+  inset: 430px -140px 0;
+  background: linear-gradient(to bottom, transparent 0%, color-mix(in srgb, var(--background) 42%, transparent) 34%, var(--background) 100%);
+  content: "";
+}
+
+.portfolio-light-ray {
+  position: absolute;
+  top: -118px;
+  width: 58px;
+  height: 640px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.34), rgba(143, 183, 255, 0.17) 34%, rgba(255, 255, 255, 0.05) 66%, transparent 94%);
+  filter: blur(13px);
+  transform-origin: top center;
+  will-change: transform, opacity;
+}
+
+.portfolio-light-ray-primary {
+  left: 322px;
+  opacity: 0.76;
+  transform: rotate(0deg);
+  animation: portfolio-light-ray-primary 9s ease-in-out infinite alternate;
+}
+
+.portfolio-light-ray-secondary {
+  left: 398px;
+  width: 78px;
+  opacity: 0.58;
+  transform: rotate(-12deg);
+  animation: portfolio-light-ray-secondary 11s ease-in-out infinite alternate;
+}
+
+.portfolio-light-ray-tertiary {
+  left: 228px;
+  width: 66px;
+  opacity: 0.48;
+  transform: rotate(18deg);
+  animation: portfolio-light-ray-tertiary 13s ease-in-out infinite alternate;
+}
+
+.light .portfolio-light-rays {
+  opacity: 0.36;
+  mix-blend-mode: multiply;
+}
+
+@media (max-width: 1023px) {
+  .portfolio-light-rays {
+    display: none;
+  }
+}
+
+@keyframes portfolio-light-ray-primary {
+  0% {
+    opacity: 0.5;
+    transform: translate3d(-5px, -8px, 0) rotate(-2deg) scaleY(0.98);
+  }
+
+  100% {
+    opacity: 0.82;
+    transform: translate3d(9px, 10px, 0) rotate(2deg) scaleY(1.08);
+  }
+}
+
+@keyframes portfolio-light-ray-secondary {
+  0% {
+    opacity: 0.36;
+    transform: translate3d(10px, -4px, 0) rotate(-16deg) scaleY(0.96);
+  }
+
+  100% {
+    opacity: 0.62;
+    transform: translate3d(-8px, 12px, 0) rotate(-11deg) scaleY(1.06);
+  }
+}
+
+@keyframes portfolio-light-ray-tertiary {
+  0% {
+    opacity: 0.28;
+    transform: translate3d(-8px, 0, 0) rotate(16deg) scaleY(0.94);
+  }
+
+  100% {
+    opacity: 0.5;
+    transform: translate3d(8px, 14px, 0) rotate(22deg) scaleY(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-light-ray {
+    animation: none;
+  }
 }

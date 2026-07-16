@@ -229,6 +229,7 @@ Atualizacao: portfolio publico recebeu layout premium com sidebar fixa no deskto
 - Componentes de motion criados em `apps/web/src/components/ds/motion.tsx`.
 - Landing publica recebeu scroll progress, reveal por viewport, stagger e hover lift.
 - Landing publica recebeu scroll-trigger reversivel por progresso real do scroll em projetos, skills, GitHub e headings.
+- Background publico recebeu light rays animados na area superior/esquerda da identidade; a aurora anterior ficou comentada/desativada por direcao visual.
 - Timeline recebeu trilho visual, marcadores e cards editoriais.
 - Cards de projeto ficaram mais compactos, com acoes sobre o preview e sem footer pesado.
 - Tecnologias receberam badges com logos adaptativos por tema; GitHub recebeu contribution graph, cards enriquecidos e atividade recente; contato recebeu CTA final mais forte.

@@ -15,8 +15,11 @@ import { resolveFileUrl } from "@/core/files/file-url";
 import { AnimatedDisclosure } from "@/features/portfolio/components/animated-disclosure";
 import { PortfolioEntryOverlay } from "@/features/portfolio/components/portfolio-entry-overlay";
 import { PortfolioFloatingMenu } from "@/features/portfolio/components/portfolio-floating-menu";
+import { ProjectCover } from "@/features/portfolio/components/project-cover";
+import { ProjectDetailsDrawer } from "@/features/portfolio/components/project-details-drawer";
 import { ProjectLikeButton } from "@/features/portfolio/components/project-like-button";
 import type { ExperienceDto, ProjectDto, PublicPortfolioDto, SkillDto } from "@portfolio/contracts";
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -110,7 +113,7 @@ export function PortfolioHome({ portfolio }: PortfolioHomeProps) {
     <PublicShell>
       <PortfolioEntryOverlay />
       <PortfolioBackground />
-      <div className="mx-auto grid w-full max-w-6xl gap-14 px-6 py-10 sm:py-16 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-x-28 lg:py-24">
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl gap-14 px-6 py-10 sm:py-16 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-x-28 lg:py-24">
         <PortfolioSidebar profile={portfolioProfile} sections={sections} />
         <main className="min-w-0">
           <MobileIntro profile={portfolioProfile} />
@@ -142,11 +145,24 @@ export function PortfolioHome({ portfolio }: PortfolioHomeProps) {
 
 function PortfolioBackground() {
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-background">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-background">
       <div className="absolute inset-x-0 top-0 h-[110px] overflow-hidden [mask-image:linear-gradient(to_bottom,black,transparent)]">
         <div className="size-full opacity-35 [background-image:radial-gradient(circle,rgba(255,255,255,0.22)_1px,transparent_1px)] [background-size:18px_18px]" />
       </div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_10%,rgba(143,183,255,0.10),transparent_28%),linear-gradient(180deg,var(--background),var(--background-subtle)_46%,var(--background))]" />
+      {/*
+        Aurora desativada por direcao visual. Mantida comentada para referencia
+        enquanto avaliamos a versao com light rays.
+      <div className="portfolio-top-aurora">
+        <span className="portfolio-top-aurora-layer portfolio-top-aurora-layer-primary" />
+        <span className="portfolio-top-aurora-layer portfolio-top-aurora-layer-secondary" />
+      </div>
+      */}
+      <div className="portfolio-light-rays">
+        <span className="portfolio-light-ray portfolio-light-ray-primary" />
+        <span className="portfolio-light-ray portfolio-light-ray-secondary" />
+        <span className="portfolio-light-ray portfolio-light-ray-tertiary" />
+      </div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent,rgba(0,0,0,0.34))]" />
     </div>
   );
@@ -161,18 +177,13 @@ function PortfolioSidebar({ profile, sections }: { profile: PortfolioProfile; se
         <MotionReveal className="flex min-h-[calc(100dvh-7rem)] flex-col gap-10" variant="slide-right">
           <section id="hero" className="flex flex-col gap-5">
             <div className="flex items-start gap-4">
-              <img alt={profile.name} className="size-[76px] rounded-full border border-border bg-muted object-cover ring-4 ring-muted/40" src={profile.avatarUrl} />
+              <Image alt={profile.name} className="size-[76px] rounded-full border border-border bg-muted object-cover ring-4 ring-muted/40" height={76} src={profile.avatarUrl} unoptimized width={76} />
               <div className="min-w-0 pt-1">
                 <p className="text-lg font-semibold tracking-[-0.03em]">{profile.name}</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">{profile.headline}</p>
               </div>
             </div>
             <p className="max-w-[270px] text-pretty text-sm leading-7 text-muted-foreground">{profile.summary}</p>
-          </section>
-
-          <section className="flex flex-col gap-3">
-            <h2 className="text-base font-semibold tracking-[-0.02em]">Sobre</h2>
-            <p className="max-w-[270px] text-pretty text-sm leading-7 text-muted-foreground">{profile.about}</p>
           </section>
 
           <SocialDock profile={profile} />
@@ -216,7 +227,7 @@ function MobileIntro({ profile }: { profile: PortfolioProfile }) {
   return (
     <section className="mb-14 flex flex-col gap-6 lg:hidden">
       <div className="flex items-center gap-4">
-        <img alt={profile.name} className="size-[76px] rounded-full border border-border bg-muted object-cover ring-4 ring-muted/40" src={profile.avatarUrl} />
+        <Image alt={profile.name} className="size-[76px] rounded-full border border-border bg-muted object-cover ring-4 ring-muted/40" height={76} src={profile.avatarUrl} unoptimized width={76} />
         <div>
           <h1 className="text-xl font-semibold tracking-[-0.03em]">Ola, sou {profile.name}</h1>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">{profile.headline}</p>
@@ -259,8 +270,6 @@ function ProjectsSection({ projects }: { projects: PortfolioProject[] }) {
 }
 
 function ProjectCard({ index, project }: { index: number; project: PortfolioProject }) {
-  const isExternal = Boolean(project.demoUrl);
-
   return (
     <MotionHoverCard className="h-full">
       <article className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card/80 transition-colors before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_0%,rgba(143,183,255,0.16),transparent_42%)] before:opacity-0 before:transition-opacity hover:border-primary-accent/40 hover:before:opacity-100">
@@ -280,23 +289,18 @@ function ProjectCard({ index, project }: { index: number; project: PortfolioProj
             {project.id ? <ProjectLikeButton compact initialLikesCount={project.likesCount ?? 0} projectId={project.id} /> : null}
           </div>
         </div>
-        <Link
-          className="block"
-          href={project.demoUrl || "#contato"}
-          rel={isExternal ? "noreferrer" : undefined}
-          target={isExternal ? "_blank" : undefined}
-        >
+        <ProjectDetailsDrawer index={index} project={project} triggerClassName="block w-full cursor-pointer text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent/35">
           <div className="flex flex-col gap-4 p-5 transition-colors hover:bg-surface-raised/45">
             <div className="flex items-center justify-between gap-3">
               <TechPill>{project.technologies[0] || "projeto"}</TechPill>
               <span className="text-[11px] text-foreground-subtle">0{index + 1}</span>
             </div>
             <div>
-              <h3 className="text-lg font-semibold tracking-[-0.02em]">{project.title}</h3>
-              <p className="mt-2 max-h-20 overflow-hidden text-pretty text-sm leading-6 text-muted-foreground">{project.summary}</p>
+              <h3 className="truncate text-lg font-semibold tracking-[-0.02em]">{project.title}</h3>
+              <p className="mt-2 overflow-hidden text-pretty text-sm leading-6 text-muted-foreground [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">{project.summary}</p>
             </div>
           </div>
-        </Link>
+        </ProjectDetailsDrawer>
       </article>
     </MotionHoverCard>
   );
@@ -318,14 +322,11 @@ function ProjectActionButton({ children, href, label }: { children: ReactNode; h
 }
 
 function ProjectRow({ index, project }: { index: number; project: PortfolioProject }) {
-  const isExternal = Boolean(project.demoUrl);
-
   return (
-    <Link
-      className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 bg-card px-5 py-4 transition-colors hover:bg-surface-raised"
-      href={project.demoUrl || "#contato"}
-      rel={isExternal ? "noreferrer" : undefined}
-      target={isExternal ? "_blank" : undefined}
+    <ProjectDetailsDrawer
+      index={index}
+      project={project}
+      triggerClassName="grid w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 bg-card px-5 py-4 text-left transition-colors hover:bg-surface-raised focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent/35"
     >
       <span className="font-mono text-xs text-foreground-subtle">0{index + 1}</span>
       <span className="min-w-0">
@@ -336,7 +337,7 @@ function ProjectRow({ index, project }: { index: number; project: PortfolioProje
         <span className="mt-1 hidden truncate text-xs text-muted-foreground sm:block">{project.summary}</span>
       </span>
       <span className="text-muted-foreground">-&gt;</span>
-    </Link>
+    </ProjectDetailsDrawer>
   );
 }
 
@@ -625,27 +626,14 @@ function PortfolioSection({ children, id, title }: { children: ReactNode; id: st
 function SectionIntro({ description, title }: { description: string; title: string }) {
   return (
     <MotionScrollReveal className="flex flex-col gap-3" y={52}>
-      <h2 className="text-2xl font-bold tracking-[-0.035em] sm:text-3xl">{title}</h2>
+      <h2 className="text-xl font-bold tracking-[-0.03em]">{title}</h2>
       <p className="max-w-2xl text-pretty text-sm leading-7 text-muted-foreground">{description}</p>
     </MotionScrollReveal>
   );
 }
 
 function ProjectVisual({ coverPath, index, title }: { coverPath?: string; index: number; title: string }) {
-  const coverUrl = resolveFileUrl(coverPath);
-
-  if (coverUrl) {
-    return <img alt={`Preview do projeto ${title}`} className="aspect-[1.45] w-full object-cover transition-transform duration-500 group-hover:scale-[1.025]" src={coverUrl} />;
-  }
-
-  return (
-    <div className="flex aspect-[1.45] items-center justify-center bg-[linear-gradient(135deg,#0b0f17,#111827_52%,#151923)] p-6">
-      <div className="flex aspect-video w-full max-w-xs flex-col justify-between rounded-xl border border-white/10 bg-black/30 p-4">
-        <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">projeto 0{index + 1}</span>
-        <span className="text-lg font-semibold tracking-[-0.03em] text-white">{title}</span>
-      </div>
-    </div>
-  );
+  return <ProjectCover coverPath={coverPath} index={index} title={title} />;
 }
 
 function TechPill({ children }: { children: ReactNode }) {

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const skillLogos: Record<string, { adaptive?: boolean; color: string; label: string; slug: string }> = {
   figma: { color: "f24e1e", label: "Figma", slug: "figma" },
@@ -37,12 +38,15 @@ export function BrandLogo({ className, name }: BrandLogoProps) {
 
   return (
     <span className={cn("grid size-5 place-items-center rounded-full bg-white/[0.04]", className)}>
-      <img
+      <Image
         alt=""
         aria-hidden="true"
         className={cn("size-3.5", logo.adaptive && "brand-logo-adaptive")}
+        height={14}
         loading="lazy"
         src={`https://cdn.simpleicons.org/${logo.slug}/${logo.color}`}
+        unoptimized
+        width={14}
       />
     </span>
   );
