@@ -54,10 +54,10 @@ Status: `pending`, `in-progress`, `done`.
 | Integracao GitHub inicial | done | Perfil, repositorios, estatisticas e atividade com cache e token opcional |
 | Estrutura preparada para i18n futuro | done | Locale e mensagens centralizados em `core/i18n`; MVP permanece pt-BR |
 | Dark mode padrao, light mode possivel | done | ThemeProvider e toggle no admin e portfolio |
-| Design system flexivel | in-progress | `components/ui` base, `components/ds` extensoes; primeira passada visual sem mexer em `components/ui` |
+| Design system flexivel | in-progress | `components/ui` base, `components/ds` extensoes; portfolio publico agora usa composicao premium sem mexer em `components/ui` |
 | Design system premium documentado | in-progress | `DESIGN.md`, `docs/design-system.md`, tokens premium e MCPs/skills de design adicionados |
 | Motion for React | done | Dependencia `motion` instalada no front e usada no toggle de curtida |
-| Sistema de animacoes premium | in-progress | `components/ds/motion`, scroll progress, reveal/stagger/hover variants e docs |
+| Sistema de animacoes premium | in-progress | `components/ds/motion`, scroll progress, reveal/stagger/hover variants, menu flutuante mobile e docs |
 | MCPs/skills de design | done | Coss, Coss Particles e Impeccable instalados; configs locais MCP criadas |
 | Vitrine do design system | in-progress | Tela inicial criada em `/admin/design-system` |
 | Auditoria funcional | done | `docs/functional-audit.md`; CRUDs, rotas, likes e upload testados manualmente |
@@ -211,6 +211,8 @@ Checkpoint: novo modulo nasce funcional e documentado.
 ### Fase 10 - Design System Base
 
 Status: `in-progress`.
+
+Atualizacao: portfolio publico recebeu layout premium com sidebar fixa no desktop, intro compacta no mobile, projetos priorizados, timeline editorial, stack compacta e menu flutuante responsivo.
 
 - Criar componentes `Page*`, `Section*`, `Ds*`.
 - Manter visual simples no MVP.
