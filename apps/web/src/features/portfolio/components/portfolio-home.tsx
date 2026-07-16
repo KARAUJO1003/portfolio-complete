@@ -1,3 +1,5 @@
+import { FramedCard } from "@/components/ds/framed-card";
+import { Ledger, LedgerRow } from "@/components/ds/ledger";
 import {
   MotionHoverCard,
   MotionItem,
@@ -6,6 +8,7 @@ import {
   ScrollParallax,
 } from "@/components/ds/motion";
 import { RichText } from "@/components/ds/rich-text";
+import { Stat, StatGrid } from "@/components/ds/stat-grid";
 import { ThemeToggle } from "@/components/ds/theme-toggle";
 import { PublicShell } from "@/components/layout/public-shell";
 import { Button } from "@/components/ui/button";
@@ -291,11 +294,13 @@ function ExperiencesSection({ experiences }: { experiences: ExperienceDto[] }) {
 function GitHubSection({ github }: { github: NonNullable<PublicPortfolioDto["github"]> }) {
   return (
     <PortfolioSection eyebrow="Open source" id="github" title="Codigo publico e atividade recente.">
-      <MotionStagger className="mt-8 grid gap-3 sm:grid-cols-3">
-        <MetricCard label="Repositorios" value={github.publicRepositories.toString()} />
-        <MetricCard label="Seguidores" value={github.followers.toString()} />
-        <MetricCard label="Perfil" value={`@${github.username}`} href={github.profileUrl} />
-      </MotionStagger>
+      <MotionReveal className="mt-8">
+        <StatGrid>
+          <Stat label="Repositorios" value={github.publicRepositories.toString()} />
+          <Stat label="Seguidores" value={github.followers.toString()} />
+          <Stat href={github.profileUrl} label="Perfil" value={`@${github.username}`} />
+        </StatGrid>
+      </MotionReveal>
       <MotionStagger className="mt-6 grid gap-3 md:grid-cols-2">
         {github.repositories.map((repository) => (
           <MotionItem key={repository.id}>
@@ -392,10 +397,12 @@ function SkillsSection({ skills }: { skills: Array<Pick<SkillDto, "title" | "sta
 }
 
 function ProjectsSection({ projects }: { projects: PortfolioProject[] }) {
+  const [featured, ...rest] = projects;
+
   return (
     <section id="projetos" className="scroll-mt-8 pt-6 lg:min-h-dvh lg:pt-0">
       <MotionReveal className="flex flex-col gap-3">
-        <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary-accent">Projetos selecionados</p>
+        <SectionEyebrow>Projetos selecionados</SectionEyebrow>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <h2 className="max-w-2xl text-balance text-4xl font-semibold tracking-[-0.03em] md:text-6xl">
             Interfaces, sistemas e experimentos fullstack.
@@ -405,53 +412,120 @@ function ProjectsSection({ projects }: { projects: PortfolioProject[] }) {
           </p>
         </div>
       </MotionReveal>
-      <MotionStagger className="mt-10 grid gap-5">
-        {projects.map((project, index) => (
-          <MotionItem key={project.title}>
-            <ProjectCard featured={index === 0} index={index} project={project} />
-          </MotionItem>
-        ))}
-      </MotionStagger>
+
+      {featured ? (
+        <MotionReveal className="mt-10">
+          <FeaturedProject index={0} project={featured} />
+        </MotionReveal>
+      ) : null}
+
+      {rest.length ? (
+        <MotionStagger className="mt-5">
+          <Ledger>
+            {rest.map((project, index) => (
+              <MotionItem key={project.title}>
+                <ProjectLedgerRow index={index + 1} project={project} />
+              </MotionItem>
+            ))}
+          </Ledger>
+        </MotionStagger>
+      ) : null}
     </section>
   );
 }
 
-function ProjectCard({ featured, index, project }: { featured: boolean; index: number; project: PortfolioProject }) {
+function FeaturedProject({ index, project }: { index: number; project: PortfolioProject }) {
   return (
     <MotionHoverCard>
-      <article className={featured ? "group grid overflow-hidden rounded-[1.35rem] border border-border/80 bg-surface/75 backdrop-blur transition-colors hover:border-primary-accent/50 md:grid-cols-[minmax(0,1.12fr)_minmax(280px,0.88fr)]" : "group grid overflow-hidden rounded-2xl border border-border/70 bg-surface/65 backdrop-blur transition-colors hover:border-primary-accent/40 md:grid-cols-[minmax(0,0.85fr)_minmax(280px,1fr)]"}>
-        <ProjectVisual coverPath={project.coverPath} featured={featured} index={index} title={project.title} />
-        <div className="flex flex-col justify-between gap-8 p-6 md:p-7">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary-accent">Projeto 0{index + 1}</p>
-            <h3 className="mt-3 text-2xl font-semibold tracking-[-0.02em] md:text-3xl">{project.title}</h3>
-            <p className="mt-4 text-pretty text-sm leading-7 text-muted-foreground">{project.summary}</p>
+      <FramedCard className="p-4 md:p-5">
+        <div className="grid gap-4 md:grid-cols-[minmax(0,1.05fr)_minmax(260px,0.95fr)] md:gap-5">
+          <div className="min-h-56 overflow-hidden rounded-xl border border-foreground/10">
+            <ProjectVisual coverPath={project.coverPath} featured index={index} title={project.title} />
           </div>
-          <div className="flex flex-col gap-5">
-            <div className="flex flex-wrap gap-2">
-              {project.technologies.map((tech) => <TechBadge key={tech}>{tech}</TechBadge>)}
+          <div className="flex flex-col justify-between gap-6 p-1 md:p-2">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary-accent">
+                Projeto 0{index + 1}
+                {project.technologies[0] ? ` · ${project.technologies[0]}` : ""}
+              </p>
+              <h3 className="mt-3 text-2xl font-semibold tracking-[-0.02em] md:text-3xl">{project.title}</h3>
+              <p className="mt-4 text-pretty text-sm leading-7 text-muted-foreground">{project.summary}</p>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <Link
-                className="inline-flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-primary-accent"
-                href={project.demoUrl || "#contato"}
-                rel={project.demoUrl ? "noreferrer" : undefined}
-                target={project.demoUrl ? "_blank" : undefined}
-              >
-                Ver projeto <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
-              </Link>
-              {project.id ? (
-                <ProjectLikeButton initialLikesCount={project.likesCount ?? 0} projectId={project.id} />
-              ) : (
-                <span className="rounded-full border border-border/80 bg-background/70 px-3 py-2 text-xs text-muted-foreground">
-                  0 curtidas
-                </span>
-              )}
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-wrap gap-2">
+                {project.technologies.map((tech) => <TechBadge key={tech}>{tech}</TechBadge>)}
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/70 pt-4">
+                <ProjectLink project={project} />
+                {project.id ? (
+                  <ProjectLikeButton initialLikesCount={project.likesCount ?? 0} projectId={project.id} />
+                ) : (
+                  <span className="rounded-full border border-border/80 bg-background/70 px-3 py-2 text-xs text-muted-foreground">
+                    0 curtidas
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </article>
+      </FramedCard>
     </MotionHoverCard>
+  );
+}
+
+function ProjectLedgerRow({ index, project }: { index: number; project: PortfolioProject }) {
+  const isExternal = Boolean(project.demoUrl);
+
+  return (
+    <LedgerRow>
+      <Link
+        className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 md:gap-6 md:px-6 md:py-5"
+        href={project.demoUrl || "#contato"}
+        rel={isExternal ? "noreferrer" : undefined}
+        target={isExternal ? "_blank" : undefined}
+      >
+        <span className="font-mono text-xs tabular-nums text-foreground-subtle transition-colors group-hover:text-primary-accent">
+          0{index + 1}
+        </span>
+        <span className="min-w-0">
+          <span className="flex items-center gap-2.5">
+            <span className="min-w-0 truncate font-medium tracking-[-0.01em]">{project.title}</span>
+            {project.technologies[0] ? (
+              <span className="hidden shrink-0 rounded border border-primary-accent/25 bg-primary-accent/10 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-primary-accent sm:inline-block">
+                {project.technologies[0]}
+              </span>
+            ) : null}
+          </span>
+          {project.summary ? (
+            <span className="mt-0.5 hidden truncate text-sm text-muted-foreground md:block">{project.summary}</span>
+          ) : null}
+        </span>
+        <span
+          aria-hidden="true"
+          className="font-mono text-foreground-subtle transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary-accent"
+        >
+          →
+        </span>
+      </Link>
+    </LedgerRow>
+  );
+}
+
+function ProjectLink({ project }: { project: PortfolioProject }) {
+  const isExternal = Boolean(project.demoUrl);
+
+  return (
+    <Link
+      className="group/link inline-flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-primary-accent"
+      href={project.demoUrl || "#contato"}
+      rel={isExternal ? "noreferrer" : undefined}
+      target={isExternal ? "_blank" : undefined}
+    >
+      Ver projeto{" "}
+      <span aria-hidden="true" className="text-primary-accent transition-transform group-hover/link:translate-x-1">
+        →
+      </span>
+    </Link>
   );
 }
 
@@ -521,14 +595,17 @@ function ProjectVisual({ coverPath, featured, index, title }: { coverPath?: stri
 function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div className="flex flex-col gap-3">
-      <SectionEyebrow>{eyebrow}</SectionEyebrow>
+      <div className="flex items-center gap-4">
+        <SectionEyebrow>{eyebrow}</SectionEyebrow>
+        <span aria-hidden="true" className="h-px flex-1 bg-border/70" />
+      </div>
       <h2 className="max-w-2xl text-balance text-3xl font-semibold tracking-[-0.03em] md:text-5xl">{title}</h2>
     </div>
   );
 }
 
 function SectionEyebrow({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary-accent">{children}</p>;
+  return <p className="font-mono text-xs font-medium uppercase tracking-[0.22em] text-primary-accent">{children}</p>;
 }
 
 function SocialLink({ children, href }: { children: React.ReactNode; href: string }) {
@@ -545,22 +622,7 @@ function SocialLink({ children, href }: { children: React.ReactNode; href: strin
 }
 
 function TechBadge({ children }: { children: React.ReactNode }) {
-  return <span className="rounded-full border border-border/80 bg-background/70 px-3 py-1.5 text-xs text-foreground-muted">{children}</span>;
-}
-
-function MetricCard({ href, label, value }: { href?: string; label: string; value: string }) {
-  const card = (
-    <div className="rounded-2xl border border-border/70 bg-surface/70 p-5 backdrop-blur transition-colors hover:border-primary-accent/40">
-      <p className="text-xs text-foreground-subtle">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-[-0.03em]">{value}</p>
-    </div>
-  );
-
-  return (
-    <MotionItem>
-      {href ? <a href={href} rel="noreferrer" target="_blank">{card}</a> : card}
-    </MotionItem>
-  );
+  return <span className="rounded-md border border-border/80 bg-background/60 px-2.5 py-1 font-mono text-[11px] tracking-[0.02em] text-foreground-muted">{children}</span>;
 }
 
 function LogoMark() {

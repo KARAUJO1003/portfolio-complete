@@ -1,5 +1,36 @@
 @import "tailwindcss";
 
+/*
+ * Registra os tokens de cor no Tailwind v4 para que as utilitarias
+ * com opacidade (ex.: bg-surface/70, border-border/80, bg-primary-accent/10)
+ * sejam geradas corretamente. Antes disso essas variantes nao existiam e
+ * eram silenciosamente ignoradas. `inline` mantem a troca de tema via `.light`.
+ */
+@theme inline {
+  --color-background: var(--background);
+  --color-background-subtle: var(--background-subtle);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-muted: var(--surface-muted);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-tint: var(--primary-tint);
+  --color-primary-accent: var(--primary-accent);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+}
+
 :root {
   color-scheme: dark;
   --background: #09090b;
