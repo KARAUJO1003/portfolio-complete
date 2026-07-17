@@ -14,6 +14,7 @@ const adminGroups = [
     links: [
       { href: "/admin", label: "Inicio" },
       { href: "/admin/profile", label: "Perfil" },
+      { href: "/admin/account", label: "Minha conta" },
     ],
   },
   {
@@ -36,6 +37,7 @@ const adminGroups = [
   {
     label: "Sistema",
     links: [
+      { href: "/admin/users", label: "Usuarios" },
       { href: "/admin/design-system", label: "Design system" },
       // <generated-admin-links>
     ],

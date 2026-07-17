@@ -24,6 +24,8 @@ import { PageDescription, PageHeader, PageTitle } from "@/components/ds/page";
 import { Section, SectionContent, SectionHeader, SectionTitle } from "@/components/ds/section";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const colorTokens = [
   { name: "background", className: "bg-background", text: "text-foreground" },
@@ -98,6 +100,11 @@ export function DesignSystemFeature() {
               <Badge>Default</Badge>
               <Badge tone="success">Publicado</Badge>
               <Badge tone="muted">Rascunho</Badge>
+              <Badge tone="warning">Atencao</Badge>
+              <Badge tone="danger">Erro</Badge>
+              <Badge dot tone="success">On Time</Badge>
+              <Badge dot tone="warning">Delayed</Badge>
+              <Badge dot tone="danger">Cancelled</Badge>
             </CardContent>
           </Card>
 
@@ -196,10 +203,46 @@ export function DesignSystemFeature() {
           onSearchChange={() => undefined}
           filters={<Button variant="ghost">Filtro</Button>}
         >
-          <div className="rounded-lg border border-border bg-background p-4 text-sm text-muted-foreground">
-            As tabelas reais usam TanStack Table dentro deste frame.
-          </div>
+          <Table variant="card">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-px">
+                  <Checkbox aria-label="Selecionar todos" />
+                </TableHead>
+                <TableHead>Projeto</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <Checkbox aria-label="Selecionar linha" />
+                </TableCell>
+                <TableCell className="font-medium">Portfolio Admin</TableCell>
+                <TableCell>
+                  <Badge dot tone="success">
+                    Publicado
+                  </Badge>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <Checkbox aria-label="Selecionar linha" />
+                </TableCell>
+                <TableCell className="font-medium">Curriculo Builder</TableCell>
+                <TableCell>
+                  <Badge dot tone="warning">
+                    Rascunho
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </DataTableFrame>
+        <p className="text-[13px] leading-5 text-muted-foreground">
+          `Table`/`Checkbox` adaptados do particle `p-table-8` (Coss/Base UI). A integracao com
+          TanStack Table por CRUD entra na proxima etapa do roadmap.
+        </p>
       </Section>
 
       <Section>
@@ -250,7 +293,7 @@ export function DesignSystemFeature() {
             <div>
               <PageFrameTitle>ConfirmDialog</PageFrameTitle>
               <PageFrameDescription>
-                Caminho unico para acao destrutiva. Foco preso, ESC e aria vem do Radix; a descricao
+                Caminho unico para acao destrutiva. Foco preso, ESC e aria vem do Base UI; a descricao
                 da consequencia e obrigatoria.
               </PageFrameDescription>
             </div>

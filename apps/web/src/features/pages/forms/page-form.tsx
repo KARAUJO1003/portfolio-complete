@@ -5,9 +5,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FormError, FormField, FormLabel } from "@/components/ds/form-field";
+import { DsForm, FormActions, FormSection } from "@/components/ds/form";
+import { FormFields } from "@/components/ds/form-fields";
+import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
 import { createPage, updatePage } from "@/features/pages/api/pages-api";
 import { pagesKeys } from "@/features/pages/api/pages-queries";
@@ -70,65 +70,55 @@ export function PageForm({ page, onDone }: PageFormProps) {
   }
 
   return (
-    <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="grid gap-4 md:grid-cols-2">
-        <TextField label="Titulo" name="title" form={form} />
-        <TextField label="Slug" name="slug" form={form} />
-        <TextField label="Resumo" name="excerpt" form={form} />
-        <TextField label="Ordem" name="order" form={form} type="number" />
-      </div>
+    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+      <FormSection title="Identidade" description="Titulo, slug e resumo exibidos na navegacao e listagens.">
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormFields.Text form={form} label="Titulo" name="title" />
+          <FormFields.Text form={form} label="Slug" name="slug" />
+          <FormFields.Text form={form} label="Resumo" name="excerpt" />
+          <FormFields.NumberStepper form={form} label="Ordem" name="order" />
+        </div>
+      </FormSection>
 
-      <FormField>
-        <FormLabel htmlFor="content">Conteudo</FormLabel>
-        <Textarea id="content" className="min-h-56" {...form.register("content")} />
-      </FormField>
+      <FormSection title="Conteudo" description="Texto da pagina e formato de persistencia.">
+        <FormFields.HtmlEditor form={form} label="Conteudo" name="content" />
+        <FormFields.Select
+          form={form}
+          label="Formato do conteudo"
+          name="contentFormat"
+          options={[
+            { label: "HTML string", value: "html" },
+            { label: "Markdown importado", value: "markdown" },
+          ]}
+        />
+      </FormSection>
 
-      <FormField>
-        <FormLabel htmlFor="contentFormat">Formato do conteudo</FormLabel>
-        <select id="contentFormat" className="h-10 rounded-md border border-border bg-background px-3 text-sm" {...form.register("contentFormat")}>
-          <option value="html">HTML string</option>
-          <option value="markdown">Markdown importado</option>
-        </select>
-      </FormField>
-
-      <FormField>
-        <FormLabel htmlFor="status">Status</FormLabel>
-        <select id="status" className="h-10 rounded-md border border-border bg-background px-3 text-sm" {...form.register("status")}>
-          <option value="draft">Rascunho</option>
-          <option value="published">Publicado</option>
-          <option value="archived">Arquivado</option>
-        </select>
-      </FormField>
-
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" {...form.register("showInNavigation")} />
-        Exibir na navegacao publica
-      </label>
+      <FormSection title="Publicacao e exibicao" description="Status da pagina e presenca na navegacao publica.">
+        <FormFields.Select
+          form={form}
+          label="Status"
+          name="status"
+          options={[
+            { label: "Rascunho", value: "draft" },
+            { label: "Publicado", value: "published" },
+            { label: "Arquivado", value: "archived" },
+          ]}
+        />
+        <FormFields.Switch form={form} label="Navegacao publica" name="showInNavigation" description="Exibe esta pagina no menu publico." />
+      </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar pagina.</FormError>}
 
-      <Button type="submit" disabled={mutation.isPending}>
-        {mutation.isPending ? "Salvando..." : page ? "Salvar alteracoes" : "Criar pagina"}
-      </Button>
-    </form>
-  );
-}
-
-type TextFieldProps = {
-  label: string;
-  name: keyof PageFormValues;
-  form: ReturnType<typeof useForm<PageFormValues>>;
-  type?: string;
-};
-
-function TextField({ label, name, form, type = "text" }: TextFieldProps) {
-  const error = form.formState.errors[name]?.message;
-
-  return (
-    <FormField>
-      <FormLabel htmlFor={name}>{label}</FormLabel>
-      <Input id={name} type={type} {...form.register(name)} />
-      {error && <FormError>{String(error)}</FormError>}
-    </FormField>
+      <FormActions>
+        <Button type="submit" disabled={mutation.isPending}>
+          {mutation.isPending ? "Salvando..." : page ? "Salvar alteracoes" : "Criar pagina"}
+        </Button>
+        {page && (
+          <Button type="button" variant="ghost" onClick={onDone}>
+            Cancelar edicao
+          </Button>
+        )}
+      </FormActions>
+    </DsForm>
   );
 }

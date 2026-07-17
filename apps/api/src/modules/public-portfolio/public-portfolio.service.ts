@@ -12,6 +12,7 @@ import { ContentVersionModel } from "../content-versions/content-versions.model"
 import { getGitHubSnapshot } from "../github/github.service";
 import { CustomSectionModel } from "../custom-sections/custom-sections.model";
 import { toCustomSectionDto } from "../custom-sections/custom-sections.mapper";
+import { renderTemplateVariables } from "../../shared/content/render-template";
 
 export async function getPublicPortfolio() {
   const profile = await ProfileModel.findOne().sort({ updatedAt: -1 });
@@ -57,7 +58,11 @@ export async function getPublicPortfolio() {
     if (!isEnabled(sectionId)) return [];
     if (!section || section.selectionMode === "all") return items;
     const selected = new Set(section.itemIds);
-    return items.filter((item) => selected.has(String(item._id)));
+    const filtered = items.filter((item) => selected.has(String(item._id)));
+    const orderIndex = new Map(section.itemIds.map((id, index) => [id, index]));
+    return filtered.sort(
+      (a, b) => (orderIndex.get(String(a._id)) ?? 0) - (orderIndex.get(String(b._id)) ?? 0),
+    );
   };
 
   const visibleProjects = filterItems(projects, "projects");
@@ -74,7 +79,10 @@ export async function getPublicPortfolio() {
     experiences: visibleExperiences.map(toExperienceDto),
     navigationPages: visiblePages.map(toCustomPageDto),
     github,
-    customSections: visibleCustomSections.map(toCustomSectionDto),
+    customSections: visibleCustomSections.map((section) => {
+      const dto = toCustomSectionDto(section);
+      return { ...dto, content: renderTemplateVariables(dto.content, { profile }) };
+    }),
     version: version
       ? {
           id: String(version._id),

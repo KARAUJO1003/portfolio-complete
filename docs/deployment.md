@@ -94,4 +94,4 @@ Apos obter a URL definitiva da Vercel, atualize `WEB_URL` no Render e faca um no
 
 O filesystem do Render gratuito e efemero. Arquivos em `storage/tmp/uploads` podem desaparecer em reinicios, suspensoes e novos deploys. O banco continuara contendo o path relativo, mas o arquivo podera deixar de existir.
 
-Para producao duravel, a proxima evolucao deve manter a interface atual de upload e trocar somente o adapter de storage por Cloudinary, S3 ou servico equivalente. Ate essa troca, nao use o Render como armazenamento definitivo dos arquivos do portfolio.
+Decisao (2026-07-17): manter upload local em `storage/tmp/uploads` dentro do proprio projeto, sem adotar Cloudinary/S3/Supabase ou qualquer storage externo. A limitacao de efemeridade no Render free e aceita por ora; se for necessario storage duravel no futuro, reavaliar nesse momento em vez de trocar o adapter preventivamente.

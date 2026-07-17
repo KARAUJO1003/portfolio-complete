@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -84,7 +85,9 @@ export function LoginForm() {
             {form.formState.isSubmitting ? "Entrando..." : "Entrar"}
           </Button>
           <p className="text-center text-xs leading-5 text-muted-foreground">
-            Recuperacao de senha e solicitacao de acesso entram na proxima fase de usuarios.
+            <Link className="underline underline-offset-4" href="/forgot-password">
+              Esqueci minha senha
+            </Link>
           </p>
         </form>
       </CardContent>

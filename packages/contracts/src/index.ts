@@ -1,4 +1,5 @@
 export * from "./auth";
+export * from "./content-variables";
 export * from "./content-version";
 export * from "./custom-section";
 export * from "./experience";
@@ -9,3 +10,4 @@ export * from "./profile";
 export * from "./project";
 export * from "./skill";
 export * from "./upload";
+export * from "./user";

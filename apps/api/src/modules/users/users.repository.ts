@@ -8,6 +8,10 @@ export async function findUserById(id: string) {
   return UserModel.findById(id);
 }
 
+export async function listUsers() {
+  return UserModel.find().sort({ createdAt: 1 });
+}
+
 export async function updateUserById(
   id: string,
   data: Partial<{
@@ -15,6 +19,9 @@ export async function updateUserById(
     roles: string[];
     permissions: string[];
     isAdmin: boolean;
+    passwordHash: string;
+    resetTokenHash: string | null;
+    resetTokenExpiresAt: Date | null;
   }>,
 ) {
   return UserModel.findByIdAndUpdate(id, { $set: data }, { new: true });
@@ -32,4 +39,19 @@ export async function createUser(data: {
     ...data,
     email: data.email.toLowerCase(),
   }) as Promise<UserDocument>;
+}
+
+export async function deleteUserById(id: string) {
+  return UserModel.findByIdAndDelete(id);
+}
+
+export async function countUsersByRole(role: string) {
+  return UserModel.countDocuments({ roles: role });
+}
+
+export async function findUserByResetTokenHash(resetTokenHash: string) {
+  return UserModel.findOne({
+    resetTokenHash,
+    resetTokenExpiresAt: { $gt: new Date() },
+  });
 }

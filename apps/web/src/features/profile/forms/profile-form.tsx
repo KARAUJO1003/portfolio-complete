@@ -5,8 +5,9 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FormDescription, FormError, FormField, FormLabel } from "@/components/ds/form-field";
+import { DsForm, FormActions, FormSection } from "@/components/ds/form";
+import { FormFields } from "@/components/ds/form-fields";
+import { FormError, FormField, FormLabel } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
 import { saveMyProfile } from "@/features/profile/api/profile-api";
 import { myProfileQueryOptions, profileKeys } from "@/features/profile/api/profile-queries";
@@ -73,69 +74,58 @@ export function ProfileForm() {
   }
 
   return (
-    <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="grid gap-4 md:grid-cols-2">
-        <TextField label="Nome" name="name" form={form} />
-        <TextField label="Headline" name="headline" form={form} />
-        <TextField label="Email" name="email" form={form} />
-        <TextField label="Telefone" name="phone" form={form} />
-        <TextField label="Localizacao" name="location" form={form} />
-        <TextField label="Endereco" name="address" form={form} />
-        <TextField label="Data de nascimento" name="birthDate" form={form} />
-        <TextField label="CNH" name="driverLicense" form={form} />
+    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+      <FormSection title="Dados pessoais" description="Identificacao, contato e localizacao exibidos no portfolio e no curriculo.">
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormFields.Text form={form} label="Nome" name="name" />
+          <FormFields.Text form={form} label="Headline" name="headline" />
+          <FormFields.Text form={form} label="Email" name="email" />
+          <FormFields.Text form={form} label="Telefone" name="phone" />
+          <FormFields.Text form={form} label="Localizacao" name="location" />
+          <FormFields.Text form={form} label="Endereco" name="address" />
+          <FormFields.Text form={form} label="Data de nascimento" name="birthDate" />
+          <FormFields.Text form={form} label="CNH" name="driverLicense" />
+        </div>
+
         <FormField>
-          <FormLabel htmlFor="avatarPath">Avatar path</FormLabel>
+          <FormLabel htmlFor="avatarPath">Avatar</FormLabel>
           <div className="flex gap-2">
             <Input className="flex-1" id="avatarPath" {...form.register("avatarPath")} />
             <FileUploadField folder="profile" onUploaded={(path) => form.setValue("avatarPath", path, { shouldDirty: true })} />
           </div>
         </FormField>
-        <TextField label="Website" name="website" form={form} />
-        <TextField label="GitHub" name="github" form={form} />
-        <TextField label="LinkedIn" name="linkedin" form={form} />
-      </div>
 
-      <FormField>
-        <FormLabel htmlFor="summary">Resumo</FormLabel>
-        <Textarea id="summary" {...form.register("summary")} />
-        <FormDescription>Use **texto** para destacar trechos em negrito no curriculo.</FormDescription>
-        {form.formState.errors.summary?.message && (
-          <FormError>{form.formState.errors.summary.message}</FormError>
-        )}
-      </FormField>
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormFields.Text form={form} label="Website" name="website" />
+          <FormFields.Text form={form} label="GitHub" name="github" />
+          <FormFields.Text form={form} label="LinkedIn" name="linkedin" />
+        </div>
+      </FormSection>
 
-      <FormField>
-        <FormLabel htmlFor="objective">Objetivo</FormLabel>
-        <Textarea id="objective" {...form.register("objective")} />
-        <FormDescription>Use **texto** para destacar trechos em negrito no curriculo.</FormDescription>
-        {form.formState.errors.objective?.message && (
-          <FormError>{form.formState.errors.objective.message}</FormError>
-        )}
-      </FormField>
+      <FormSection title="Resumo e objetivo" description="Textos usados no curriculo. Use **texto** para negrito.">
+        <FormFields.RichTextField
+          description="Use **texto** para destacar trechos em negrito no curriculo."
+          form={form}
+          label="Resumo"
+          name="summary"
+          rows={5}
+        />
+        <FormFields.RichTextField
+          description="Use **texto** para destacar trechos em negrito no curriculo."
+          form={form}
+          label="Objetivo"
+          name="objective"
+          rows={4}
+        />
+      </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar perfil.</FormError>}
 
-      <Button type="submit" disabled={form.formState.isSubmitting || mutation.isPending}>
-        {mutation.isPending ? "Salvando..." : "Salvar perfil"}
-      </Button>
-    </form>
-  );
-}
-
-type TextFieldProps = {
-  label: string;
-  name: keyof ProfileFormValues;
-  form: ReturnType<typeof useForm<ProfileFormValues>>;
-};
-
-function TextField({ label, name, form }: TextFieldProps) {
-  const error = form.formState.errors[name]?.message;
-
-  return (
-    <FormField>
-      <FormLabel htmlFor={name}>{label}</FormLabel>
-      <Input id={name} {...form.register(name)} />
-      {error && <FormError>{String(error)}</FormError>}
-    </FormField>
+      <FormActions>
+        <Button type="submit" disabled={form.formState.isSubmitting || mutation.isPending}>
+          {mutation.isPending ? "Salvando..." : "Salvar perfil"}
+        </Button>
+      </FormActions>
+    </DsForm>
   );
 }

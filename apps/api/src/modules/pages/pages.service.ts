@@ -1,5 +1,7 @@
 import type { CreateCustomPageRequest, UpdateCustomPageRequest } from "@portfolio/contracts";
 import { ApiError } from "../../shared/errors/api-error";
+import { renderTemplateVariables } from "../../shared/content/render-template";
+import { ProfileModel } from "../profile/profile.model";
 import { toCustomPageDto } from "./pages.mapper";
 import * as repository from "./pages.repository";
 
@@ -11,7 +13,9 @@ export async function list(ownerId: string) {
 export async function findPublished(slug: string) {
   const page = await repository.findPublishedPageBySlug(slug);
   if (!page) throw new ApiError("Page not found", 404);
-  return toCustomPageDto(page);
+  const dto = toCustomPageDto(page);
+  const profile = await ProfileModel.findOne({ ownerId: page.ownerId });
+  return { ...dto, content: renderTemplateVariables(dto.content, { profile }) };
 }
 
 export async function create(ownerId: string, input: CreateCustomPageRequest) {

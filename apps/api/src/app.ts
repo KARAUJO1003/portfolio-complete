@@ -18,6 +18,7 @@ import { publicPortfolioRoutes } from "./modules/public-portfolio/public-portfol
 import { resumePdfRoutes } from "./modules/resume-pdf/resume-pdf.routes";
 import { skillsRoutes } from "./modules/skills/skills.routes";
 import { uploadsRoutes } from "./modules/uploads/uploads.routes";
+import { usersRoutes } from "./modules/users/users.routes";
 // <generated-module-imports>
 
 export function createApp() {
@@ -64,6 +65,7 @@ export function createApp() {
   app.use("/resume-pdf", resumePdfRoutes);
   app.use("/skills", skillsRoutes);
   app.use("/uploads", uploadsRoutes);
+  app.use("/users", usersRoutes);
   // <generated-module-routes>
 
   app.use(notFoundHandler);

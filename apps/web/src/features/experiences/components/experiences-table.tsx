@@ -3,9 +3,11 @@
 import type { ExperienceDto } from "@portfolio/contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/datatable/data-table";
+import { ErrorState } from "@/components/ds/admin-primitives";
+import { ConfirmDialog } from "@/components/ds/confirm-dialog";
 import { Can } from "@/core/auth/components/can";
 import { deleteExperience } from "@/features/experiences/api/experiences-api";
 import {
@@ -21,10 +23,14 @@ type ExperiencesTableProps = {
 export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
   const queryClient = useQueryClient();
   const experiencesQuery = useQuery(experiencesListQueryOptions());
+  const [pendingDelete, setPendingDelete] = useState<ExperienceDto | null>(null);
 
   const deleteMutation = useMutation({
     mutationFn: deleteExperience,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: experiencesKeys.list() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: experiencesKeys.list() });
+      setPendingDelete(null);
+    },
   });
 
   const columns = useMemo<ColumnDef<ExperienceDto, unknown>[]>(
@@ -55,7 +61,7 @@ export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
               </Button>
             </Can>
             <Can can={[EXPERIENCES_PERMISSIONS.delete]}>
-              <Button type="button" variant="ghost" onClick={() => deleteMutation.mutate(row.original.id)}>
+              <Button type="button" variant="ghost" onClick={() => setPendingDelete(row.original)}>
                 Excluir
               </Button>
             </Can>
@@ -63,14 +69,34 @@ export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
         ),
       },
     ],
-    [deleteMutation, onEdit],
+    [onEdit],
   );
 
+  if (experiencesQuery.isError) {
+    return (
+      <ErrorState
+        title="Nao foi possivel carregar a trajetoria"
+        description="A listagem nao respondeu. Verifique a API e tente novamente."
+      />
+    );
+  }
+
   return (
-    <DataTable
-      data={experiencesQuery.data ?? []}
-      columns={columns}
-      emptyLabel={experiencesQuery.isLoading ? "Carregando itens..." : "Nenhum item cadastrado."}
-    />
+    <>
+      <DataTable
+        data={experiencesQuery.data ?? []}
+        columns={columns}
+        emptyLabel="Nenhum item cadastrado."
+        isLoading={experiencesQuery.isLoading}
+      />
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title="Excluir item"
+        description={`Esta acao remove "${pendingDelete?.title}" definitivamente.`}
+        loading={deleteMutation.isPending}
+        onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+      />
+    </>
   );
 }

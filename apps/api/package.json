@@ -10,9 +10,9 @@
     "generate:module": "node scripts/generate-module.mjs"
   },
   "dependencies": {
+    "@portfolio/config": "workspace:*",
     "@portfolio/contracts": "workspace:*",
     "@portfolio/feature-flags": "workspace:*",
-    "@portfolio/config": "workspace:*",
     "@portfolio/permissions": "workspace:*",
     "bcryptjs": "^2.0.0",
     "cookie-parser": "^1.0.0",
@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^8.0.0",
     "multer": "^1.0.0",
+    "resend": "^6.17.2",
     "zod": "^4.0.0"
   },
   "devDependencies": {

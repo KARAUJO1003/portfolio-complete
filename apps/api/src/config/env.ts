@@ -24,6 +24,8 @@ const envSchema = z.object({
   FILES_BASE_PATH: z.string().default("/files"),
   GITHUB_TOKEN: z.string().optional(),
   AUTH_ENABLED: booleanFromEnv.default(false),
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM_EMAIL: z.string().default("Portfolio <onboarding@resend.dev>"),
 });
 
 const parsed = envSchema.parse(process.env);
@@ -43,4 +45,6 @@ export const env = {
   filesBasePath: parsed.FILES_BASE_PATH,
   githubToken: parsed.GITHUB_TOKEN,
   authEnabled: parsed.AUTH_ENABLED,
+  resendApiKey: parsed.RESEND_API_KEY,
+  resendFromEmail: parsed.RESEND_FROM_EMAIL,
 };

@@ -1,7 +1,13 @@
 import type { CookieOptions, RequestHandler } from "express";
 import { env } from "../../config/env";
-import { loginRequestSchema } from "./auth.schemas";
-import { loginWithCredentials } from "./auth.service";
+import { ApiError } from "../../shared/errors/api-error";
+import {
+  changePasswordRequestSchema,
+  forgotPasswordRequestSchema,
+  loginRequestSchema,
+  resetPasswordRequestSchema,
+} from "./auth.schemas";
+import { changePassword, loginWithCredentials, requestPasswordReset, resetPassword } from "./auth.service";
 
 export const login: RequestHandler = async (request, response, next) => {
   try {
@@ -11,6 +17,37 @@ export const login: RequestHandler = async (request, response, next) => {
     response.cookie(env.authCookieName, result.token, authCookieOptions());
 
     response.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const forgotPassword: RequestHandler = async (request, response, next) => {
+  try {
+    const input = forgotPasswordRequestSchema.parse(request.body);
+    await requestPasswordReset(input.email);
+    response.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPasswordHandler: RequestHandler = async (request, response, next) => {
+  try {
+    const input = resetPasswordRequestSchema.parse(request.body);
+    await resetPassword(input.token, input.password);
+    response.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePasswordHandler: RequestHandler = async (request, response, next) => {
+  try {
+    if (!request.user) throw new ApiError("Unauthenticated", 401);
+    const input = changePasswordRequestSchema.parse(request.body);
+    await changePassword(request.user.id, input.currentPassword, input.newPassword);
+    response.status(204).send();
   } catch (error) {
     next(error);
   }

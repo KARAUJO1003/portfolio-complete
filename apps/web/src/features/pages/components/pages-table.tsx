@@ -4,9 +4,11 @@ import type { CustomPageDto } from "@portfolio/contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/datatable/data-table";
+import { ErrorState } from "@/components/ds/admin-primitives";
+import { ConfirmDialog } from "@/components/ds/confirm-dialog";
 import { Can } from "@/core/auth/components/can";
 import { deletePage } from "@/features/pages/api/pages-api";
 import { pagesKeys, pagesListQueryOptions } from "@/features/pages/api/pages-queries";
@@ -19,10 +21,14 @@ type PagesTableProps = {
 export function PagesTable({ onEdit }: PagesTableProps) {
   const queryClient = useQueryClient();
   const pagesQuery = useQuery(pagesListQueryOptions());
+  const [pendingDelete, setPendingDelete] = useState<CustomPageDto | null>(null);
 
   const deleteMutation = useMutation({
     mutationFn: deletePage,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: pagesKeys.list() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: pagesKeys.list() });
+      setPendingDelete(null);
+    },
   });
 
   const columns = useMemo<ColumnDef<CustomPageDto, unknown>[]>(
@@ -53,7 +59,7 @@ export function PagesTable({ onEdit }: PagesTableProps) {
               </Button>
             </Can>
             <Can can={[PAGES_PERMISSIONS.delete]}>
-              <Button type="button" variant="ghost" onClick={() => deleteMutation.mutate(row.original.id)}>
+              <Button type="button" variant="ghost" onClick={() => setPendingDelete(row.original)}>
                 Excluir
               </Button>
             </Can>
@@ -61,14 +67,34 @@ export function PagesTable({ onEdit }: PagesTableProps) {
         ),
       },
     ],
-    [deleteMutation, onEdit],
+    [onEdit],
   );
 
+  if (pagesQuery.isError) {
+    return (
+      <ErrorState
+        title="Nao foi possivel carregar paginas"
+        description="A listagem nao respondeu. Verifique a API e tente novamente."
+      />
+    );
+  }
+
   return (
-    <DataTable
-      data={pagesQuery.data ?? []}
-      columns={columns}
-      emptyLabel={pagesQuery.isLoading ? "Carregando paginas..." : "Nenhuma pagina cadastrada."}
-    />
+    <>
+      <DataTable
+        data={pagesQuery.data ?? []}
+        columns={columns}
+        emptyLabel="Nenhuma pagina cadastrada."
+        isLoading={pagesQuery.isLoading}
+      />
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title="Excluir pagina"
+        description={`Esta acao remove "${pendingDelete?.title}" definitivamente. Se estiver publicada, a rota publica deixa de existir.`}
+        loading={deleteMutation.isPending}
+        onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
+        onOpenChange={(open) => !open && setPendingDelete(null)}
+      />
+    </>
   );
 }

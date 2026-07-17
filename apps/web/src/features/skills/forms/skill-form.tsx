@@ -5,9 +5,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FormError, FormField, FormLabel } from "@/components/ds/form-field";
+import { DsForm, FormActions, FormSection } from "@/components/ds/form";
+import { FormFields } from "@/components/ds/form-fields";
+import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
 import { createSkill, updateSkill } from "@/features/skills/api/skills-api";
 import { skillsKeys } from "@/features/skills/api/skills-queries";
@@ -84,55 +84,39 @@ export function SkillForm({ skill, onDone }: SkillFormProps) {
   }
 
   return (
-    <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="grid gap-4 md:grid-cols-2">
-        <TextField label="Titulo" name="title" form={form} />
-        <TextField label="Categoria" name="category" form={form} />
-        <TextField label="Data de inicio" name="startedAt" form={form} />
-        <TextField label="Icone" name="icon" form={form} />
-        <TextField label="Ordem" name="order" form={form} type="number" />
-      </div>
+    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+      <FormSection title="Identidade" description="Nome, categoria e desde quando a habilidade e praticada.">
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormFields.Text form={form} label="Titulo" name="title" />
+          <FormFields.Text form={form} label="Categoria" name="category" />
+          <FormFields.Text form={form} label="Data de inicio" name="startedAt" />
+          <FormFields.Text form={form} label="Icone" name="icon" />
+        </div>
+        <FormFields.Textarea form={form} label="Descricao" name="description" rows={4} />
+      </FormSection>
 
-      <FormField>
-        <FormLabel htmlFor="description">Descricao</FormLabel>
-        <Textarea id="description" {...form.register("description")} />
-      </FormField>
-
-      <div className="grid gap-3 md:grid-cols-2">
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" {...form.register("showOnPortfolio")} />
-          Exibir no portfolio
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" {...form.register("showOnResume")} />
-          Exibir no curriculo
-        </label>
-      </div>
+      <FormSection title="Publicacao e exibicao" description="Controle onde esta habilidade aparece.">
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormFields.NumberStepper form={form} label="Ordem" name="order" />
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponivel para versoes de portfolio." />
+          <FormFields.Switch form={form} label="Curriculo" name="showOnResume" description="Disponivel para versoes de curriculo." />
+        </div>
+      </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar habilidade.</FormError>}
 
-      <Button type="submit" disabled={mutation.isPending}>
-        {mutation.isPending ? "Salvando..." : skill ? "Salvar alteracoes" : "Criar habilidade"}
-      </Button>
-    </form>
-  );
-}
-
-type TextFieldProps = {
-  label: string;
-  name: keyof SkillFormValues;
-  form: ReturnType<typeof useForm<SkillFormValues>>;
-  type?: string;
-};
-
-function TextField({ label, name, form, type = "text" }: TextFieldProps) {
-  const error = form.formState.errors[name]?.message;
-
-  return (
-    <FormField>
-      <FormLabel htmlFor={name}>{label}</FormLabel>
-      <Input id={name} type={type} {...form.register(name)} />
-      {error && <FormError>{String(error)}</FormError>}
-    </FormField>
+      <FormActions>
+        <Button type="submit" disabled={mutation.isPending}>
+          {mutation.isPending ? "Salvando..." : skill ? "Salvar alteracoes" : "Criar habilidade"}
+        </Button>
+        {skill && (
+          <Button type="button" variant="ghost" onClick={onDone}>
+            Cancelar edicao
+          </Button>
+        )}
+      </FormActions>
+    </DsForm>
   );
 }

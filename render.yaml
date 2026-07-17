@@ -37,3 +37,7 @@ services:
         value: ../../storage/tmp/uploads
       - key: FILES_BASE_PATH
         value: /files
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false

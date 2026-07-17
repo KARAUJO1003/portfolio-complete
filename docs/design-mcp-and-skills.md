@@ -55,6 +55,24 @@ Fonte: https://coss.com/ui/docs/skills
 
 Uso: skill local e particulas para componentes mais agradaveis, especialmente buttons, cards, tables, forms e particles.
 
+### ReUI
+
+Fonte: https://reui.io/docs (docs), https://reui.io/blocks (blocks), https://reui.io/docs/claude (setup Claude Code).
+
+Uso: registry construido sobre shadcn/ui e Tailwind, compativel com Base UI e Radix. Referencia visual explicita do usuario (2026-07-17) para o admin: dense, limpo, premium. Free: 17 primitivos (data-grid, kanban, filters, date-selector, stepper, tree), 1000+ exemplos, 562 icones. Premium: 485+ blocks (Application, Data Grid, Solutions, eCommerce, Marketing) e templates, exigem `REUI_LICENSE_KEY` proprio do usuario.
+
+Config em `.mcp.json`/`.cursor/mcp.json`/`.vscode/mcp.json`:
+
+```json
+"reui": { "type": "http", "url": "https://mcp.reui.io" }
+```
+
+Pendente de acao do usuario (nao pode ser feito pelo assistente):
+
+- Autenticar via `/mcp` no Claude Code (fluxo OAuth interativo) ou `claude mcp add --transport http reui https://mcp.reui.io --header "Authorization: Bearer <token>"` para uso headless.
+- Instalar a skill oficial rodando `curl -fsSL https://mcp.reui.io/install | node -` na raiz do projeto (script remoto; o assistente nao executa `curl | node` por politica de seguranca).
+- Se for usar blocks premium, adicionar `REUI_LICENSE_KEY` em `.env.local` e o registry `@reui` em `components.json` (ver docs oficiais).
+
 ## Politica De Uso
 
 - MCP/skills servem como referencia e acelerador, nao como substituto do design system local.

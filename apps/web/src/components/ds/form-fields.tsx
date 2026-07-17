@@ -1,7 +1,8 @@
 "use client";
 
-import type { FieldValues, Path, PathValue, UseFormReturn } from "react-hook-form";
+import { Controller, type FieldValues, type Path, type PathValue, type UseFormReturn } from "react-hook-form";
 import { FormDescription, FormError, FormField, FormLabel } from "@/components/ds/form-field";
+import { RichTextEditor } from "@/components/ds/rich-text-editor";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -121,7 +122,7 @@ function Select<TValues extends FieldValues>({
       <FormLabel htmlFor={name}>{label}</FormLabel>
       <select
         id={name}
-        className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none transition-colors focus:border-primary"
+        className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none transition-colors focus:border-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         {...form.register(name)}
       >
         {options.map((option) => (
@@ -193,7 +194,33 @@ function RichTextField<TValues extends FieldValues>(props: BaseFieldProps<TValue
   );
 }
 
+function HtmlEditor<TValues extends FieldValues>({
+  className,
+  description,
+  form,
+  label,
+  name,
+}: BaseFieldProps<TValues>) {
+  const error = fieldError(form, name);
+
+  return (
+    <FormField className={className}>
+      <FormLabel htmlFor={name}>{label}</FormLabel>
+      <Controller
+        control={form.control}
+        name={name}
+        render={({ field }) => (
+          <RichTextEditor id={name} value={field.value ?? ""} onChange={field.onChange} />
+        )}
+      />
+      {description && <FormDescription>{description}</FormDescription>}
+      {error && <FormError>{error}</FormError>}
+    </FormField>
+  );
+}
+
 export const FormFields = {
+  HtmlEditor,
   NumberStepper,
   RichTextField,
   Select,

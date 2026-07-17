@@ -5,9 +5,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FormError, FormField, FormLabel } from "@/components/ds/form-field";
+import { DsForm, FormActions, FormSection } from "@/components/ds/form";
+import { FormFields } from "@/components/ds/form-fields";
+import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
 import { createExperience, updateExperience } from "@/features/experiences/api/experiences-api";
 import { experiencesKeys } from "@/features/experiences/api/experiences-queries";
@@ -101,70 +101,51 @@ export function ExperienceForm({ experience, onDone }: ExperienceFormProps) {
   }
 
   return (
-    <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-      <div className="grid gap-4 md:grid-cols-2">
-        <FormField>
-          <FormLabel htmlFor="type">Tipo</FormLabel>
-          <select id="type" className="h-10 rounded-md border border-border bg-background px-3 text-sm" {...form.register("type")}>
-            <option value="work">Experiencia</option>
-            <option value="education">Formacao</option>
-            <option value="certification">Certificacao</option>
-            <option value="link">Link</option>
-          </select>
-        </FormField>
-        <TextField label="Titulo" name="title" form={form} />
-        <TextField label="Organizacao" name="organization" form={form} />
-        <TextField label="Localizacao" name="location" form={form} />
-        <TextField label="Inicio" name="startDate" form={form} />
-        <TextField label="Fim" name="endDate" form={form} />
-        <TextField label="URL" name="url" form={form} />
-        <TextField label="Ordem" name="order" form={form} type="number" />
-      </div>
+    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+      <FormSection title="Identidade" description="Tipo de item, titulo, organizacao e periodo.">
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormFields.Select
+            form={form}
+            label="Tipo"
+            name="type"
+            options={[
+              { label: "Experiencia", value: "work" },
+              { label: "Formacao", value: "education" },
+              { label: "Certificacao", value: "certification" },
+              { label: "Link", value: "link" },
+            ]}
+          />
+          <FormFields.Text form={form} label="Titulo" name="title" />
+          <FormFields.Text form={form} label="Organizacao" name="organization" />
+          <FormFields.Text form={form} label="Localizacao" name="location" />
+          <FormFields.Text form={form} label="Inicio" name="startDate" />
+          <FormFields.Text form={form} label="Fim" name="endDate" />
+          <FormFields.Text form={form} label="URL" name="url" />
+          <FormFields.NumberStepper form={form} label="Ordem" name="order" />
+        </div>
+        <FormFields.Textarea form={form} label="Descricao" name="description" rows={4} />
+      </FormSection>
 
-      <FormField>
-        <FormLabel htmlFor="description">Descricao</FormLabel>
-        <Textarea id="description" {...form.register("description")} />
-      </FormField>
-
-      <div className="grid gap-3 md:grid-cols-3">
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" {...form.register("current")} />
-          Atual
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" {...form.register("showOnPortfolio")} />
-          Exibir no portfolio
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" {...form.register("showOnResume")} />
-          Exibir no curriculo
-        </label>
-      </div>
+      <FormSection title="Publicacao e exibicao" description="Controle status atual e onde este item aparece.">
+        <div className="grid gap-3 md:grid-cols-3">
+          <FormFields.Switch form={form} label="Atual" name="current" />
+          <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponivel para versoes de portfolio." />
+          <FormFields.Switch form={form} label="Curriculo" name="showOnResume" description="Disponivel para versoes de curriculo." />
+        </div>
+      </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar item.</FormError>}
 
-      <Button type="submit" disabled={mutation.isPending}>
-        {mutation.isPending ? "Salvando..." : experience ? "Salvar alteracoes" : "Criar item"}
-      </Button>
-    </form>
-  );
-}
-
-type TextFieldProps = {
-  label: string;
-  name: keyof ExperienceFormValues;
-  form: ReturnType<typeof useForm<ExperienceFormValues>>;
-  type?: string;
-};
-
-function TextField({ label, name, form, type = "text" }: TextFieldProps) {
-  const error = form.formState.errors[name]?.message;
-
-  return (
-    <FormField>
-      <FormLabel htmlFor={name}>{label}</FormLabel>
-      <Input id={name} type={type} {...form.register(name)} />
-      {error && <FormError>{String(error)}</FormError>}
-    </FormField>
+      <FormActions>
+        <Button type="submit" disabled={mutation.isPending}>
+          {mutation.isPending ? "Salvando..." : experience ? "Salvar alteracoes" : "Criar item"}
+        </Button>
+        {experience && (
+          <Button type="button" variant="ghost" onClick={onDone}>
+            Cancelar edicao
+          </Button>
+        )}
+      </FormActions>
+    </DsForm>
   );
 }

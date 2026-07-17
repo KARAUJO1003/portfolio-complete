@@ -58,21 +58,22 @@ Status: `pending`, `in-progress`, `done`.
 | Design system premium documentado | in-progress | `DESIGN.md`, `docs/design-system.md`, tokens premium e MCPs/skills de design adicionados |
 | Motion for React | done | Dependencia `motion` instalada no front e usada no toggle de curtida |
 | Sistema de animacoes premium | in-progress | `components/ds/motion`, scroll progress, reveal/stagger/hover variants, scroll-trigger reversivel, stacks animados, sticky stack, menu flutuante mobile e docs |
-| MCPs/skills de design | done | Coss, Coss Particles e Impeccable instalados; configs locais MCP criadas |
-| Vitrine do design system | in-progress | Tela inicial criada em `/admin/design-system` |
+| MCPs/skills de design | done | Coss, Coss Particles e Impeccable instalados; configs locais MCP criadas; ReUI adicionado em `.mcp.json`/`.cursor`/`.vscode` como referencia visual do admin, pendente de autenticacao do usuario |
+| Vitrine do design system | in-progress | `/admin/design-system` cobre tokens, componentes base, Admin UX, tabelas, metricas, estados e dialogs; faltam tipografia, layout, upload, builders, permissoes e feature flags |
 | Roadmap admin UX/forms/tables/builders | done | Plano em `docs/admin-ux-roadmap.md` e skill local `admin-ux-system` |
-| Redesign do admin e login | in-progress | AdminShell com navegacao superior agrupada e login redesenhado; ainda falta aplicar refinamento fino em todas as telas |
-| Sistema avancado de formularios admin | in-progress | DS inicial criado com `DsForm`, secoes, steps, preview, number stepper, switches e piloto em projetos; Tiptap/autocomplete ficam para fase seguinte |
-| Tabelas admin padronizadas | in-progress | `DataTableFrame` criado e piloto em projetos com busca, filtro e ordenacao; falta replicar nos demais CRUDs |
-| Builders com preview real e drag and drop | pending | Portfolio/curriculo com preview antes de salvar, dnd-kit e versoes melhoradas |
-| Usuarios, profile e recuperacao de senha | pending | Usuarios, cadastro/convite, esqueci senha, roles e permissoes integradas |
+| Primitivos de UI (Base UI) | in-progress | Base UI escolhido como primitivo padrao (nao Radix); decisao e regras em `docs/ui-primitives.md`. Radix remanescente so via `vaul` (drawer do portfolio publico) |
+| Redesign do admin e login | in-progress | AdminShell com navegacao superior agrupada, login redesenhado e `ConfirmDialog` criado; agora tambem usado de verdade antes de excluir em todas as tabelas (ver hardening). Ainda falta aplicar refinamento fino em todas as telas |
+| Sistema avancado de formularios admin | in-progress | `projects` continua sendo o piloto completo (steps, preview, aside); `skills`, `experiences`, `pages`, `profile` e `custom-sections` migrados para `DsForm`/`FormSection`/`FormFields` no padrao basico, sem preview/steps. `custom-sections` ganhou form dedicado com React Hook Form (antes era `useState` puro). Tiptap/autocomplete ficam para fase seguinte |
+| Tabelas admin padronizadas | in-progress | `DataTableFrame` criado e piloto em projetos com busca, filtro e ordenacao; falta replicar nos demais CRUDs. Hardening (2026-07-17): `ConfirmDialog` antes de excluir e `ErrorState` em erro de listagem em todas as tabelas; skeleton real de loading (`DataTable` ganhou prop `isLoading`); corrigido `overflow-hidden` que cortava a coluna Acoes no mobile (agora `overflow-x-auto`); foco visivel padronizado em Input/Textarea/selects nativos |
+| Builders com preview real e drag and drop | in-progress | Preview real ja existia; reorder de secoes usa `@dnd-kit` via `BuilderSortableList`. Reorder de itens dentro de uma secao adicionado via `BuilderSectionItemsPicker`; corrigido bug onde a ordem de `itemIds` era salva mas ignorada na renderizacao publica (`public-portfolio.service.ts` agora ordena por `itemIds`). Comparacao de versoes continua fora de escopo (decisao original do roadmap) |
+| Usuarios, profile e recuperacao de senha | in-progress | CRUD de usuarios (`/admin/users`) com papeis owner/admin/editor/viewer e presets de permissao; recuperacao de senha via Resend (`/forgot-password`, `/reset-password`); troca de senha em `/admin/account`. Falta convite por email e permissoes granulares por campo |
 | Auditoria funcional | done | `docs/functional-audit.md`; CRUDs, rotas, likes e upload testados manualmente |
 | Gerador de feature front | done | Interativo/pipe, templates separados, CRUD Query/Table/Form e rota admin |
 | Gerador de modulo back | done | Interativo/pipe, templates separados, CRUD modular e registro de rota |
 | Build de producao do monorepo | done | Packages compartilhados, API e 15 rotas Next compilados sem erros de TypeScript |
 | Preparacao Git inicial | done | `.gitignore` na raiz, web e API protege dependencias, builds, secrets, logs e uploads temporarios |
 | Deploy gratuito inicial | done | Blueprint Render e guia Vercel/Atlas em `docs/deployment.md`; upload persistente permanece pendente |
-| Conteudo rico em paginas/secoes | in-progress | `contentFormat` iniciado com default `html`; editor Tiptap, import Markdown e blocos padronizados ficam para proximas fases |
+| Conteudo rico em paginas/secoes | in-progress | Editor Tiptap real criado e usado em `PageForm`/`CustomSectionForm`. Adicionado: sistema de variaveis (`{profile.name}`, `{year}` etc. via `packages/contracts/src/content-variables.ts` + `apps/api/src/shared/content/render-template.ts`, testado ponta a ponta), bloco Callout (Tiptap custom node) e import de Markdown (`marked`). Perfil/projeto continuam na convencao antiga `**bold**` (alimentam o PDF). Faltam blocos de galeria/cards/stack (precisam upload), preview lado a lado e validacao formal antes de publicar |
 
 ## MVP Por Fases
 
@@ -276,9 +277,21 @@ Checkpoint: base pronta para redesign sem refatoracao pesada.
 - Mudancas visuais devem seguir `DESIGN.md`.
 - Motion deve ser usado para microinteracoes objetivas, especialmente feedback de estado, entrada/saida curta e transicoes de layout.
 - Portfolio publico e brand surface; admin e product surface.
-- Ao criar ou modificar telas no front, verificar referencias de blocks/componentes em Coss, Animate UI, Kibo UI, beUI e Impeccable quando aplicavel.
+- Ao criar ou modificar telas no front, verificar referencias de blocks/componentes em Coss, Animate UI, Kibo UI, beUI, ReUI e Impeccable quando aplicavel.
 - Animacoes repetiveis devem virar componentes/variants em `components/ds`, evitando configs duplicadas nas features.
 - Portfolio publico pode misturar reveal, hover premium, scroll-linked animation, parallax sutil e futuramente GSAP ScrollTrigger.
+
+## Prioridade Atual Do Admin UX (2026-07-17, reordenado)
+
+Decisao revertida em 2026-07-17: o usuario decidiu priorizar o redesign visual agora, pausando o avanco de P3/P4/P5/P6 ate o redesign avancar. Ver `docs/admin-ux-roadmap.md` para o plano de etapas do redesign.
+
+1. **P0 + P1 (redesign)** - Pesquisa de referencias (Coss Particles, ReUI, Kibo UI, beUI, bklit/evilcharts), estilos de componente, layout base (nav superior sem sidebar/sem scroll, estilo Vercel/Supabase - aguardando imagem de referencia do usuario), padroes de pagina/secao/listagem, estrategia de formularios (inline vs Dialog vs Drawer vs Sheet), dashboard com bklit, rollout tela a tela.
+
+**Checkpoint de retomada (2026-07-17):** direcao visual aprovada pelo usuario, ainda em fase de mockup HTML (nao ha codigo React novo ainda). Ver `docs/design-references/admin-redesign-direction.html` (nav/dashboard/tabela/formulario) e `docs/design-references/admin-redesign-pages.html` (Projetos/Skills/Portfolio Builder/Curriculo Builder) - abrir direto no navegador. Decisoes e perguntas em aberto documentadas em `docs/admin-visual-references.md`, secao "Direcao Confirmada Para O Redesign (2026-07-17)". Proximo passo ao retomar: responder as perguntas em aberto (visao unica ou toggle grade/tabela em Projetos e Skills; preview em janela/papel ok?) antes de comecar a escrever componentes React de verdade. Navegacao top nav segue bloqueada ate o usuario enviar a imagem de referencia do Vercel/Supabase.
+2. P3 - Builders (comparacao de versoes) - pausado.
+3. P4 - Editor de conteudo (blocos de galeria/cards/stack, preview lado a lado) - pausado.
+4. P6 - Hardening (contraste WCAG numerico) - pausado.
+5. P5 - Usuarios/auth (convite por email, auditoria, permissoes granulares) - pausado.
 
 ## Regras De Retomada
 

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { PublicShell } from "@/components/layout/public-shell";
+import { HtmlContent } from "@/components/ds/html-content";
 import { PageDescription, PageHeader, PageTitle } from "@/components/ds/page";
 import { Section, SectionContent } from "@/components/ds/section";
 import { getPublishedPage } from "@/features/pages/api/pages-api";
@@ -26,8 +27,8 @@ export default async function PublicCustomPage({
         </PageHeader>
 
         <Section>
-          <SectionContent className="text-foreground whitespace-pre-wrap">
-            {page.content}
+          <SectionContent className="text-foreground">
+            <HtmlContent html={page.content} />
           </SectionContent>
         </Section>
       </PublicShell>

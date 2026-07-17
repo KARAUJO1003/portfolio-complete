@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/datatable/data-table";
 import { Badge } from "@/components/ds/badge";
+import { ConfirmDialog } from "@/components/ds/confirm-dialog";
 import { DataTableFrame } from "@/components/ds/data-table-frame";
 import { ErrorState } from "@/components/ds/admin-primitives";
 import { Can } from "@/core/auth/components/can";
@@ -25,10 +26,14 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
   const projectsQuery = useQuery(projectsListQueryOptions());
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"all" | ProjectDto["status"]>("all");
+  const [pendingDelete, setPendingDelete] = useState<ProjectDto | null>(null);
 
   const deleteMutation = useMutation({
     mutationFn: deleteProject,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: projectsKeys.list() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: projectsKeys.list() });
+      setPendingDelete(null);
+    },
   });
 
   const columns = useMemo<ColumnDef<ProjectDto, unknown>[]>(
@@ -110,7 +115,7 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() => deleteMutation.mutate(row.original.id)}
+                onClick={() => setPendingDelete(row.original)}
               >
                 Excluir
               </Button>
@@ -119,7 +124,7 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
         ),
       },
     ],
-    [deleteMutation, onEdit],
+    [onEdit],
   );
 
   const filteredProjects = useMemo(() => {
@@ -148,6 +153,7 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
   }
 
   return (
+    <>
     <DataTableFrame
       title="Projetos cadastrados"
       description="Busque, filtre e ordene os projetos que alimentam o portfolio e o curriculo."
@@ -163,7 +169,7 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
       }
       filters={
         <select
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none"
+          className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           value={status}
           onChange={(event) => setStatus(event.target.value as typeof status)}
         >
@@ -177,8 +183,18 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
       <DataTable
         data={filteredProjects}
         columns={columns}
-        emptyLabel={projectsQuery.isLoading ? "Carregando projetos..." : "Nenhum projeto cadastrado."}
+        emptyLabel="Nenhum projeto cadastrado."
+        isLoading={projectsQuery.isLoading}
       />
     </DataTableFrame>
+    <ConfirmDialog
+      open={Boolean(pendingDelete)}
+      title="Excluir projeto"
+      description={`Esta acao remove "${pendingDelete?.title}" definitivamente. Ele deixa de aparecer no portfolio e no curriculo.`}
+      loading={deleteMutation.isPending}
+      onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
+      onOpenChange={(open) => !open && setPendingDelete(null)}
+    />
+    </>
   );
 }

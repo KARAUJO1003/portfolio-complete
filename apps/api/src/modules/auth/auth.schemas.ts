@@ -1,1 +1,6 @@
-export { loginRequestSchema } from "@portfolio/contracts";
+export {
+  loginRequestSchema,
+  forgotPasswordRequestSchema,
+  resetPasswordRequestSchema,
+  changePasswordRequestSchema,
+} from "@portfolio/contracts";

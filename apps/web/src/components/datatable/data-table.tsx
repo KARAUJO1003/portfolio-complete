@@ -15,12 +15,14 @@ type DataTableProps<TData> = {
   data: TData[];
   columns: ColumnDef<TData, unknown>[];
   emptyLabel?: string;
+  isLoading?: boolean;
 };
 
 export function DataTable<TData>({
   data,
   columns,
   emptyLabel = "Nenhum registro encontrado.",
+  isLoading = false,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
@@ -33,8 +35,8 @@ export function DataTable<TData>({
   });
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card">
-      <table className="w-full border-collapse text-sm">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+      <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead className="bg-muted/70">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -60,7 +62,19 @@ export function DataTable<TData>({
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.length ? (
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, rowIndex) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <tr key={rowIndex} className="border-t border-border">
+                {columns.map((_column, columnIndex) => (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <td key={columnIndex} className="px-3 py-2 align-top">
+                    <div className="h-4 w-full max-w-40 animate-pulse rounded bg-muted" />
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="border-t border-border transition-colors hover:bg-muted/30">
                 {row.getVisibleCells().map((cell) => (

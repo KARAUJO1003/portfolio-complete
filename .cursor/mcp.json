@@ -11,6 +11,10 @@
     "beui": {
       "command": "npx",
       "args": ["-y", "mcp-remote", "https://mcp.beui.dev/mcp"]
+    },
+    "reui": {
+      "type": "http",
+      "url": "https://mcp.reui.io"
     }
   }
 }

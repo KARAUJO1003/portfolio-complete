@@ -10,11 +10,12 @@ import {
   BuilderItem,
   BuilderItemContent,
   BuilderItemDescription,
-  BuilderItemOptions,
   BuilderItemTitle,
   BuilderLayout,
   BuilderPanel,
   BuilderPreview,
+  BuilderSectionItemsPicker,
+  BuilderSortableList,
   BuilderStatus,
 } from "@/components/ds/builder";
 import { PageDescription, PageHeader, PageTitle } from "@/components/ds/page";
@@ -30,12 +31,12 @@ import {
   contentVersionKeys,
   contentVersionsQueryOptions,
 } from "@/features/content-versions/api/content-versions-queries";
-import { listExperiences } from "@/features/experiences/api/experiences-api";
-import { listCustomSections } from "@/features/custom-sections/api/custom-sections-api";
-import { listPages } from "@/features/pages/api/pages-api";
+import { customSectionsListQueryOptions } from "@/features/custom-sections/api/custom-sections-queries";
+import { experiencesListQueryOptions } from "@/features/experiences/api/experiences-queries";
+import { pagesListQueryOptions } from "@/features/pages/api/pages-queries";
 import { getPublicPortfolio } from "@/features/portfolio/api/public-portfolio-api";
-import { listProjects } from "@/features/projects/api/projects-api";
-import { listSkills } from "@/features/skills/api/skills-api";
+import { projectsListQueryOptions } from "@/features/projects/api/projects-queries";
+import { skillsListQueryOptions } from "@/features/skills/api/skills-queries";
 
 const defaultSections: ContentVersionSection[] = [
   section("hero", "Hero", 0),
@@ -53,11 +54,11 @@ export function PortfolioBuilderFeature() {
   const queryClient = useQueryClient();
   const versionsQuery = useQuery(contentVersionsQueryOptions("portfolio"));
   const portfolioQuery = useQuery({ queryKey: ["public-portfolio", "portfolio-builder"], queryFn: getPublicPortfolio });
-  const projectsQuery = useQuery({ queryKey: ["projects", "builder"], queryFn: listProjects });
-  const skillsQuery = useQuery({ queryKey: ["skills", "builder"], queryFn: listSkills });
-  const experiencesQuery = useQuery({ queryKey: ["experiences", "builder"], queryFn: listExperiences });
-  const pagesQuery = useQuery({ queryKey: ["pages", "builder"], queryFn: listPages });
-  const customSectionsQuery = useQuery({ queryKey: ["custom-sections", "builder"], queryFn: listCustomSections });
+  const projectsQuery = useQuery(projectsListQueryOptions());
+  const skillsQuery = useQuery(skillsListQueryOptions());
+  const experiencesQuery = useQuery(experiencesListQueryOptions());
+  const pagesQuery = useQuery(pagesListQueryOptions());
+  const customSectionsQuery = useQuery(customSectionsListQueryOptions());
   const [versionId, setVersionId] = useState("");
   const [name, setName] = useState("Portfolio principal");
   const [sections, setSections] = useState(defaultSections);
@@ -127,15 +128,8 @@ export function PortfolioBuilderFeature() {
     setSections((current) => current.map((item) => (item.id === id ? { ...item, ...patch } : item)));
   }
 
-  function moveSection(id: string, direction: -1 | 1) {
-    setSections((current) => {
-      const ordered = [...current].sort((a, b) => a.order - b.order);
-      const index = ordered.findIndex((item) => item.id === id);
-      const target = index + direction;
-      if (target < 0 || target >= ordered.length) return current;
-      [ordered[index], ordered[target]] = [ordered[target], ordered[index]];
-      return ordered.map((item, order) => ({ ...item, order }));
-    });
+  function reorderSections(reordered: ContentVersionSection[]) {
+    setSections(reordered.map((item, order) => ({ ...item, order })));
   }
 
   function toggleItem(sectionId: string, itemId: string) {
@@ -163,7 +157,7 @@ export function PortfolioBuilderFeature() {
             {currentVersion && <Badge tone={currentVersion.status === "published" ? "success" : "muted"}>{currentVersion.status}</Badge>}
           </SectionHeader>
           <div className="grid grid-cols-[1fr_auto] gap-2">
-            <select className="h-10 rounded-md border border-input bg-background px-3 text-sm" value={versionId} onChange={(event) => loadVersion(event.target.value)}>
+            <select className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" value={versionId} onChange={(event) => loadVersion(event.target.value)}>
               <option value="">Nova versao</option>
               {versionsQuery.data?.map((version) => <option key={version.id} value={version.id}>{version.name} ({version.status})</option>)}
             </select>
@@ -171,33 +165,32 @@ export function PortfolioBuilderFeature() {
           </div>
           <Input aria-label="Nome da versao" value={name} onChange={(event) => setName(event.target.value)} />
 
-          {[...sections].sort((a, b) => a.order - b.order).map((item) => (
-            <div key={item.id} className="rounded-md border border-border bg-background p-3">
-              <BuilderItem className="border-0 bg-transparent p-0">
-                <input checked={item.enabled} className="mt-1 size-4" type="checkbox" onChange={() => updateSection(item.id, { enabled: !item.enabled })} />
-                <BuilderItemContent>
-                  <BuilderItemTitle>{item.label}</BuilderItemTitle>
-                  <BuilderItemDescription>{items[item.id]?.length ? `${items[item.id].length} itens disponiveis` : "Secao de perfil"}</BuilderItemDescription>
-                </BuilderItemContent>
-                <Button aria-label="Mover para cima" className="size-8" title="Mover para cima" type="button" variant="ghost" onClick={(event) => { event.preventDefault(); moveSection(item.id, -1); }}>↑</Button>
-                <Button aria-label="Mover para baixo" className="size-8" title="Mover para baixo" type="button" variant="ghost" onClick={(event) => { event.preventDefault(); moveSection(item.id, 1); }}>↓</Button>
-              </BuilderItem>
-              {items[item.id]?.length > 0 && (
-                <BuilderItemOptions>
-                  <label className="flex items-center gap-2 text-xs font-medium">
-                    <input checked={item.selectionMode === "all"} type="checkbox" onChange={() => updateSection(item.id, { selectionMode: item.selectionMode === "all" ? "selected" : "all" })} />
-                    Usar todos os itens visiveis
-                  </label>
-                  {item.selectionMode === "selected" && items[item.id].map((option) => (
-                    <label key={option.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <input checked={item.itemIds.includes(option.id)} type="checkbox" onChange={() => toggleItem(item.id, option.id)} />
-                      {option.label}
-                    </label>
-                  ))}
-                </BuilderItemOptions>
-              )}
-            </div>
-          ))}
+          <BuilderSortableList
+            items={[...sections].sort((a, b) => a.order - b.order)}
+            renderItem={(item) => (
+              <div className="rounded-md border border-border bg-background p-3">
+                <BuilderItem className="border-0 bg-transparent p-0">
+                  <input checked={item.enabled} className="mt-1 size-4" type="checkbox" onChange={() => updateSection(item.id, { enabled: !item.enabled })} />
+                  <BuilderItemContent>
+                    <BuilderItemTitle>{item.label}</BuilderItemTitle>
+                    <BuilderItemDescription>{items[item.id]?.length ? `${items[item.id].length} itens disponiveis` : "Secao de perfil"}</BuilderItemDescription>
+                  </BuilderItemContent>
+                </BuilderItem>
+                {items[item.id]?.length > 0 && (
+                  <BuilderSectionItemsPicker
+                    items={items[item.id]}
+                    section={item}
+                    onReorder={(orderedIds) => updateSection(item.id, { itemIds: orderedIds })}
+                    onToggleAll={() =>
+                      updateSection(item.id, { selectionMode: item.selectionMode === "all" ? "selected" : "all" })
+                    }
+                    onToggleItem={(optionId) => toggleItem(item.id, optionId)}
+                  />
+                )}
+              </div>
+            )}
+            onReorder={reorderSections}
+          />
 
           <div className="flex flex-wrap gap-3 pt-2">
             <Button disabled={busy} onClick={() => saveMutation.mutate()}>{saveMutation.isPending ? "Salvando..." : "Salvar"}</Button>
@@ -219,16 +212,26 @@ export function PortfolioBuilderFeature() {
   );
 }
 
-function PortfolioPreviewSection({ id, portfolio }: { id: string; portfolio: Awaited<ReturnType<typeof getPublicPortfolio>> | undefined }) {
-  if (id === "hero") return <section className="flex min-h-48 flex-col justify-center gap-3"><p className="text-sm text-muted-foreground">software</p><h2 className="text-4xl font-semibold">{portfolio?.profile?.headline || "developer"}</h2></section>;
-  if (id === "about") return <PreviewSection title="Sobre">{portfolio?.profile?.summary || "Resumo do perfil."}</PreviewSection>;
-  if (id === "skills") return <PreviewGrid title="Habilidades" items={portfolio?.skills.map((item) => item.title) ?? []} />;
-  if (id === "projects") return <PreviewGrid title="Projetos" items={portfolio?.projects.map((item) => item.title) ?? []} />;
-  if (id === "experiences") return <PreviewGrid title="Experiencias" items={portfolio?.experiences.map((item) => item.title) ?? []} />;
-  if (id === "pages") return <PreviewGrid title="Paginas" items={portfolio?.navigationPages.map((item) => item.title) ?? []} />;
-  if (id === "custom-sections") return <PreviewGrid title="Secoes" items={portfolio?.customSections.map((item) => item.title) ?? []} />;
-  if (id === "github") return <PreviewGrid title="GitHub" items={portfolio?.github?.repositories.map((item) => item.name) ?? []} />;
-  return null;
+type PortfolioData = Awaited<ReturnType<typeof getPublicPortfolio>>;
+
+const portfolioPreviewRegistry: Record<string, (portfolio: PortfolioData | undefined) => React.ReactNode> = {
+  hero: (portfolio) => (
+    <section className="flex min-h-48 flex-col justify-center gap-3">
+      <p className="text-sm text-muted-foreground">software</p>
+      <h2 className="text-4xl font-semibold">{portfolio?.profile?.headline || "developer"}</h2>
+    </section>
+  ),
+  about: (portfolio) => <PreviewSection title="Sobre">{portfolio?.profile?.summary || "Resumo do perfil."}</PreviewSection>,
+  skills: (portfolio) => <PreviewGrid items={portfolio?.skills.map((item) => item.title) ?? []} title="Habilidades" />,
+  projects: (portfolio) => <PreviewGrid items={portfolio?.projects.map((item) => item.title) ?? []} title="Projetos" />,
+  experiences: (portfolio) => <PreviewGrid items={portfolio?.experiences.map((item) => item.title) ?? []} title="Experiencias" />,
+  pages: (portfolio) => <PreviewGrid items={portfolio?.navigationPages.map((item) => item.title) ?? []} title="Paginas" />,
+  "custom-sections": (portfolio) => <PreviewGrid items={portfolio?.customSections.map((item) => item.title) ?? []} title="Secoes" />,
+  github: (portfolio) => <PreviewGrid items={portfolio?.github?.repositories.map((item) => item.name) ?? []} title="GitHub" />,
+};
+
+function PortfolioPreviewSection({ id, portfolio }: { id: string; portfolio: PortfolioData | undefined }) {
+  return portfolioPreviewRegistry[id]?.(portfolio) ?? null;
 }
 
 function PreviewSection({ children, title }: { children: React.ReactNode; title: string }) {
