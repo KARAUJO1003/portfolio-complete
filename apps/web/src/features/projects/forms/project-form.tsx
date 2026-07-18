@@ -6,9 +6,8 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { AsyncImageFrame } from "@/components/ds/async-image-frame";
 import { FormFields } from "@/components/ds/form-fields";
-import { DsForm, FormActions, FormAside, FormPreviewFrame, FormSection, FormStep } from "@/components/ds/form";
+import { DsForm, FormAside, FormPreviewFrame, FormSection, FormStep } from "@/components/ds/form";
 import { Badge } from "@/components/ds/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormDescription, FormError, FormField, FormLabel } from "@/components/ds/form-field";
 import { resolveFileUrl } from "@/core/files/file-url";
@@ -18,9 +17,12 @@ import { projectsKeys } from "@/features/projects/api/projects-queries";
 import { projectFormSchema, type ProjectFormValues } from "@/features/projects/schemas/project-form-schema";
 import { FileUploadField } from "@/features/uploads/components/file-upload-field";
 
+export const PROJECT_FORM_ID = "project-form";
+
 type ProjectFormProps = {
-  project?: ProjectDto | null;
   onDone?: () => void;
+  onPendingChange?: (pending: boolean) => void;
+  project?: ProjectDto | null;
 };
 
 const defaultValues: ProjectFormValues = {
@@ -39,7 +41,7 @@ const defaultValues: ProjectFormValues = {
   showOnResume: false,
 };
 
-export function ProjectForm({ project, onDone }: ProjectFormProps) {
+export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormProps) {
   const queryClient = useQueryClient();
   const form = useForm<ProjectFormValues>({
     resolver: typedZodResolver(projectFormSchema),
@@ -106,6 +108,10 @@ export function ProjectForm({ project, onDone }: ProjectFormProps) {
     await mutation.mutateAsync(values);
   }
 
+  useEffect(() => {
+    onPendingChange?.(mutation.isPending);
+  }, [mutation.isPending, onPendingChange]);
+
   const preview = form.watch();
   const coverUrl = resolveFileUrl(preview.coverPath);
   const technologies = (preview.technologiesText ?? "")
@@ -115,7 +121,7 @@ export function ProjectForm({ project, onDone }: ProjectFormProps) {
     .slice(0, 5);
 
   return (
-    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+    <DsForm id={PROJECT_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
       <div className="flex flex-wrap gap-2">
         <FormStep active index={1} label="Conteudo" />
         <FormStep active={Boolean(preview.coverPath)} index={2} label="Midia" />
@@ -244,20 +250,6 @@ export function ProjectForm({ project, onDone }: ProjectFormProps) {
       </div>
 
       {mutation.isError && <FormError>Erro ao salvar projeto.</FormError>}
-
-      <FormActions>
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Salvando..." : project ? "Salvar alteracoes" : "Criar projeto"}
-        </Button>
-        {project && (
-          <Button type="button" variant="ghost" onClick={onDone}>
-            Cancelar edicao
-          </Button>
-        )}
-        {form.formState.isDirty && (
-          <span className="text-xs text-muted-foreground">Existem alteracoes ainda nao salvas.</span>
-        )}
-      </FormActions>
     </DsForm>
   );
 }

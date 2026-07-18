@@ -22,6 +22,7 @@ import {
 import { marked } from "marked";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Callout } from "@/components/ds/rich-text-callout-extension";
 import { cn } from "@/lib/utils";
 
@@ -85,7 +86,7 @@ export function RichTextEditor({ value, onChange, placeholder, className, minHei
   }
 
   return (
-    <div className={cn("rounded-md border border-input bg-background", className)}>
+    <div className={cn("rounded-md border border-input bg-input/20", className)}>
       <RichTextToolbar
         editor={editor}
         markdownPanelOpen={showMarkdownPanel}
@@ -94,7 +95,7 @@ export function RichTextEditor({ value, onChange, placeholder, className, minHei
       {showMarkdownPanel && (
         <div className="border-b border-border bg-surface-muted/50 p-2">
           <textarea
-            className="min-h-24 w-full resize-y rounded-md border border-input bg-background p-2 text-xs font-mono"
+            className="min-h-24 w-full resize-y rounded-md border border-input bg-input/20 p-2 text-xs font-mono"
             placeholder="Cole o Markdown aqui..."
             value={markdownDraft}
             onChange={(event) => setMarkdownDraft(event.target.value)}
@@ -182,23 +183,24 @@ function RichTextToolbar({
         <Redo2Icon className="size-4" />
       </ToolbarToggle>
       <ToolbarSeparator />
-      <select
-        className="h-8 rounded-md border border-input bg-background px-2 text-xs text-muted-foreground outline-none"
+      <Select
         value=""
-        onChange={(event) => {
-          const key = event.target.value;
+        onValueChange={(key) => {
           if (!key) return;
           editor.chain().focus().insertContent(`{${key}}`).run();
-          event.target.value = "";
         }}
       >
-        <option value="">Inserir variavel...</option>
-        {CONTENT_VARIABLES.map((variable) => (
-          <option key={variable.key} value={variable.key}>
-            {variable.label}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger className="h-8 w-auto text-xs text-muted-foreground">
+          <SelectValue>{() => "Inserir variavel..."}</SelectValue>
+        </SelectTrigger>
+        <SelectPopup>
+          {CONTENT_VARIABLES.map((variable) => (
+            <SelectItem key={variable.key} value={variable.key}>
+              {variable.label}
+            </SelectItem>
+          ))}
+        </SelectPopup>
+      </Select>
       <ToolbarToggle active={markdownPanelOpen} label="Importar Markdown" onClick={onToggleMarkdownPanel}>
         <FileCode2Icon className="size-4" />
       </ToolbarToggle>

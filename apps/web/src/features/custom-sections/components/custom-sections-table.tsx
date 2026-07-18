@@ -1,9 +1,8 @@
 "use client";
 
-import type { CustomPageDto } from "@portfolio/contracts";
+import type { CustomSectionDto } from "@portfolio/contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Badge } from "@/components/ds/badge";
 import { Button } from "@/components/ui/button";
@@ -13,78 +12,83 @@ import { DataTableFrame } from "@/components/ds/data-table-frame";
 import { ErrorState } from "@/components/ds/admin-primitives";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Can } from "@/core/auth/components/can";
-import { deletePage } from "@/features/pages/api/pages-api";
-import { pagesKeys, pagesListQueryOptions } from "@/features/pages/api/pages-queries";
-import { PAGES_PERMISSIONS } from "@/features/pages/permissions";
+import { deleteCustomSection } from "@/features/custom-sections/api/custom-sections-api";
+import {
+  customSectionsKeys,
+  customSectionsListQueryOptions,
+} from "@/features/custom-sections/api/custom-sections-queries";
+import { CUSTOM_SECTIONS_PERMISSIONS } from "@/features/custom-sections/permissions";
 
-const statusLabel: Record<CustomPageDto["status"], string> = {
+const statusLabel: Record<CustomSectionDto["status"], string> = {
   draft: "Rascunho",
   published: "Publicado",
   archived: "Arquivado",
 };
 
-const statusTone: Record<CustomPageDto["status"], "muted" | "success" | "warning"> = {
+const statusTone: Record<CustomSectionDto["status"], "muted" | "success" | "warning"> = {
   draft: "warning",
   published: "success",
   archived: "muted",
 };
 
-const statusFilterLabel: Record<"all" | CustomPageDto["status"], string> = {
+const statusFilterLabel: Record<"all" | CustomSectionDto["status"], string> = {
   all: "Todos os status",
   ...statusLabel,
 };
 
-type PagesTableProps = {
-  onEdit: (page: CustomPageDto) => void;
+type CustomSectionsTableProps = {
+  onEdit: (section: CustomSectionDto) => void;
 };
 
-export function PagesTable({ onEdit }: PagesTableProps) {
+export function CustomSectionsTable({ onEdit }: CustomSectionsTableProps) {
   const queryClient = useQueryClient();
-  const pagesQuery = useQuery(pagesListQueryOptions());
+  const query = useQuery(customSectionsListQueryOptions());
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<"all" | CustomPageDto["status"]>("all");
-  const [pendingDelete, setPendingDelete] = useState<CustomPageDto | null>(null);
+  const [status, setStatus] = useState<"all" | CustomSectionDto["status"]>("all");
+  const [pendingDelete, setPendingDelete] = useState<CustomSectionDto | null>(null);
 
   const deleteMutation = useMutation({
-    mutationFn: deletePage,
+    mutationFn: deleteCustomSection,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: pagesKeys.list() });
+      queryClient.invalidateQueries({ queryKey: customSectionsKeys.list() });
       setPendingDelete(null);
     },
   });
 
-  const columns = useMemo<ColumnDef<CustomPageDto, unknown>[]>(
+  const columns = useMemo<ColumnDef<CustomSectionDto, unknown>[]>(
     () => [
       { accessorKey: "title", header: "Titulo" },
-      { accessorKey: "slug", header: "Slug" },
+      { accessorKey: "key", header: "Chave" },
       {
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => <Badge tone={statusTone[row.original.status]}>{statusLabel[row.original.status]}</Badge>,
       },
       {
-        id: "publicUrl",
-        header: "Publica",
-        cell: ({ row }) =>
-          row.original.status === "published" ? (
-            <Link className="underline underline-offset-4" href={`/p/${row.original.slug}`}>
-              abrir
-            </Link>
-          ) : (
-            "-"
-          ),
+        id: "visibility",
+        header: "Visibilidade",
+        cell: ({ row }) => {
+          const visibility = row.original.visibility;
+          return (
+            <div className="flex flex-wrap gap-2">
+              {visibility.portfolio && <Badge>Portfolio</Badge>}
+              {visibility.resume && <Badge>Curriculo</Badge>}
+              {!visibility.portfolio && !visibility.resume && <Badge tone="muted">Oculto</Badge>}
+            </div>
+          );
+        },
       },
       {
         id: "actions",
         header: "Acoes",
         cell: ({ row }) => (
           <div className="flex gap-2">
-            <Can can={[PAGES_PERMISSIONS.update]}>
+            <Can can={[CUSTOM_SECTIONS_PERMISSIONS.update]}>
               <Button type="button" variant="ghost" onClick={() => onEdit(row.original)}>
                 Editar
               </Button>
             </Can>
-            <Can can={[PAGES_PERMISSIONS.delete]}>
+            <Can can={[CUSTOM_SECTIONS_PERMISSIONS.delete]}>
               <Button type="button" variant="ghost" onClick={() => setPendingDelete(row.original)}>
                 Excluir
               </Button>
@@ -96,43 +100,42 @@ export function PagesTable({ onEdit }: PagesTableProps) {
     [onEdit],
   );
 
-  const filteredPages = useMemo(() => {
+  const filteredSections = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
-    return (pagesQuery.data ?? []).filter((item) => {
+    return (query.data ?? []).filter((item) => {
       const matchesStatus = status === "all" || item.status === status;
-      const matchesSearch =
-        !normalizedSearch || [item.title, item.slug, item.excerpt].some((value) => value.toLowerCase().includes(normalizedSearch));
+      const matchesSearch = !normalizedSearch || [item.title, item.key].some((value) => value.toLowerCase().includes(normalizedSearch));
 
       return matchesStatus && matchesSearch;
     });
-  }, [pagesQuery.data, search, status]);
+  }, [query.data, search, status]);
 
-  if (pagesQuery.isError) {
+  if (query.isError) {
     return (
       <ErrorState
-        title="Nao foi possivel carregar paginas"
+        title="Nao foi possivel carregar as secoes"
         description="A listagem nao respondeu. Verifique a API e tente novamente."
       />
     );
   }
 
-  const isEmpty = !pagesQuery.isLoading && filteredPages.length === 0;
+  const isEmpty = !query.isLoading && filteredSections.length === 0;
 
   return (
     <>
       <DataTableFrame
-        title="Paginas cadastradas"
-        description="Busque, filtre e ordene as paginas publicas customizadas."
+        title="Secoes cadastradas"
+        description="Busque, filtre e ordene os blocos livres do portfolio e do curriculo."
         search={search}
-        searchPlaceholder="Buscar por titulo, slug ou resumo..."
+        searchPlaceholder="Buscar por titulo ou chave..."
         onSearchChange={setSearch}
         empty={isEmpty}
-        emptyTitle={search || status !== "all" ? "Nenhuma pagina encontrada" : "Nenhuma pagina cadastrada"}
+        emptyTitle={search || status !== "all" ? "Nenhuma secao encontrada" : "Nenhuma secao cadastrada"}
         emptyDescription={
           search || status !== "all"
             ? "Ajuste os filtros para ampliar a busca."
-            : "Crie a primeira pagina pelo botao \"Nova pagina\"."
+            : "Crie a primeira secao pelo botao \"Nova secao\"."
         }
         filters={
           <Select value={status} onValueChange={(next) => setStatus(next as typeof status)}>
@@ -149,16 +152,16 @@ export function PagesTable({ onEdit }: PagesTableProps) {
         }
       >
         <DataTable
-          data={filteredPages}
+          data={filteredSections}
           columns={columns}
-          emptyLabel="Nenhuma pagina cadastrada."
-          isLoading={pagesQuery.isLoading}
+          emptyLabel="Nenhuma secao cadastrada."
+          isLoading={query.isLoading}
         />
       </DataTableFrame>
       <ConfirmDialog
         open={Boolean(pendingDelete)}
-        title="Excluir pagina"
-        description={`Esta acao remove "${pendingDelete?.title}" definitivamente. Se estiver publicada, a rota publica deixa de existir.`}
+        title="Excluir secao"
+        description={`Esta acao remove "${pendingDelete?.title}" definitivamente.`}
         loading={deleteMutation.isPending}
         onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
         onOpenChange={(open) => !open && setPendingDelete(null)}

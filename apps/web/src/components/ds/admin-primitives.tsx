@@ -17,7 +17,7 @@ export function PageFrameHeader({ className, ...props }: React.HTMLAttributes<HT
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 border-b border-border bg-surface-raised/80 px-5 py-4 sm:flex-row sm:items-center sm:justify-between",
+        "flex flex-col gap-3 border-b border-border bg-surface-raised/80 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between",
         className,
       )}
       {...props}
@@ -37,7 +37,7 @@ export function PageFrameDescription({
 }
 
 export function PageFrameContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("p-5", className)} {...props} />;
+  return <div className={cn("p-4", className)} {...props} />;
 }
 
 export function ActionBar({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {

@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageDescription, PageHeader, PageTitle } from "@/components/ds/page";
 import { Section, SectionContent, SectionHeader, SectionTitle } from "@/components/ds/section";
+import { Stat, StatGrid } from "@/components/ds/stat-grid";
 import { useAuth } from "@/core/auth/contexts/auth-context";
 import { env } from "@/core/config/env";
 import { useQuery } from "@tanstack/react-query";
@@ -63,17 +63,11 @@ const workflowSteps = [
 ];
 
 export function AdminDashboard() {
-  const router = useRouter();
   const auth = useAuth();
   const projects = useQuery({ queryKey: ["projects", "dashboard"], queryFn: listProjects });
   const skills = useQuery({ queryKey: ["skills", "dashboard"], queryFn: listSkills });
   const experiences = useQuery({ queryKey: ["experiences", "dashboard"], queryFn: listExperiences });
   const portfolioVersions = useQuery(contentVersionsQueryOptions("portfolio"));
-
-  async function handleLogout() {
-    await auth.logout();
-    router.push("/login");
-  }
 
   return (
     <>
@@ -81,7 +75,7 @@ export function AdminDashboard() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-medium uppercase text-muted-foreground">Portfolio OS</p>
-            <PageTitle className="mt-3 max-w-2xl text-4xl">
+            <PageTitle className="mt-3 max-w-2xl text-3xl">
               Painel para montar portfolio, curriculo e publicacoes.
             </PageTitle>
             <PageDescription className="mt-4">
@@ -100,23 +94,20 @@ export function AdminDashboard() {
         </div>
       </PageHeader>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatusCard label="Sessao" value={auth.user?.name || "Dev Admin"} description={auth.user?.email || "auth bypass"} />
-        <StatusCard
+      <StatGrid className="sm:grid-cols-4">
+        <Stat label="Sessao" value={auth.user?.name || "Dev Admin"} delta={auth.user?.email || "auth bypass"} />
+        <Stat
           label="Autenticacao"
           value={env.authEnabled ? "Ativa" : "Desligada"}
-          description={env.authEnabled ? "Login real habilitado" : "Modo visual de desenvolvimento"}
+          delta={env.authEnabled ? "Login real habilitado" : "Modo visual de desenvolvimento"}
         />
-        <StatusCard label="Conteudo" value={`${projects.data?.length ?? 0} projetos`} description={`${skills.data?.length ?? 0} skills e ${experiences.data?.length ?? 0} registros de trajetoria`} />
-        <StatusCard label="Publicacao" value={portfolioVersions.data?.find((item) => item.status === "published")?.name ?? "Sem versao"} description="Versao ativa do portfolio" />
-      </div>
+        <Stat label="Conteudo" value={`${projects.data?.length ?? 0} projetos`} delta={`${skills.data?.length ?? 0} skills e ${experiences.data?.length ?? 0} registros de trajetoria`} />
+        <Stat label="Publicacao" value={portfolioVersions.data?.find((item) => item.status === "published")?.name ?? "Sem versao"} delta="Versao ativa do portfolio" />
+      </StatGrid>
 
       <Section>
         <SectionHeader>
           <SectionTitle>Acoes principais</SectionTitle>
-          {env.authEnabled && <Button variant="ghost" onClick={handleLogout}>
-            Sair
-          </Button>}
         </SectionHeader>
         <div className="grid gap-4 md:grid-cols-2">
           {primaryActions.map((action) => (
@@ -134,7 +125,7 @@ export function AdminDashboard() {
             {contentActions.map((action) => (
               <Link
                 key={action.href}
-                className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 hover:border-zinc-500"
+                className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-surface-raised"
                 href={action.href}
               >
                 <span>
@@ -169,20 +160,6 @@ export function AdminDashboard() {
   );
 }
 
-function StatusCard({ description, label, value }: { description: string; label: string; value: string }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardDescription>{label}</CardDescription>
-        <CardTitle>{value}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
 function ActionCard({
   description,
   href,
@@ -196,7 +173,7 @@ function ActionCard({
 }) {
   return (
     <Link className="group" href={href}>
-      <Card className="h-full transition-colors group-hover:border-zinc-500">
+      <Card className="h-full transition-colors group-hover:bg-surface-raised">
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div>

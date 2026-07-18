@@ -22,6 +22,7 @@ import { RichText } from "@/components/ds/rich-text";
 import { SectionHeader, SectionTitle } from "@/components/ds/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   createContentVersion,
   publishContentVersion,
@@ -169,14 +170,33 @@ export function ResumeBuilderFeature() {
             {currentVersion && <Badge tone={currentVersion.status === "published" ? "success" : "muted"}>{currentVersion.status}</Badge>}
           </SectionHeader>
           <div className="grid grid-cols-[1fr_auto] gap-2">
-            <select className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" value={versionId} onChange={(event) => loadVersion(event.target.value)}>
-              <option value="">Nova versao</option>
-              {versionsQuery.data?.map((version) => <option key={version.id} value={version.id}>{version.name} ({version.status})</option>)}
-            </select>
+            <Select value={versionId} onValueChange={(next) => loadVersion(next ?? "")}>
+              <SelectTrigger>
+                <SelectValue>
+                  {() => (currentVersion ? `${currentVersion.name} (${currentVersion.status})` : "Nova versao")}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectPopup>
+                <SelectItem value="">Nova versao</SelectItem>
+                {versionsQuery.data?.map((version) => (
+                  <SelectItem key={version.id} value={version.id}>
+                    {version.name} ({version.status})
+                  </SelectItem>
+                ))}
+              </SelectPopup>
+            </Select>
             <Button type="button" variant="ghost" onClick={newVersion}>Nova</Button>
           </div>
           <Input aria-label="Nome da versao" value={name} onChange={(event) => setName(event.target.value)} />
-          <select className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" value={template} onChange={(event) => setTemplate(event.target.value as "classic-ats" | "compact-ats")}><option value="classic-ats">Classic ATS</option><option value="compact-ats">Compact ATS</option></select>
+          <Select value={template} onValueChange={(next) => setTemplate(next as "classic-ats" | "compact-ats")}>
+            <SelectTrigger>
+              <SelectValue>{() => (template === "classic-ats" ? "Classic ATS" : "Compact ATS")}</SelectValue>
+            </SelectTrigger>
+            <SelectPopup>
+              <SelectItem value="classic-ats">Classic ATS</SelectItem>
+              <SelectItem value="compact-ats">Compact ATS</SelectItem>
+            </SelectPopup>
+          </Select>
 
           <BuilderSortableList
             items={[...sections].sort((a, b) => a.order - b.order)}
@@ -213,7 +233,7 @@ export function ResumeBuilderFeature() {
           <BuilderStatus>Resumo, objetivo e descricoes aceitam **negrito**. O download salva a versao antes de gerar.</BuilderStatus>
         </BuilderPanel>
 
-        <BuilderPreview className="overflow-auto bg-neutral-200 p-6">
+        <BuilderPreview className="overflow-auto bg-surface-muted p-4">
           <ResumePreview profile={profileQuery.data} skills={skillsQuery.data ?? []} projects={projectsQuery.data ?? []} experiences={experiences} customSections={customSectionsQuery.data ?? []} sections={sections} />
         </BuilderPreview>
       </BuilderLayout>
@@ -293,7 +313,7 @@ function ResumePreview({ profile, skills, projects, experiences, customSections,
   const ctx: ResumeRenderCtx = { profile, skills, projects, experiences, customSections, selected };
 
   return (
-    <article className="mx-auto min-h-[842px] w-full max-w-[595px] bg-white px-12 py-10 text-[12px] leading-[1.45] text-neutral-900 shadow-sm">
+    <article className="mx-auto min-h-[842px] w-full max-w-[595px] rounded-sm bg-white px-12 py-10 text-[12px] leading-[1.45] text-neutral-900 shadow-[0_1px_0_var(--border)]">
       {visible.map((config) => (
         <Fragment key={config.id}>{resumeSectionRegistry[config.id]?.(config, ctx) ?? null}</Fragment>
       ))}

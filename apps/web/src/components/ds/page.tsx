@@ -9,7 +9,7 @@ export function PageHeader({ className, ...props }: React.HTMLAttributes<HTMLDiv
 }
 
 export function PageTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h1 className={cn("text-3xl font-semibold tracking-normal", className)} {...props} />;
+  return <h1 className={cn("text-2xl font-semibold tracking-normal", className)} {...props} />;
 }
 
 export function PageDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {

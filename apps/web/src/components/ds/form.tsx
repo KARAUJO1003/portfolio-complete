@@ -16,8 +16,8 @@ export function FormSection({
   title: string;
 }) {
   return (
-    <section className={cn("rounded-xl border border-border bg-card p-4", className)}>
-      <div className="mb-4">
+    <section className={cn("grid gap-4 border-t border-border pt-5 first:border-t-0 first:pt-0", className)}>
+      <div>
         <h3 className="text-sm font-semibold">{title}</h3>
         {description && <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>}
       </div>

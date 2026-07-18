@@ -3,7 +3,7 @@ import { ResetPasswordForm } from "@/features/auth/components/reset-password-for
 
 export default function ResetPasswordPage() {
   return (
-    <main className="grid min-h-dvh place-items-center bg-background-subtle px-4 py-10 text-foreground">
+    <main className="admin-shell grid min-h-dvh place-items-center bg-background-subtle px-4 py-10 text-foreground">
       <Suspense fallback={null}>
         <ResetPasswordForm />
       </Suspense>

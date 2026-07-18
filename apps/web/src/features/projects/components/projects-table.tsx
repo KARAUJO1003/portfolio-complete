@@ -5,23 +5,27 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/datatable/data-table";
 import { Badge } from "@/components/ds/badge";
 import { ConfirmDialog } from "@/components/ds/confirm-dialog";
 import { DataTableFrame } from "@/components/ds/data-table-frame";
-import { ErrorState } from "@/components/ds/admin-primitives";
+import { EmptyState, ErrorState, Toolbar } from "@/components/ds/admin-primitives";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Can } from "@/core/auth/components/can";
 import { resolveFileUrl } from "@/core/files/file-url";
 import { deleteProject } from "@/features/projects/api/projects-api";
 import { projectsKeys, projectsListQueryOptions } from "@/features/projects/api/projects-queries";
 import { PROJECTS_PERMISSIONS } from "@/features/projects/permissions";
+import { ProjectCard } from "@/features/projects/components/project-card";
 import Image from "next/image";
 
 type ProjectsTableProps = {
   onEdit: (project: ProjectDto) => void;
+  view: "grid" | "table";
 };
 
-export function ProjectsTable({ onEdit }: ProjectsTableProps) {
+export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
   const queryClient = useQueryClient();
   const projectsQuery = useQuery(projectsListQueryOptions());
   const [search, setSearch] = useState("");
@@ -152,41 +156,82 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
     );
   }
 
+  const isEmpty = !projectsQuery.isLoading && filteredProjects.length === 0;
+  const emptyTitle = search || status !== "all" ? "Nenhum projeto encontrado" : "Nenhum projeto cadastrado";
+  const emptyDescription =
+    search || status !== "all"
+      ? "Ajuste os filtros para ampliar a busca."
+      : "Crie o primeiro projeto pelo botao \"Novo projeto\".";
+
+  const statusFilterLabel: Record<typeof status, string> = {
+    all: "Todos os status",
+    draft: "Rascunho",
+    published: "Publicado",
+    archived: "Arquivado",
+  };
+
+  const statusFilter = (
+    <Select value={status} onValueChange={(next) => setStatus(next as typeof status)}>
+      <SelectTrigger className="w-auto min-w-40">
+        <SelectValue>{() => statusFilterLabel[status]}</SelectValue>
+      </SelectTrigger>
+      <SelectPopup>
+        <SelectItem value="all">Todos os status</SelectItem>
+        <SelectItem value="draft">Rascunho</SelectItem>
+        <SelectItem value="published">Publicado</SelectItem>
+        <SelectItem value="archived">Arquivado</SelectItem>
+      </SelectPopup>
+    </Select>
+  );
+
   return (
     <>
-    <DataTableFrame
-      title="Projetos cadastrados"
-      description="Busque, filtre e ordene os projetos que alimentam o portfolio e o curriculo."
-      search={search}
-      searchPlaceholder="Buscar por titulo, slug ou tecnologia..."
-      onSearchChange={setSearch}
-      empty={!projectsQuery.isLoading && filteredProjects.length === 0}
-      emptyTitle={search || status !== "all" ? "Nenhum projeto encontrado" : "Nenhum projeto cadastrado"}
-      emptyDescription={
-        search || status !== "all"
-          ? "Ajuste os filtros para ampliar a busca."
-          : "Crie o primeiro projeto no formulario acima."
-      }
-      filters={
-        <select
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          value={status}
-          onChange={(event) => setStatus(event.target.value as typeof status)}
-        >
-          <option value="all">Todos os status</option>
-          <option value="draft">Rascunho</option>
-          <option value="published">Publicado</option>
-          <option value="archived">Arquivado</option>
-        </select>
-      }
-    >
-      <DataTable
-        data={filteredProjects}
-        columns={columns}
-        emptyLabel="Nenhum projeto cadastrado."
-        isLoading={projectsQuery.isLoading}
-      />
-    </DataTableFrame>
+    {view === "grid" ? (
+      <div className="grid gap-4">
+        <Toolbar>
+          <Input
+            className="min-w-64 max-w-sm"
+            placeholder="Buscar por titulo, slug ou tecnologia..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+          {statusFilter}
+        </Toolbar>
+        {isEmpty ? (
+          <EmptyState description={emptyDescription} title={emptyTitle} />
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {filteredProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onDelete={setPendingDelete}
+                onEdit={onEdit}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    ) : (
+      <DataTableFrame
+        title="Projetos cadastrados"
+        description="Busque, filtre e ordene os projetos que alimentam o portfolio e o curriculo."
+        search={search}
+        searchPlaceholder="Buscar por titulo, slug ou tecnologia..."
+        onSearchChange={setSearch}
+        empty={isEmpty}
+        emptyTitle={emptyTitle}
+        emptyDescription={emptyDescription}
+        filters={statusFilter}
+      >
+        <DataTable
+          data={filteredProjects}
+          columns={columns}
+          emptyLabel="Nenhum projeto cadastrado."
+          isLoading={projectsQuery.isLoading}
+        />
+      </DataTableFrame>
+    )}
     <ConfirmDialog
       open={Boolean(pendingDelete)}
       title="Excluir projeto"

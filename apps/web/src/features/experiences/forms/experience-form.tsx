@@ -4,8 +4,7 @@ import type { ExperienceDto } from "@portfolio/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { DsForm, FormActions, FormSection } from "@/components/ds/form";
+import { DsForm, FormSection } from "@/components/ds/form";
 import { FormFields } from "@/components/ds/form-fields";
 import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
@@ -16,9 +15,12 @@ import {
   type ExperienceFormValues,
 } from "@/features/experiences/schemas/experience-form-schema";
 
+export const EXPERIENCE_FORM_ID = "experience-form";
+
 type ExperienceFormProps = {
   experience?: ExperienceDto | null;
   onDone?: () => void;
+  onPendingChange?: (pending: boolean) => void;
 };
 
 const defaultValues: ExperienceFormValues = {
@@ -36,7 +38,7 @@ const defaultValues: ExperienceFormValues = {
   showOnResume: true,
 };
 
-export function ExperienceForm({ experience, onDone }: ExperienceFormProps) {
+export function ExperienceForm({ experience, onDone, onPendingChange }: ExperienceFormProps) {
   const queryClient = useQueryClient();
   const form = useForm<ExperienceFormValues>({
     resolver: typedZodResolver(experienceFormSchema),
@@ -100,8 +102,12 @@ export function ExperienceForm({ experience, onDone }: ExperienceFormProps) {
     await mutation.mutateAsync(values);
   }
 
+  useEffect(() => {
+    onPendingChange?.(mutation.isPending);
+  }, [mutation.isPending, onPendingChange]);
+
   return (
-    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+    <DsForm id={EXPERIENCE_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
       <FormSection title="Identidade" description="Tipo de item, titulo, organizacao e periodo.">
         <div className="grid gap-4 md:grid-cols-2">
           <FormFields.Select
@@ -135,17 +141,6 @@ export function ExperienceForm({ experience, onDone }: ExperienceFormProps) {
       </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar item.</FormError>}
-
-      <FormActions>
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Salvando..." : experience ? "Salvar alteracoes" : "Criar item"}
-        </Button>
-        {experience && (
-          <Button type="button" variant="ghost" onClick={onDone}>
-            Cancelar edicao
-          </Button>
-        )}
-      </FormActions>
     </DsForm>
   );
 }

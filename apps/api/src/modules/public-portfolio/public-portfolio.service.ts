@@ -59,7 +59,9 @@ export async function getPublicPortfolio() {
     if (!section || section.selectionMode === "all") return items;
     const selected = new Set(section.itemIds);
     const filtered = items.filter((item) => selected.has(String(item._id)));
-    const orderIndex = new Map(section.itemIds.map((id, index) => [id, index]));
+    const orderIndex = new Map<string, number>(
+      section.itemIds.map((id: string, index: number) => [id, index]),
+    );
     return filtered.sort(
       (a, b) => (orderIndex.get(String(a._id)) ?? 0) - (orderIndex.get(String(b._id)) ?? 0),
     );

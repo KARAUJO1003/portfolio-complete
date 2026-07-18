@@ -4,8 +4,7 @@ import type { SkillDto } from "@portfolio/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { DsForm, FormActions, FormSection } from "@/components/ds/form";
+import { DsForm, FormSection } from "@/components/ds/form";
 import { FormFields } from "@/components/ds/form-fields";
 import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
@@ -13,9 +12,12 @@ import { createSkill, updateSkill } from "@/features/skills/api/skills-api";
 import { skillsKeys } from "@/features/skills/api/skills-queries";
 import { skillFormSchema, type SkillFormValues } from "@/features/skills/schemas/skill-form-schema";
 
+export const SKILL_FORM_ID = "skill-form";
+
 type SkillFormProps = {
-  skill?: SkillDto | null;
   onDone?: () => void;
+  onPendingChange?: (pending: boolean) => void;
+  skill?: SkillDto | null;
 };
 
 const defaultValues: SkillFormValues = {
@@ -29,7 +31,7 @@ const defaultValues: SkillFormValues = {
   showOnResume: true,
 };
 
-export function SkillForm({ skill, onDone }: SkillFormProps) {
+export function SkillForm({ onDone, onPendingChange, skill }: SkillFormProps) {
   const queryClient = useQueryClient();
   const form = useForm<SkillFormValues>({
     resolver: typedZodResolver(skillFormSchema),
@@ -83,8 +85,12 @@ export function SkillForm({ skill, onDone }: SkillFormProps) {
     await mutation.mutateAsync(values);
   }
 
+  useEffect(() => {
+    onPendingChange?.(mutation.isPending);
+  }, [mutation.isPending, onPendingChange]);
+
   return (
-    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+    <DsForm id={SKILL_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
       <FormSection title="Identidade" description="Nome, categoria e desde quando a habilidade e praticada.">
         <div className="grid gap-4 md:grid-cols-2">
           <FormFields.Text form={form} label="Titulo" name="title" />
@@ -106,17 +112,6 @@ export function SkillForm({ skill, onDone }: SkillFormProps) {
       </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar habilidade.</FormError>}
-
-      <FormActions>
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Salvando..." : skill ? "Salvar alteracoes" : "Criar habilidade"}
-        </Button>
-        {skill && (
-          <Button type="button" variant="ghost" onClick={onDone}>
-            Cancelar edicao
-          </Button>
-        )}
-      </FormActions>
     </DsForm>
   );
 }

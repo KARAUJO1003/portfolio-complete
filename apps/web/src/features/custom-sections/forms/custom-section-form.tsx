@@ -4,8 +4,7 @@ import type { CustomSectionDto } from "@portfolio/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { DsForm, FormActions, FormSection } from "@/components/ds/form";
+import { DsForm, FormSection } from "@/components/ds/form";
 import { FormFields } from "@/components/ds/form-fields";
 import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
@@ -16,9 +15,12 @@ import {
   type CustomSectionFormValues,
 } from "@/features/custom-sections/schemas/custom-section-form-schema";
 
+export const CUSTOM_SECTION_FORM_ID = "custom-section-form";
+
 type CustomSectionFormProps = {
-  section?: CustomSectionDto | null;
   onDone?: () => void;
+  onPendingChange?: (pending: boolean) => void;
+  section?: CustomSectionDto | null;
 };
 
 const defaultValues: CustomSectionFormValues = {
@@ -32,7 +34,7 @@ const defaultValues: CustomSectionFormValues = {
   showOnResume: false,
 };
 
-export function CustomSectionForm({ section, onDone }: CustomSectionFormProps) {
+export function CustomSectionForm({ onDone, onPendingChange, section }: CustomSectionFormProps) {
   const queryClient = useQueryClient();
   const form = useForm<CustomSectionFormValues>({
     resolver: typedZodResolver(customSectionFormSchema),
@@ -83,8 +85,12 @@ export function CustomSectionForm({ section, onDone }: CustomSectionFormProps) {
     await mutation.mutateAsync(values);
   }
 
+  useEffect(() => {
+    onPendingChange?.(mutation.isPending);
+  }, [mutation.isPending, onPendingChange]);
+
   return (
-    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+    <DsForm id={CUSTOM_SECTION_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
       <FormSection title="Identidade" description="Titulo, chave unica e ordem de exibicao.">
         <div className="grid gap-4 md:grid-cols-3">
           <FormFields.Text form={form} label="Titulo" name="title" />
@@ -124,17 +130,6 @@ export function CustomSectionForm({ section, onDone }: CustomSectionFormProps) {
       </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar secao.</FormError>}
-
-      <FormActions>
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Salvando..." : section ? "Salvar alteracoes" : "Criar secao"}
-        </Button>
-        {section && (
-          <Button type="button" variant="ghost" onClick={onDone}>
-            Cancelar edicao
-          </Button>
-        )}
-      </FormActions>
     </DsForm>
   );
 }

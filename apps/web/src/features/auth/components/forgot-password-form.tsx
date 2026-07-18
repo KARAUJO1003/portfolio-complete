@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FormError, FormField, FormLabel } from "@/components/ds/form-field";
 import { forgotPasswordRequest } from "@/core/auth/api/auth-api";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
+import { useAdminThemeScope } from "@/hooks/use-admin-theme-scope";
 import {
   forgotPasswordFormSchema,
   type ForgotPasswordFormValues,
@@ -17,6 +18,7 @@ import {
 export function ForgotPasswordForm() {
   const [sent, setSent] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  useAdminThemeScope();
 
   const form = useForm<ForgotPasswordFormValues>({
     resolver: typedZodResolver(forgotPasswordFormSchema),

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/datatable/data-table";
 import { ErrorState } from "@/components/ds/admin-primitives";
 import { ConfirmDialog } from "@/components/ds/confirm-dialog";
+import { DataTableFrame } from "@/components/ds/data-table-frame";
 import { Can } from "@/core/auth/components/can";
 import { useAuth } from "@/core/auth/contexts/auth-context";
 import { deleteUser } from "@/features/users/api/users-api";
@@ -23,6 +24,7 @@ export function UsersTable({ onEdit }: UsersTableProps) {
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
   const usersQuery = useQuery(usersListQueryOptions());
+  const [search, setSearch] = useState("");
   const [pendingDelete, setPendingDelete] = useState<UserDto | null>(null);
 
   const deleteMutation = useMutation({
@@ -74,6 +76,14 @@ export function UsersTable({ onEdit }: UsersTableProps) {
     [currentUser?.id, onEdit],
   );
 
+  const filteredUsers = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+
+    return (usersQuery.data ?? []).filter(
+      (item) => !normalizedSearch || [item.name, item.email].some((value) => value.toLowerCase().includes(normalizedSearch)),
+    );
+  }, [usersQuery.data, search]);
+
   if (usersQuery.isError) {
     return (
       <ErrorState
@@ -83,14 +93,29 @@ export function UsersTable({ onEdit }: UsersTableProps) {
     );
   }
 
+  const isEmpty = !usersQuery.isLoading && filteredUsers.length === 0;
+
   return (
     <>
-      <DataTable
-        data={usersQuery.data ?? []}
-        columns={columns}
-        emptyLabel="Nenhum usuario cadastrado."
-        isLoading={usersQuery.isLoading}
-      />
+      <DataTableFrame
+        title="Usuarios cadastrados"
+        description="Busque e gerencie as contas com acesso ao admin."
+        search={search}
+        searchPlaceholder="Buscar por nome ou email..."
+        onSearchChange={setSearch}
+        empty={isEmpty}
+        emptyTitle={search ? "Nenhum usuario encontrado" : "Nenhum usuario cadastrado"}
+        emptyDescription={
+          search ? "Ajuste a busca para ampliar os resultados." : "Crie o primeiro usuario pelo botao \"Novo usuario\"."
+        }
+      >
+        <DataTable
+          data={filteredUsers}
+          columns={columns}
+          emptyLabel="Nenhum usuario cadastrado."
+          isLoading={usersQuery.isLoading}
+        />
+      </DataTableFrame>
       <ConfirmDialog
         open={Boolean(pendingDelete)}
         title="Excluir usuario"

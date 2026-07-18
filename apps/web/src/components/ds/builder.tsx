@@ -43,6 +43,30 @@ export function BuilderPreview({ className, ...props }: React.HTMLAttributes<HTM
   );
 }
 
+/**
+ * Chrome de "janela de navegador" para deixar claro que o preview e uma
+ * simulacao do site publico. Pontos em escala de cinza (nao vermelho/amarelo/
+ * verde de macOS) para seguir o principio de monocromia do admin.
+ * Ver docs/admin-visual-references.md, secao Portfolio Builder.
+ */
+export function BuilderBrowserBar({ className, url, ...props }: React.HTMLAttributes<HTMLDivElement> & { url: string }) {
+  return (
+    <div
+      className={cn("flex items-center gap-2.5 border-b border-border bg-surface-raised px-3 py-2", className)}
+      {...props}
+    >
+      <div className="flex shrink-0 gap-1.5">
+        <span className="size-1.5 rounded-full bg-border" />
+        <span className="size-1.5 rounded-full bg-border" />
+        <span className="size-1.5 rounded-full bg-border" />
+      </div>
+      <div className="min-w-0 flex-1 truncate rounded-md bg-background px-2.5 py-1 text-center font-mono text-[11px] text-muted-foreground">
+        {url}
+      </div>
+    </div>
+  );
+}
+
 export function BuilderItem({ className, ...props }: React.HTMLAttributes<HTMLLabelElement>) {
   return (
     <label

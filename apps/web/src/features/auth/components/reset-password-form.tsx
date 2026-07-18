@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FormError, FormField, FormLabel } from "@/components/ds/form-field";
 import { resetPasswordRequest } from "@/core/auth/api/auth-api";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
+import { useAdminThemeScope } from "@/hooks/use-admin-theme-scope";
 import { resetPasswordFormSchema, type ResetPasswordFormValues } from "@/features/auth/schemas/reset-password-schema";
 
 export function ResetPasswordForm() {
@@ -18,6 +19,7 @@ export function ResetPasswordForm() {
   const token = searchParams.get("token") ?? "";
   const [serverError, setServerError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  useAdminThemeScope();
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: typedZodResolver(resetPasswordFormSchema),

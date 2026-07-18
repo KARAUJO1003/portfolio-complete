@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderPlusIcon, Trash2Icon } from "lucide-react";
+import { ChevronDownIcon, FolderPlusIcon, LogOutIcon, SettingsIcon, Trash2Icon, UserIcon } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ds/badge";
 import {
@@ -25,6 +25,7 @@ import { Section, SectionContent, SectionHeader, SectionTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Menu, MenuGroup, MenuItem, MenuPopup, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const colorTokens = [
@@ -57,7 +58,7 @@ export function DesignSystemFeature() {
       <MotionReveal>
         <PageHeader className="rounded-2xl border border-border bg-card p-6">
           <p className="text-xs font-medium uppercase text-primary-accent">Design System</p>
-          <PageTitle className="mt-3 max-w-3xl text-4xl">
+          <PageTitle className="mt-3 max-w-3xl text-3xl">
             Base visual minimalista, moderna e premium.
           </PageTitle>
           <PageDescription className="mt-4">
@@ -115,7 +116,10 @@ export function DesignSystemFeature() {
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
               <Button>Primario</Button>
+              <Button variant="secondary">Secundario</Button>
+              <Button variant="outline">Outline</Button>
               <Button variant="ghost">Ghost</Button>
+              <Button variant="destructive">Destrutivo</Button>
             </CardContent>
           </Card>
 
@@ -165,7 +169,12 @@ export function DesignSystemFeature() {
             <PageFrameHeader>
               <div>
                 <PageFrameTitle>Formularios complexos</PageFrameTitle>
-                <PageFrameDescription>Projetos, portfolio, curriculo e paginas ricas usam secoes e preview.</PageFrameDescription>
+                <PageFrameDescription>
+                  Projetos, Skills, Trajetoria, Paginas, Secoes e Usuarios vivem em `Drawer` bottom;
+                  a acao principal fica no header do drawer (toolbar), nao mais num rodape flutuante.
+                  `FormSection` nao usa mais card (fundo/borda) - so titulo, descricao e um divisor fino
+                  entre secoes. Ver `docs/admin-visual-references.md`.
+                </PageFrameDescription>
               </div>
             </PageFrameHeader>
             <PageFrameContent className="grid gap-4">
@@ -175,17 +184,18 @@ export function DesignSystemFeature() {
                 <FormStep index={3} label="Publicacao" />
               </div>
               <FormSection title="Secao de formulario" description="Agrupa campos relacionados e explica o impacto.">
-                <div className="h-10 rounded-md border border-input bg-background" />
+                <div className="h-7 rounded-md border border-input bg-input/20" />
               </FormSection>
               <div className="grid gap-3 md:grid-cols-2">
-                <FormAside>Aside para contexto, dicas e resumo.</FormAside>
+                <FormAside>Aside para contexto, dicas e resumo (Projetos usa; Skills/Paginas/Secoes/Usuarios nao precisam).</FormAside>
                 <FormPreviewFrame className="grid min-h-24 place-items-center text-sm text-muted-foreground">
                   Preview
                 </FormPreviewFrame>
               </div>
               <FormActions className="static shadow-none">
-                <Button>Acao primaria</Button>
-                <span className="text-xs text-muted-foreground">Dirty state e erros aparecem aqui.</span>
+                <span className="text-xs text-muted-foreground">
+                  `FormActions` agora so aparece no rodape em forms inline sem Drawer (Perfil, Minha conta); mostra so o erro de validacao quando falha.
+                </span>
               </FormActions>
             </PageFrameContent>
           </PageFrame>
@@ -240,8 +250,10 @@ export function DesignSystemFeature() {
           </Table>
         </DataTableFrame>
         <p className="text-[13px] leading-5 text-muted-foreground">
-          `Table`/`Checkbox` adaptados do particle `p-table-8` (Coss/Base UI). A integracao com
-          TanStack Table por CRUD entra na proxima etapa do roadmap.
+          `Table`/`Checkbox` adaptados do particle `p-table-8` (Coss/Base UI). A busca/filtro do
+          `DataTableFrame` fica sempre fora do frame, como um irmao acima (nao um filho). Todos os
+          CRUDs administrativos (Projetos, Skills, Trajetoria, Paginas, Secoes, Usuarios) ja usam
+          `DataTableFrame` com TanStack Table de verdade.
         </p>
       </Section>
 
@@ -313,6 +325,50 @@ export function DesignSystemFeature() {
               description="O projeto sai do portfolio publico imediatamente. Esta acao nao pode ser desfeita."
               confirmLabel="Remover"
             />
+          </PageFrameContent>
+        </PageFrame>
+      </Section>
+
+      <Section>
+        <SectionHeader>
+          <SectionTitle>Menu</SectionTitle>
+        </SectionHeader>
+        <PageFrame>
+          <PageFrameHeader>
+            <div>
+              <PageFrameTitle>Menu</PageFrameTitle>
+              <PageFrameDescription>
+                Base UI Menu (`components/ui/menu.tsx`, adaptado do `@coss/menu`). Usado no `UserMenu`
+                (avatar com Minha conta/Site publico/tema/Sair) e na nav principal (mega-menu por
+                grupo, hover com `openOnHover`). Popup usa `bg-card`/`border-border` (o projeto nao
+                tem tokens `--popover`/`--accent`); item destacado usa `bg-muted`.
+              </PageFrameDescription>
+            </div>
+          </PageFrameHeader>
+          <PageFrameContent>
+            <Menu>
+              <MenuTrigger className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2.5 py-1.5 text-xs font-medium hover:bg-muted">
+                Conta
+                <ChevronDownIcon className="size-3.5" />
+              </MenuTrigger>
+              <MenuPopup align="start">
+                <MenuGroup>
+                  <MenuItem>
+                    <UserIcon />
+                    Minha conta
+                  </MenuItem>
+                  <MenuItem>
+                    <SettingsIcon />
+                    Preferencias
+                  </MenuItem>
+                </MenuGroup>
+                <MenuSeparator />
+                <MenuItem variant="destructive">
+                  <LogOutIcon />
+                  Sair
+                </MenuItem>
+              </MenuPopup>
+            </Menu>
           </PageFrameContent>
         </PageFrame>
       </Section>

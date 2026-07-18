@@ -30,16 +30,11 @@ export function DataTableFrame({
   searchPlaceholder = "Buscar...",
   title,
 }: DataTableFrameProps) {
+  const hasToolbar = Boolean(onSearchChange) || Boolean(filters);
+
   return (
-    <PageFrame>
-      <PageFrameHeader>
-        <div>
-          <PageFrameTitle>{title}</PageFrameTitle>
-          {description && <PageFrameDescription>{description}</PageFrameDescription>}
-        </div>
-        {actions}
-      </PageFrameHeader>
-      <PageFrameContent className="grid gap-4">
+    <div className="grid gap-3">
+      {hasToolbar && (
         <Toolbar>
           {onSearchChange && (
             <Input
@@ -51,8 +46,19 @@ export function DataTableFrame({
           )}
           {filters}
         </Toolbar>
-        {empty ? <EmptyState description={emptyDescription} title={emptyTitle} /> : children}
-      </PageFrameContent>
-    </PageFrame>
+      )}
+      <PageFrame>
+        <PageFrameHeader>
+          <div>
+            <PageFrameTitle>{title}</PageFrameTitle>
+            {description && <PageFrameDescription>{description}</PageFrameDescription>}
+          </div>
+          {actions}
+        </PageFrameHeader>
+        <PageFrameContent className="grid gap-4">
+          {empty ? <EmptyState description={emptyDescription} title={emptyTitle} /> : children}
+        </PageFrameContent>
+      </PageFrame>
+    </div>
   );
 }

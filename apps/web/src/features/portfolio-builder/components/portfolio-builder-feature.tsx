@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ds/badge";
 import {
+  BuilderBrowserBar,
   BuilderItem,
   BuilderItemContent,
   BuilderItemDescription,
@@ -22,6 +23,8 @@ import { PageDescription, PageHeader, PageTitle } from "@/components/ds/page";
 import { Section, SectionContent, SectionHeader, SectionTitle } from "@/components/ds/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { env } from "@/core/config/env";
 import {
   createContentVersion,
   publishContentVersion,
@@ -157,10 +160,21 @@ export function PortfolioBuilderFeature() {
             {currentVersion && <Badge tone={currentVersion.status === "published" ? "success" : "muted"}>{currentVersion.status}</Badge>}
           </SectionHeader>
           <div className="grid grid-cols-[1fr_auto] gap-2">
-            <select className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" value={versionId} onChange={(event) => loadVersion(event.target.value)}>
-              <option value="">Nova versao</option>
-              {versionsQuery.data?.map((version) => <option key={version.id} value={version.id}>{version.name} ({version.status})</option>)}
-            </select>
+            <Select value={versionId} onValueChange={(next) => loadVersion(next ?? "")}>
+              <SelectTrigger>
+                <SelectValue>
+                  {() => (currentVersion ? `${currentVersion.name} (${currentVersion.status})` : "Nova versao")}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectPopup>
+                <SelectItem value="">Nova versao</SelectItem>
+                {versionsQuery.data?.map((version) => (
+                  <SelectItem key={version.id} value={version.id}>
+                    {version.name} ({version.status})
+                  </SelectItem>
+                ))}
+              </SelectPopup>
+            </Select>
             <Button type="button" variant="ghost" onClick={newVersion}>Nova</Button>
           </div>
           <Input aria-label="Nome da versao" value={name} onChange={(event) => setName(event.target.value)} />
@@ -201,6 +215,7 @@ export function PortfolioBuilderFeature() {
         </BuilderPanel>
 
         <BuilderPreview className="overflow-hidden p-0">
+          <BuilderBrowserBar url={displayUrl(env.appUrl)} />
           <div className="flex min-h-[620px] flex-col gap-8 bg-background p-6">
             {[...sections].filter((item) => item.enabled).sort((a, b) => a.order - b.order).map((item) => (
               <PortfolioPreviewSection key={item.id} id={item.id} portfolio={portfolioQuery.data} />
@@ -244,6 +259,10 @@ function PreviewGrid({ items, title }: { items: string[]; title: string }) {
 
 function section(id: string, label: string, order: number): ContentVersionSection {
   return { id, label, order, enabled: true, selectionMode: "all", itemIds: [] };
+}
+
+function displayUrl(url: string) {
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
 function slugify(value: string) {

@@ -5,8 +5,7 @@ import { USER_ROLES } from "@portfolio/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { DsForm, FormActions, FormSection } from "@/components/ds/form";
+import { DsForm, FormSection } from "@/components/ds/form";
 import { FormFields } from "@/components/ds/form-fields";
 import { FormError, FormField, FormLabel } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
@@ -14,9 +13,12 @@ import { createUser, updateUser } from "@/features/users/api/users-api";
 import { usersKeys } from "@/features/users/api/users-queries";
 import { userFormSchema, type UserFormValues } from "@/features/users/schemas/user-form-schema";
 
+export const USER_FORM_ID = "user-form";
+
 type UserFormProps = {
-  user?: UserDto | null;
   onDone?: () => void;
+  onPendingChange?: (pending: boolean) => void;
+  user?: UserDto | null;
 };
 
 const ROLE_LABELS: Record<(typeof USER_ROLES)[number], string> = {
@@ -33,7 +35,7 @@ const defaultValues: UserFormValues = {
   role: "editor",
 };
 
-export function UserForm({ user, onDone }: UserFormProps) {
+export function UserForm({ onDone, onPendingChange, user }: UserFormProps) {
   const queryClient = useQueryClient();
   const form = useForm<UserFormValues>({
     resolver: typedZodResolver(userFormSchema),
@@ -79,15 +81,19 @@ export function UserForm({ user, onDone }: UserFormProps) {
     await mutation.mutateAsync(values);
   }
 
+  useEffect(() => {
+    onPendingChange?.(mutation.isPending);
+  }, [mutation.isPending, onPendingChange]);
+
   return (
-    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+    <DsForm id={USER_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
       <FormSection title="Identidade" description="Nome e email do usuario. O email nao pode ser alterado depois de criado.">
         <div className="grid gap-4 md:grid-cols-2">
           <FormFields.Text form={form} label="Nome" name="name" />
           {user ? (
             <FormField>
               <FormLabel>Email</FormLabel>
-              <p className="flex h-10 items-center rounded-md border border-input bg-surface-muted px-3 text-sm text-muted-foreground">
+              <p className="flex h-7 items-center rounded-md border border-input bg-surface-muted px-2 text-sm text-muted-foreground">
                 {user.email}
               </p>
             </FormField>
@@ -116,17 +122,6 @@ export function UserForm({ user, onDone }: UserFormProps) {
       </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar usuario.</FormError>}
-
-      <FormActions>
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Salvando..." : user ? "Salvar alteracoes" : "Criar usuario"}
-        </Button>
-        {user && (
-          <Button type="button" variant="ghost" onClick={onDone}>
-            Cancelar edicao
-          </Button>
-        )}
-      </FormActions>
     </DsForm>
   );
 }

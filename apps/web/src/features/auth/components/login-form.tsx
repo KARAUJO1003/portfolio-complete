@@ -11,12 +11,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FormError, FormField, FormLabel } from "@/components/ds/form-field";
 import { useAuth } from "@/core/auth/contexts/auth-context";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
+import { useAdminThemeScope } from "@/hooks/use-admin-theme-scope";
 import { loginFormSchema, type LoginFormValues } from "@/features/auth/schemas/login-schema";
 
 export function LoginForm() {
   const router = useRouter();
   const auth = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
+  useAdminThemeScope();
 
   const form = useForm<LoginFormValues>({
     resolver: typedZodResolver(loginFormSchema),

@@ -2,7 +2,7 @@ import { ForgotPasswordForm } from "@/features/auth/components/forgot-password-f
 
 export default function ForgotPasswordPage() {
   return (
-    <main className="grid min-h-dvh place-items-center bg-background-subtle px-4 py-10 text-foreground">
+    <main className="admin-shell grid min-h-dvh place-items-center bg-background-subtle px-4 py-10 text-foreground">
       <ForgotPasswordForm />
     </main>
   );

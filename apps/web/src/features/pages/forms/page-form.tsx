@@ -4,8 +4,7 @@ import type { CustomPageDto } from "@portfolio/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { DsForm, FormActions, FormSection } from "@/components/ds/form";
+import { DsForm, FormSection } from "@/components/ds/form";
 import { FormFields } from "@/components/ds/form-fields";
 import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
@@ -13,9 +12,12 @@ import { createPage, updatePage } from "@/features/pages/api/pages-api";
 import { pagesKeys } from "@/features/pages/api/pages-queries";
 import { pageFormSchema, type PageFormValues } from "@/features/pages/schemas/page-form-schema";
 
+export const PAGE_FORM_ID = "page-form";
+
 type PageFormProps = {
-  page?: CustomPageDto | null;
   onDone?: () => void;
+  onPendingChange?: (pending: boolean) => void;
+  page?: CustomPageDto | null;
 };
 
 const defaultValues: PageFormValues = {
@@ -29,7 +31,7 @@ const defaultValues: PageFormValues = {
   showInNavigation: false,
 };
 
-export function PageForm({ page, onDone }: PageFormProps) {
+export function PageForm({ onDone, onPendingChange, page }: PageFormProps) {
   const queryClient = useQueryClient();
   const form = useForm<PageFormValues>({
     resolver: typedZodResolver(pageFormSchema),
@@ -69,8 +71,12 @@ export function PageForm({ page, onDone }: PageFormProps) {
     await mutation.mutateAsync(values);
   }
 
+  useEffect(() => {
+    onPendingChange?.(mutation.isPending);
+  }, [mutation.isPending, onPendingChange]);
+
   return (
-    <DsForm onSubmit={form.handleSubmit(onSubmit)}>
+    <DsForm id={PAGE_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
       <FormSection title="Identidade" description="Titulo, slug e resumo exibidos na navegacao e listagens.">
         <div className="grid gap-4 md:grid-cols-2">
           <FormFields.Text form={form} label="Titulo" name="title" />
@@ -108,17 +114,6 @@ export function PageForm({ page, onDone }: PageFormProps) {
       </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar pagina.</FormError>}
-
-      <FormActions>
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Salvando..." : page ? "Salvar alteracoes" : "Criar pagina"}
-        </Button>
-        {page && (
-          <Button type="button" variant="ghost" onClick={onDone}>
-            Cancelar edicao
-          </Button>
-        )}
-      </FormActions>
     </DsForm>
   );
 }

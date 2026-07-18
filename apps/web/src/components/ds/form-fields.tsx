@@ -4,7 +4,17 @@ import { Controller, type FieldValues, type Path, type PathValue, type UseFormRe
 import { FormDescription, FormError, FormField, FormLabel } from "@/components/ds/form-field";
 import { RichTextEditor } from "@/components/ds/rich-text-editor";
 import { Input } from "@/components/ui/input";
+import {
+  NumberField,
+  NumberFieldDecrement,
+  NumberFieldGroup,
+  NumberFieldIncrement,
+  NumberFieldInput,
+} from "@/components/ui/number-field";
+import { Select as SelectRoot, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch as SwitchPrimitive } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
 type BaseFieldProps<TValues extends FieldValues> = {
@@ -49,38 +59,25 @@ function NumberStepper<TValues extends FieldValues>({
   step = 1,
 }: BaseFieldProps<TValues> & { step?: number }) {
   const error = fieldError(form, name);
-  const rawValue = form.watch(name);
-  const value = Number(rawValue || 0);
-
-  function setNext(next: number) {
-    form.setValue(name, next as PathValue<TValues, typeof name>, { shouldDirty: true, shouldValidate: true });
-  }
+  const value = Number(form.watch(name) || 0);
 
   return (
     <FormField className={className}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
-      <div className="grid grid-cols-[40px_1fr_40px] overflow-hidden rounded-md border border-input bg-background">
-        <button
-          className="border-r border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          type="button"
-          onClick={() => setNext(value - step)}
-        >
-          -
-        </button>
-        <Input
-          id={name}
-          className="rounded-none border-0 text-center shadow-none focus-visible:ring-0"
-          type="number"
-          {...form.register(name)}
-        />
-        <button
-          className="border-l border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          type="button"
-          onClick={() => setNext(value + step)}
-        >
-          +
-        </button>
-      </div>
+      <NumberField
+        id={name}
+        step={step}
+        value={value}
+        onValueChange={(next) =>
+          form.setValue(name, (next ?? 0) as PathValue<TValues, typeof name>, { shouldDirty: true, shouldValidate: true })
+        }
+      >
+        <NumberFieldGroup>
+          <NumberFieldDecrement />
+          <NumberFieldInput />
+          <NumberFieldIncrement />
+        </NumberFieldGroup>
+      </NumberField>
       {description && <FormDescription>{description}</FormDescription>}
       {error && <FormError>{error}</FormError>}
     </FormField>
@@ -116,21 +113,29 @@ function Select<TValues extends FieldValues>({
   options,
 }: BaseFieldProps<TValues> & { options: Array<{ label: string; value: string }> }) {
   const error = fieldError(form, name);
+  const value = String(form.watch(name) ?? "");
+  const selectedLabel = options.find((option) => option.value === value)?.label;
 
   return (
     <FormField className={className}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
-      <select
-        id={name}
-        className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none transition-colors focus:border-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        {...form.register(name)}
+      <SelectRoot
+        value={value}
+        onValueChange={(next) =>
+          form.setValue(name, next as PathValue<TValues, typeof name>, { shouldDirty: true, shouldValidate: true })
+        }
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger id={name}>
+          <SelectValue>{() => selectedLabel}</SelectValue>
+        </SelectTrigger>
+        <SelectPopup>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectPopup>
+      </SelectRoot>
       {description && <FormDescription>{description}</FormDescription>}
       {error && <FormError>{error}</FormError>}
     </FormField>

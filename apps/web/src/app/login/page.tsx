@@ -2,7 +2,7 @@ import { LoginForm } from "@/features/auth/components/login-form";
 
 export default function LoginPage() {
   return (
-    <main className="relative grid min-h-dvh overflow-hidden bg-background-subtle text-foreground lg:grid-cols-[minmax(0,1fr)_480px]">
+    <main className="admin-shell relative grid min-h-dvh overflow-hidden bg-background-subtle text-foreground lg:grid-cols-[minmax(0,1fr)_480px]">
       <section className="relative hidden flex-col justify-between border-r border-border bg-background p-10 lg:flex">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,hsl(var(--primary)/0.18),transparent_34%),radial-gradient(circle_at_80%_65%,hsl(var(--primary-accent)/0.12),transparent_30%)]" />
         <div className="relative z-10">
