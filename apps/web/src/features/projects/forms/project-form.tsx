@@ -1,7 +1,7 @@
 "use client";
 
 import type { ProjectDto } from "@portfolio/contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { AsyncImageFrame } from "@/components/ds/async-image-frame";
@@ -13,7 +13,7 @@ import { FormDescription, FormError, FormField, FormLabel } from "@/components/d
 import { resolveFileUrl } from "@/core/files/file-url";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
 import { createProject, updateProject } from "@/features/projects/api/projects-api";
-import { projectsKeys } from "@/features/projects/api/projects-queries";
+import { projectsKeys, projectsListQueryOptions } from "@/features/projects/api/projects-queries";
 import { projectFormSchema, type ProjectFormValues } from "@/features/projects/schemas/project-form-schema";
 import { FileUploadField } from "@/features/uploads/components/file-upload-field";
 
@@ -43,6 +43,8 @@ const defaultValues: ProjectFormValues = {
 
 export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormProps) {
   const queryClient = useQueryClient();
+  const projectsQuery = useQuery(projectsListQueryOptions());
+  const maxOrder = projectsQuery.data?.length ?? 0;
   const form = useForm<ProjectFormValues>({
     resolver: typedZodResolver(projectFormSchema),
     mode: "onSubmit",
@@ -145,11 +147,11 @@ export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormPro
               rows={3}
               description="Use uma frase objetiva. O card publico trunca o texto e o drawer mostra detalhes."
             />
-            <FormFields.RichTextField
+            <FormFields.HtmlEditor
               form={form}
               label="Descricao longa"
               name="description"
-              description="Texto completo para drawer, curriculo e futuras paginas detalhadas."
+              description="Texto completo para drawer e futuras paginas detalhadas. Nao alimenta o PDF do curriculo (que usa o Resumo curto)."
             />
           </FormSection>
 
@@ -200,17 +202,8 @@ export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormPro
               />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              <FormFields.NumberStepper form={form} label="Ordem" name="order" />
-              <FormFields.Select
-                form={form}
-                label="Status"
-                name="status"
-                options={[
-                  { label: "Rascunho", value: "draft" },
-                  { label: "Publicado", value: "published" },
-                  { label: "Arquivado", value: "archived" },
-                ]}
-              />
+              <FormFields.NumberStepper form={form} label="Ordem" max={maxOrder} name="order" />
+              <FormFields.StatusToggle form={form} label="Status" name="status" />
             </div>
           </FormSection>
         </div>

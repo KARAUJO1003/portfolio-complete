@@ -1,7 +1,7 @@
 "use client";
 
 import type { CustomSectionDto } from "@portfolio/contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { DsForm, FormSection } from "@/components/ds/form";
@@ -9,7 +9,7 @@ import { FormFields } from "@/components/ds/form-fields";
 import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
 import { createCustomSection, updateCustomSection } from "@/features/custom-sections/api/custom-sections-api";
-import { customSectionsKeys } from "@/features/custom-sections/api/custom-sections-queries";
+import { customSectionsKeys, customSectionsListQueryOptions } from "@/features/custom-sections/api/custom-sections-queries";
 import {
   customSectionFormSchema,
   type CustomSectionFormValues,
@@ -35,6 +35,8 @@ const defaultValues: CustomSectionFormValues = {
 };
 
 export function CustomSectionForm({ onDone, onPendingChange, section }: CustomSectionFormProps) {
+  const customSectionsQuery = useQuery(customSectionsListQueryOptions());
+  const maxOrder = customSectionsQuery.data?.length ?? 0;
   const queryClient = useQueryClient();
   const form = useForm<CustomSectionFormValues>({
     resolver: typedZodResolver(customSectionFormSchema),
@@ -95,7 +97,7 @@ export function CustomSectionForm({ onDone, onPendingChange, section }: CustomSe
         <div className="grid gap-4 md:grid-cols-3">
           <FormFields.Text form={form} label="Titulo" name="title" />
           <FormFields.Text form={form} label="Chave" name="key" />
-          <FormFields.NumberStepper form={form} label="Ordem" name="order" />
+          <FormFields.NumberStepper form={form} label="Ordem" max={maxOrder} name="order" />
         </div>
       </FormSection>
 
@@ -113,16 +115,7 @@ export function CustomSectionForm({ onDone, onPendingChange, section }: CustomSe
       </FormSection>
 
       <FormSection title="Publicacao e exibicao" description="Status e onde esta secao aparece.">
-        <FormFields.Select
-          form={form}
-          label="Status"
-          name="status"
-          options={[
-            { label: "Rascunho", value: "draft" },
-            { label: "Publicado", value: "published" },
-            { label: "Arquivado", value: "archived" },
-          ]}
-        />
+        <FormFields.StatusToggle form={form} label="Status" name="status" />
         <div className="grid gap-3 md:grid-cols-2">
           <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponivel para versoes de portfolio." />
           <FormFields.Switch form={form} label="Curriculo" name="showOnResume" description="Disponivel para versoes de curriculo." />

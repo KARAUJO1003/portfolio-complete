@@ -55,17 +55,23 @@ function NumberStepper<TValues extends FieldValues>({
   description,
   form,
   label,
+  max,
+  min = 0,
   name,
   step = 1,
-}: BaseFieldProps<TValues> & { step?: number }) {
+}: BaseFieldProps<TValues> & { max?: number; min?: number; step?: number }) {
   const error = fieldError(form, name);
   const value = Number(form.watch(name) || 0);
+  const clampedDescription =
+    typeof max === "number" ? (description ?? `Use um valor entre 0 e ${max} (quantidade de itens cadastrados).`) : description;
 
   return (
     <FormField className={className}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
       <NumberField
         id={name}
+        max={max}
+        min={min}
         step={step}
         value={value}
         onValueChange={(next) =>
@@ -78,7 +84,7 @@ function NumberStepper<TValues extends FieldValues>({
           <NumberFieldIncrement />
         </NumberFieldGroup>
       </NumberField>
-      {description && <FormDescription>{description}</FormDescription>}
+      {clampedDescription && <FormDescription>{clampedDescription}</FormDescription>}
       {error && <FormError>{error}</FormError>}
     </FormField>
   );
@@ -162,21 +168,55 @@ function Switch<TValues extends FieldValues>({
         <span className="block font-medium">{label}</span>
         {description && <span className="mt-1 block text-xs leading-5 text-muted-foreground">{description}</span>}
       </span>
-      <input className="sr-only" type="checkbox" {...form.register(name)} />
-      <span
-        className={cn(
-          "relative mt-0.5 h-6 w-10 rounded-full border border-border bg-muted transition-colors",
-          checked && "border-primary/50 bg-primary",
-        )}
-      >
-        <span
-          className={cn(
-            "absolute left-0.5 top-0.5 size-5 rounded-full bg-background shadow-sm transition-transform",
-            checked && "translate-x-4",
-          )}
-        />
-      </span>
+      <SwitchPrimitive
+        checked={checked}
+        className="mt-0.5"
+        onCheckedChange={(next) =>
+          form.setValue(name, next as PathValue<TValues, typeof name>, { shouldDirty: true, shouldValidate: true })
+        }
+      />
     </label>
+  );
+}
+
+const statusToggleLabel: Record<string, string> = {
+  archived: "Arquivado",
+  draft: "Rascunho",
+  published: "Publicado",
+};
+
+function StatusToggle<TValues extends FieldValues>({
+  className,
+  description,
+  form,
+  label,
+  name,
+  options = ["draft", "published", "archived"],
+}: BaseFieldProps<TValues> & { options?: string[] }) {
+  const error = fieldError(form, name);
+  const value = String(form.watch(name) ?? options[0]);
+
+  return (
+    <FormField className={className}>
+      <FormLabel htmlFor={name}>{label}</FormLabel>
+      <ToggleGroup
+        id={name}
+        value={[value]}
+        onValueChange={(next) => {
+          const nextValue = next[0];
+          if (!nextValue) return;
+          form.setValue(name, nextValue as PathValue<TValues, typeof name>, { shouldDirty: true, shouldValidate: true });
+        }}
+      >
+        {options.map((option) => (
+          <ToggleGroupItem key={option} value={option}>
+            {statusToggleLabel[option] ?? option}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+      {description && <FormDescription>{description}</FormDescription>}
+      {error && <FormError>{error}</FormError>}
+    </FormField>
   );
 }
 
@@ -229,6 +269,7 @@ export const FormFields = {
   NumberStepper,
   RichTextField,
   Select,
+  StatusToggle,
   Switch,
   TagInput,
   Text,

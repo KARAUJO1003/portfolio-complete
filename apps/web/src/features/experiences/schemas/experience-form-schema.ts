@@ -10,7 +10,7 @@ export const experienceFormSchema = z.object({
   current: z.boolean().default(false),
   description: z.string().default(""),
   url: z.string().url().or(z.literal("")).default(""),
-  order: z.coerce.number().default(0),
+  order: z.coerce.number().int("Ordem deve ser um numero inteiro.").min(0, "Ordem nao pode ser negativa.").default(0),
   showOnPortfolio: z.boolean().default(false),
   showOnResume: z.boolean().default(true),
 });

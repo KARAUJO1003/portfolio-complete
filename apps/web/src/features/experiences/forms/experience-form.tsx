@@ -1,7 +1,7 @@
 "use client";
 
 import type { ExperienceDto } from "@portfolio/contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { DsForm, FormSection } from "@/components/ds/form";
@@ -9,7 +9,7 @@ import { FormFields } from "@/components/ds/form-fields";
 import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
 import { createExperience, updateExperience } from "@/features/experiences/api/experiences-api";
-import { experiencesKeys } from "@/features/experiences/api/experiences-queries";
+import { experiencesKeys, experiencesListQueryOptions } from "@/features/experiences/api/experiences-queries";
 import {
   experienceFormSchema,
   type ExperienceFormValues,
@@ -39,6 +39,8 @@ const defaultValues: ExperienceFormValues = {
 };
 
 export function ExperienceForm({ experience, onDone, onPendingChange }: ExperienceFormProps) {
+  const experiencesQuery = useQuery(experiencesListQueryOptions());
+  const maxOrder = experiencesQuery.data?.length ?? 0;
   const queryClient = useQueryClient();
   const form = useForm<ExperienceFormValues>({
     resolver: typedZodResolver(experienceFormSchema),
@@ -127,9 +129,9 @@ export function ExperienceForm({ experience, onDone, onPendingChange }: Experien
           <FormFields.Text form={form} label="Inicio" name="startDate" />
           <FormFields.Text form={form} label="Fim" name="endDate" />
           <FormFields.Text form={form} label="URL" name="url" />
-          <FormFields.NumberStepper form={form} label="Ordem" name="order" />
+          <FormFields.NumberStepper form={form} label="Ordem" max={maxOrder} name="order" />
         </div>
-        <FormFields.Textarea form={form} label="Descricao" name="description" rows={4} />
+        <FormFields.HtmlEditor form={form} label="Descricao" name="description" />
       </FormSection>
 
       <FormSection title="Publicacao e exibicao" description="Controle status atual e onde este item aparece.">

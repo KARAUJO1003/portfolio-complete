@@ -95,6 +95,14 @@ export function spans(...items: PdfSpan[]): PdfLine {
   return { spans: items, size: 9.5 };
 }
 
+export function bulletSpans(items: PdfSpan[], options: Partial<PdfLine> = {}): PdfLine {
+  return { spans: [{ text: "• " }, ...items], size: 9.5, indent: 8, ...options };
+}
+
+export function numberedSpans(items: PdfSpan[], index: number, options: Partial<PdfLine> = {}): PdfLine {
+  return { spans: [{ text: `${index}. ` }, ...items], size: 9.5, indent: 8, ...options };
+}
+
 function parseMarkdownSpans(text: string, forceBold = false): PdfSpan[] {
   const normalized = normalizeText(text).trim();
   const parts = normalized.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);

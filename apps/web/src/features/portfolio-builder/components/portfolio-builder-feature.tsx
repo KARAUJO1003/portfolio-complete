@@ -3,11 +3,11 @@
 import type { ContentVersionSection } from "@portfolio/contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ds/badge";
 import {
   BuilderBrowserBar,
+  BuilderEmptyState,
   BuilderItem,
   BuilderItemContent,
   BuilderItemDescription,
@@ -18,13 +18,13 @@ import {
   BuilderSectionItemsPicker,
   BuilderSortableList,
   BuilderStatus,
+  BuilderVersionSwitcher,
 } from "@/components/ds/builder";
 import { PageDescription, PageHeader, PageTitle } from "@/components/ds/page";
-import { Section, SectionContent, SectionHeader, SectionTitle } from "@/components/ds/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { env } from "@/core/config/env";
+import { resolveFileUrl } from "@/core/files/file-url";
 import {
   createContentVersion,
   publishContentVersion,
@@ -38,6 +38,17 @@ import { customSectionsListQueryOptions } from "@/features/custom-sections/api/c
 import { experiencesListQueryOptions } from "@/features/experiences/api/experiences-queries";
 import { pagesListQueryOptions } from "@/features/pages/api/pages-queries";
 import { getPublicPortfolio } from "@/features/portfolio/api/public-portfolio-api";
+import {
+  AboutSection,
+  ContactSection,
+  CustomSectionsSection,
+  GitHubSection,
+  PagesSection,
+  ProjectsSection,
+  SkillsSection,
+  TimelineSection,
+  type PortfolioProfile,
+} from "@/features/portfolio/components/portfolio-home";
 import { projectsListQueryOptions } from "@/features/projects/api/projects-queries";
 import { skillsListQueryOptions } from "@/features/skills/api/skills-queries";
 
@@ -66,11 +77,17 @@ export function PortfolioBuilderFeature() {
   const [name, setName] = useState("Portfolio principal");
   const [sections, setSections] = useState(defaultSections);
 
+  const hasAutoLoaded = useRef(false);
   useEffect(() => {
-    if (versionId || !versionsQuery.data?.length) return;
+    // So roda uma vez, quando os dados chegam - nao pode reagir a versionId
+    // (senao clicar em "Nova" limpa versionId, o que re-dispara este efeito e
+    // desfaz o clique carregando a versao publicada de novo). Ver Fase 7 em
+    // docs/admin-redesign-tasks.md.
+    if (hasAutoLoaded.current || !versionsQuery.data?.length) return;
+    hasAutoLoaded.current = true;
     const initial = versionsQuery.data.find((version) => version.status === "published") ?? versionsQuery.data[0];
     loadVersion(initial.id);
-  }, [versionsQuery.data, versionId]);
+  }, [versionsQuery.data]);
 
   const items = useMemo<Record<string, { id: string; label: string }[]>>(
     () => ({
@@ -145,6 +162,7 @@ export function PortfolioBuilderFeature() {
 
   const busy = saveMutation.isPending || publishMutation.isPending;
   const currentVersion = versionsQuery.data?.find((item) => item.id === versionId);
+  const liveVersion = versionsQuery.data?.find((item) => item.status === "published");
 
   return (
     <>
@@ -155,28 +173,13 @@ export function PortfolioBuilderFeature() {
 
       <BuilderLayout>
         <BuilderPanel>
-          <SectionHeader>
-            <SectionTitle>Versao</SectionTitle>
-            {currentVersion && <Badge tone={currentVersion.status === "published" ? "success" : "muted"}>{currentVersion.status}</Badge>}
-          </SectionHeader>
-          <div className="grid grid-cols-[1fr_auto] gap-2">
-            <Select value={versionId} onValueChange={(next) => loadVersion(next ?? "")}>
-              <SelectTrigger>
-                <SelectValue>
-                  {() => (currentVersion ? `${currentVersion.name} (${currentVersion.status})` : "Nova versao")}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectPopup>
-                <SelectItem value="">Nova versao</SelectItem>
-                {versionsQuery.data?.map((version) => (
-                  <SelectItem key={version.id} value={version.id}>
-                    {version.name} ({version.status})
-                  </SelectItem>
-                ))}
-              </SelectPopup>
-            </Select>
-            <Button type="button" variant="ghost" onClick={newVersion}>Nova</Button>
-          </div>
+          <BuilderVersionSwitcher
+            currentVersion={currentVersion}
+            liveVersion={liveVersion}
+            versions={versionsQuery.data ?? []}
+            onNew={newVersion}
+            onSelect={loadVersion}
+          />
           <Input aria-label="Nome da versao" value={name} onChange={(event) => setName(event.target.value)} />
 
           <BuilderSortableList
@@ -229,32 +232,81 @@ export function PortfolioBuilderFeature() {
 
 type PortfolioData = Awaited<ReturnType<typeof getPublicPortfolio>>;
 
+/**
+ * Preview reaproveita os componentes reais de secao do site publico
+ * (`features/portfolio/components/portfolio-home.tsx`, exportados so pra
+ * isso) em vez de uma renderizacao simplificada propria - fica fiel de
+ * verdade ao que sera publicado. Ver Fase 8 em docs/admin-redesign-tasks.md.
+ * "hero" nao tem componente proprio no site real (o conteudo vive na sidebar/
+ * MobileIntro, que dependem de layout de pagina inteira) - mantido como bloco
+ * simples aqui.
+ */
+function toPortfolioProfile(portfolio: PortfolioData | undefined): PortfolioProfile {
+  const profile = portfolio?.profile;
+  return {
+    name: profile?.name || "",
+    headline: profile?.headline || "",
+    summary: profile?.summary || "",
+    about: profile?.objective || profile?.summary || "",
+    github: profile?.github || "",
+    linkedin: profile?.linkedin || "",
+    instagram: "",
+    avatarUrl: resolveFileUrl(profile?.avatarPath) || "",
+  };
+}
+
 const portfolioPreviewRegistry: Record<string, (portfolio: PortfolioData | undefined) => React.ReactNode> = {
-  hero: (portfolio) => (
-    <section className="flex min-h-48 flex-col justify-center gap-3">
-      <p className="text-sm text-muted-foreground">software</p>
-      <h2 className="text-4xl font-semibold">{portfolio?.profile?.headline || "developer"}</h2>
-    </section>
-  ),
-  about: (portfolio) => <PreviewSection title="Sobre">{portfolio?.profile?.summary || "Resumo do perfil."}</PreviewSection>,
-  skills: (portfolio) => <PreviewGrid items={portfolio?.skills.map((item) => item.title) ?? []} title="Habilidades" />,
-  projects: (portfolio) => <PreviewGrid items={portfolio?.projects.map((item) => item.title) ?? []} title="Projetos" />,
-  experiences: (portfolio) => <PreviewGrid items={portfolio?.experiences.map((item) => item.title) ?? []} title="Experiencias" />,
-  pages: (portfolio) => <PreviewGrid items={portfolio?.navigationPages.map((item) => item.title) ?? []} title="Paginas" />,
-  "custom-sections": (portfolio) => <PreviewGrid items={portfolio?.customSections.map((item) => item.title) ?? []} title="Secoes" />,
-  github: (portfolio) => <PreviewGrid items={portfolio?.github?.repositories.map((item) => item.name) ?? []} title="GitHub" />,
+  hero: (portfolio) => {
+    const profile = toPortfolioProfile(portfolio);
+    return (
+      <section className="flex min-h-48 flex-col justify-center gap-3">
+        <p className="text-sm text-muted-foreground">{profile.name || "Seu nome"}</p>
+        <h2 className="text-4xl font-semibold">{profile.headline || "Seu titulo aqui"}</h2>
+      </section>
+    );
+  },
+  about: (portfolio) => <AboutSection profile={toPortfolioProfile(portfolio)} />,
+  skills: (portfolio) =>
+    portfolio?.skills.length ? (
+      <SkillsSection skills={portfolio.skills} />
+    ) : (
+      <BuilderEmptyState description="Cadastre habilidades e marque-as como visiveis no portfolio para aparecerem aqui." title="Nenhuma habilidade" />
+    ),
+  projects: (portfolio) =>
+    portfolio?.projects.length ? (
+      <ProjectsSection projects={portfolio.projects} />
+    ) : (
+      <BuilderEmptyState description="Cadastre projetos e marque-os como visiveis no portfolio para aparecerem aqui." title="Nenhum projeto" />
+    ),
+  experiences: (portfolio) =>
+    portfolio?.experiences.length ? (
+      <TimelineSection experiences={portfolio.experiences} />
+    ) : (
+      <BuilderEmptyState description="Cadastre experiencias e marque-as como visiveis no portfolio para aparecerem aqui." title="Nenhuma experiencia" />
+    ),
+  pages: (portfolio) =>
+    portfolio?.navigationPages.length ? (
+      <PagesSection pages={portfolio.navigationPages} />
+    ) : (
+      <BuilderEmptyState description="Publique paginas com 'Exibir na navegacao' ativado para aparecerem aqui." title="Nenhuma pagina" />
+    ),
+  "custom-sections": (portfolio) =>
+    portfolio?.customSections.length ? (
+      <CustomSectionsSection sections={portfolio.customSections} />
+    ) : (
+      <BuilderEmptyState description="Publique secoes customizadas e marque-as como visiveis no portfolio para aparecerem aqui." title="Nenhuma secao" />
+    ),
+  github: (portfolio) =>
+    portfolio?.github ? (
+      <GitHubSection github={portfolio.github} />
+    ) : (
+      <BuilderEmptyState description="Informe seu usuario do GitHub no Perfil para exibir estatisticas aqui." title="GitHub nao conectado" />
+    ),
+  contact: (portfolio) => <ContactSection profile={toPortfolioProfile(portfolio)} />,
 };
 
 function PortfolioPreviewSection({ id, portfolio }: { id: string; portfolio: PortfolioData | undefined }) {
   return portfolioPreviewRegistry[id]?.(portfolio) ?? null;
-}
-
-function PreviewSection({ children, title }: { children: React.ReactNode; title: string }) {
-  return <Section><SectionTitle>{title}</SectionTitle><SectionContent>{children}</SectionContent></Section>;
-}
-
-function PreviewGrid({ items, title }: { items: string[]; title: string }) {
-  return <Section><SectionTitle>{title}</SectionTitle><div className="grid gap-3 md:grid-cols-2">{(items.length ? items : ["Sem itens."]).map((item) => <div key={item} className="rounded-md border border-border bg-card p-3 text-sm">{item}</div>)}</div></Section>;
 }
 
 function section(id: string, label: string, order: number): ContentVersionSection {

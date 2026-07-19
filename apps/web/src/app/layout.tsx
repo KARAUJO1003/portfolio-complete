@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html className={`${raleway.variable} ${oxanium.variable} ${geistMono.variable}`} lang="pt-BR" suppressHydrationWarning>
+    <html className={`${raleway.variable} ${oxanium.variable} ${geistMono.variable} scroll-smooth`} lang="pt-BR" suppressHydrationWarning>
       <body>
         <RootProviders>{children}</RootProviders>
       </body>

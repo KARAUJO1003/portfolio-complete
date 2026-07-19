@@ -100,16 +100,7 @@ export function PageForm({ onDone, onPendingChange, page }: PageFormProps) {
       </FormSection>
 
       <FormSection title="Publicacao e exibicao" description="Status da pagina e presenca na navegacao publica.">
-        <FormFields.Select
-          form={form}
-          label="Status"
-          name="status"
-          options={[
-            { label: "Rascunho", value: "draft" },
-            { label: "Publicado", value: "published" },
-            { label: "Arquivado", value: "archived" },
-          ]}
-        />
+        <FormFields.StatusToggle form={form} label="Status" name="status" />
         <FormFields.Switch form={form} label="Navegacao publica" name="showInNavigation" description="Exibe esta pagina no menu publico." />
       </FormSection>
 

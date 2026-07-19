@@ -17,8 +17,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { GripVertical, InboxIcon } from "lucide-react";
 import { useId } from "react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 export function BuilderLayout({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -102,6 +104,90 @@ export function BuilderItemOptions({ className, ...props }: React.HTMLAttributes
 
 export function BuilderStatus({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
   return <p className={cn("text-xs leading-5 text-muted-foreground", className)} {...props} />;
+}
+
+type BuilderVersionSummary = { id: string; name: string; status: string };
+
+/**
+ * Junta o Select de versao + botao "Nova" + o indicador de qual versao esta
+ * ao vivo no site publico num unico componente. Antes disso era so um Badge
+ * solto que refletia o status da versao CARREGADA (nao necessariamente a
+ * publicada) - facil de confundir "o que estou editando" com "o que esta no
+ * ar". Ver docs/admin-redesign-tasks.md, Fase 7.
+ */
+export function BuilderVersionSwitcher({
+  currentVersion,
+  liveVersion,
+  onNew,
+  onSelect,
+  versions,
+}: {
+  currentVersion?: BuilderVersionSummary | null;
+  liveVersion?: BuilderVersionSummary | null;
+  onNew: () => void;
+  onSelect: (id: string) => void;
+  versions: BuilderVersionSummary[];
+}) {
+  const isNew = !currentVersion;
+  const isEditingLive = Boolean(currentVersion && liveVersion && currentVersion.id === liveVersion.id);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-medium text-muted-foreground">Versao</span>
+        {liveVersion ? (
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
+            Ao vivo: {liveVersion.name}
+          </span>
+        ) : (
+          <span className="text-xs text-muted-foreground">Nada publicado ainda</span>
+        )}
+      </div>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <Select value={currentVersion?.id ?? ""} onValueChange={(next) => onSelect(next ?? "")}>
+          <SelectTrigger>
+            <SelectValue>{() => (currentVersion ? `${currentVersion.name} (${currentVersion.status})` : "Nova versao")}</SelectValue>
+          </SelectTrigger>
+          <SelectPopup>
+            <SelectItem value="">Nova versao</SelectItem>
+            {versions.map((version) => (
+              <SelectItem key={version.id} value={version.id}>
+                {version.name} ({version.status})
+              </SelectItem>
+            ))}
+          </SelectPopup>
+        </Select>
+        <Button type="button" variant="ghost" onClick={onNew}>
+          Nova
+        </Button>
+      </div>
+      {isNew ? (
+        <p className="text-xs leading-5 text-muted-foreground">Uma versao nova sera criada ao salvar.</p>
+      ) : !isEditingLive && liveVersion ? (
+        <p className="rounded-md border border-warning/30 bg-warning/10 px-2.5 py-1.5 text-xs leading-5 text-warning">
+          Voce esta editando um rascunho - o site publico ainda mostra &quot;{liveVersion.name}&quot;.
+        </p>
+      ) : isEditingLive ? (
+        <p className="text-xs leading-5 text-muted-foreground">Esta e a versao publicada atualmente.</p>
+      ) : null}
+    </div>
+  );
+}
+
+/** Estado vazio para os previews dos builders quando nao ha nenhum conteudo cadastrado ainda. */
+export function BuilderEmptyState({ description, title }: { description: string; title: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+      <div className="grid size-11 place-items-center rounded-full border border-border bg-surface-muted text-muted-foreground">
+        <InboxIcon className="size-5" />
+      </div>
+      <div className="max-w-xs">
+        <p className="font-medium">{title}</p>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>
+      </div>
+    </div>
+  );
 }
 
 export function BuilderSortableList<T extends { id: string }>({

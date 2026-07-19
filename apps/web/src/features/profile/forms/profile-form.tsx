@@ -102,21 +102,9 @@ export function ProfileForm() {
         </div>
       </FormSection>
 
-      <FormSection title="Resumo e objetivo" description="Textos usados no curriculo. Use **texto** para negrito.">
-        <FormFields.RichTextField
-          description="Use **texto** para destacar trechos em negrito no curriculo."
-          form={form}
-          label="Resumo"
-          name="summary"
-          rows={5}
-        />
-        <FormFields.RichTextField
-          description="Use **texto** para destacar trechos em negrito no curriculo."
-          form={form}
-          label="Objetivo"
-          name="objective"
-          rows={4}
-        />
+      <FormSection title="Resumo e objetivo" description="Textos usados no curriculo (PDF entende negrito, listas, titulos e citacoes).">
+        <FormFields.HtmlEditor form={form} label="Resumo" name="summary" />
+        <FormFields.HtmlEditor form={form} label="Objetivo" name="objective" />
       </FormSection>
 
       {mutation.isError && <FormError>Erro ao salvar perfil.</FormError>}

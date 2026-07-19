@@ -1,7 +1,7 @@
 "use client";
 
 import type { SkillDto } from "@portfolio/contracts";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { DsForm, FormSection } from "@/components/ds/form";
@@ -9,7 +9,7 @@ import { FormFields } from "@/components/ds/form-fields";
 import { FormError } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
 import { createSkill, updateSkill } from "@/features/skills/api/skills-api";
-import { skillsKeys } from "@/features/skills/api/skills-queries";
+import { skillsKeys, skillsListQueryOptions } from "@/features/skills/api/skills-queries";
 import { skillFormSchema, type SkillFormValues } from "@/features/skills/schemas/skill-form-schema";
 
 export const SKILL_FORM_ID = "skill-form";
@@ -33,6 +33,8 @@ const defaultValues: SkillFormValues = {
 
 export function SkillForm({ onDone, onPendingChange, skill }: SkillFormProps) {
   const queryClient = useQueryClient();
+  const skillsQuery = useQuery(skillsListQueryOptions());
+  const maxOrder = skillsQuery.data?.length ?? 0;
   const form = useForm<SkillFormValues>({
     resolver: typedZodResolver(skillFormSchema),
     mode: "onSubmit",
@@ -98,12 +100,12 @@ export function SkillForm({ onDone, onPendingChange, skill }: SkillFormProps) {
           <FormFields.Text form={form} label="Data de inicio" name="startedAt" />
           <FormFields.Text form={form} label="Icone" name="icon" />
         </div>
-        <FormFields.Textarea form={form} label="Descricao" name="description" rows={4} />
+        <FormFields.HtmlEditor form={form} label="Descricao" name="description" />
       </FormSection>
 
       <FormSection title="Publicacao e exibicao" description="Controle onde esta habilidade aparece.">
         <div className="grid gap-4 md:grid-cols-2">
-          <FormFields.NumberStepper form={form} label="Ordem" name="order" />
+          <FormFields.NumberStepper form={form} label="Ordem" max={maxOrder} name="order" />
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponivel para versoes de portfolio." />

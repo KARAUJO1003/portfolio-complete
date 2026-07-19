@@ -2,10 +2,10 @@
 
 import type { ContentVersionSection, CustomSectionDto, ExperienceDto, ProfileDto, ProjectDto, SkillDto } from "@portfolio/contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ds/badge";
 import {
+  BuilderEmptyState,
   BuilderItem,
   BuilderItemContent,
   BuilderItemDescription,
@@ -16,10 +16,10 @@ import {
   BuilderSectionItemsPicker,
   BuilderSortableList,
   BuilderStatus,
+  BuilderVersionSwitcher,
 } from "@/components/ds/builder";
+import { HtmlContent } from "@/components/ds/html-content";
 import { PageDescription, PageHeader, PageTitle } from "@/components/ds/page";
-import { RichText } from "@/components/ds/rich-text";
-import { SectionHeader, SectionTitle } from "@/components/ds/section";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -62,11 +62,17 @@ export function ResumeBuilderFeature() {
   const [sections, setSections] = useState(defaultSections);
   const [template, setTemplate] = useState<"classic-ats" | "compact-ats">("classic-ats");
 
+  const hasAutoLoaded = useRef(false);
   useEffect(() => {
-    if (versionId || !versionsQuery.data?.length) return;
+    // So roda uma vez, quando os dados chegam - nao pode reagir a versionId
+    // (senao clicar em "Nova" limpa versionId, o que re-dispara este efeito e
+    // desfaz o clique carregando a versao publicada de novo). Ver Fase 7 em
+    // docs/admin-redesign-tasks.md.
+    if (hasAutoLoaded.current || !versionsQuery.data?.length) return;
+    hasAutoLoaded.current = true;
     const initial = versionsQuery.data.find((version) => version.status === "published") ?? versionsQuery.data[0];
     loadVersion(initial.id);
-  }, [versionsQuery.data, versionId]);
+  }, [versionsQuery.data]);
 
   const experiences = experiencesQuery.data ?? [];
   const items = useMemo<Record<string, { id: string; label: string }[]>>(() => ({
@@ -156,6 +162,7 @@ export function ResumeBuilderFeature() {
 
   const busy = saveMutation.isPending || publishMutation.isPending || pdfMutation.isPending;
   const currentVersion = versionsQuery.data?.find((item) => item.id === versionId);
+  const liveVersion = versionsQuery.data?.find((item) => item.status === "published");
 
   return (
     <>
@@ -165,28 +172,13 @@ export function ResumeBuilderFeature() {
       </PageHeader>
       <BuilderLayout>
         <BuilderPanel>
-          <SectionHeader>
-            <SectionTitle>Versao</SectionTitle>
-            {currentVersion && <Badge tone={currentVersion.status === "published" ? "success" : "muted"}>{currentVersion.status}</Badge>}
-          </SectionHeader>
-          <div className="grid grid-cols-[1fr_auto] gap-2">
-            <Select value={versionId} onValueChange={(next) => loadVersion(next ?? "")}>
-              <SelectTrigger>
-                <SelectValue>
-                  {() => (currentVersion ? `${currentVersion.name} (${currentVersion.status})` : "Nova versao")}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectPopup>
-                <SelectItem value="">Nova versao</SelectItem>
-                {versionsQuery.data?.map((version) => (
-                  <SelectItem key={version.id} value={version.id}>
-                    {version.name} ({version.status})
-                  </SelectItem>
-                ))}
-              </SelectPopup>
-            </Select>
-            <Button type="button" variant="ghost" onClick={newVersion}>Nova</Button>
-          </div>
+          <BuilderVersionSwitcher
+            currentVersion={currentVersion}
+            liveVersion={liveVersion}
+            versions={versionsQuery.data ?? []}
+            onNew={newVersion}
+            onSelect={loadVersion}
+          />
           <Input aria-label="Nome da versao" value={name} onChange={(event) => setName(event.target.value)} />
           <Select value={template} onValueChange={(next) => setTemplate(next as "classic-ats" | "compact-ats")}>
             <SelectTrigger>
@@ -230,7 +222,7 @@ export function ResumeBuilderFeature() {
             <Button disabled={busy} variant="secondary" onClick={() => publishMutation.mutate()}>{publishMutation.isPending ? "Publicando..." : "Publicar"}</Button>
             <Button disabled={busy} variant="outline" onClick={() => pdfMutation.mutate()}>{pdfMutation.isPending ? "Gerando..." : "Baixar PDF"}</Button>
           </div>
-          <BuilderStatus>Resumo, objetivo e descricoes aceitam **negrito**. O download salva a versao antes de gerar.</BuilderStatus>
+          <BuilderStatus>Resumo, objetivo e descricoes usam o editor rico (negrito, listas, titulos). O download salva a versao antes de gerar.</BuilderStatus>
         </BuilderPanel>
 
         <BuilderPreview className="overflow-auto bg-surface-muted p-4">
@@ -259,15 +251,20 @@ const resumeSectionRegistry: Record<string, (config: ContentVersionSection, ctx:
     </header>
   ),
   summary: (_config, { profile }) =>
-    profile?.summary ? <ResumeBlock title="Resumo profissional"><RichText value={profile.summary} /></ResumeBlock> : null,
+    profile?.summary ? <ResumeBlock title="Resumo profissional"><HtmlContent html={profile.summary} /></ResumeBlock> : null,
   objective: (_config, { profile }) =>
-    profile?.objective ? <ResumeBlock title="Objetivo"><RichText value={profile.objective} /></ResumeBlock> : null,
+    profile?.objective ? <ResumeBlock title="Objetivo"><HtmlContent html={profile.objective} /></ResumeBlock> : null,
   skills: (config, { skills, selected }) => (
     <ResumeBlock title="Competencias">
       <strong className="block text-sky-700">TECNICAS:</strong>
       <p className="font-semibold">{skills.filter((item) => !/pessoal|soft/i.test(item.category) && selected(config.id, item.id)).map((item) => item.title).join(", ")}</p>
       <strong className="mt-2 block text-sky-700">PESSOAIS:</strong>
-      {skills.filter((item) => /pessoal|soft/i.test(item.category) && selected(config.id, item.id)).map((item) => <p key={item.id}>• {item.description || item.title}</p>)}
+      {skills.filter((item) => /pessoal|soft/i.test(item.category) && selected(config.id, item.id)).map((item) => (
+        <div key={item.id} className="flex gap-1">
+          <span>•</span>
+          {item.description ? <HtmlContent html={item.description} /> : <span>{item.title}</span>}
+        </div>
+      ))}
     </ResumeBlock>
   ),
   work: (config, { experiences, selected }) => renderTypedBlock(config, experiences.filter((item) => item.type === "work"), selected),
@@ -284,7 +281,7 @@ const resumeSectionRegistry: Record<string, (config: ContentVersionSection, ctx:
   ),
   "custom-sections": (config, { customSections, selected }) => (
     <div>
-      {customSections.filter((item) => selected(config.id, item.id)).map((item) => <ResumeBlock key={item.id} title={item.title}><RichText value={item.content} /></ResumeBlock>)}
+      {customSections.filter((item) => selected(config.id, item.id)).map((item) => <ResumeBlock key={item.id} title={item.title}><HtmlContent html={item.content} /></ResumeBlock>)}
     </div>
   ),
 };
@@ -294,11 +291,11 @@ function renderTypedBlock(config: ContentVersionSection, typed: ExperienceDto[],
   return (
     <ResumeBlock title={config.label}>
       {typed.filter((item) => selected(config.id, item.id)).map((item, index) => (
-        <p key={item.id} className="mb-1">
+        <div key={item.id} className="mb-1">
           {numbered ? `${index + 1}. ` : "• "}
           <strong>{item.title}</strong>{item.organization ? ` - ${item.organization}` : ""}
-          {item.description ? <><br /><RichText value={item.description} /></> : null}
-        </p>
+          {item.description ? <HtmlContent className="mt-1" html={item.description} /> : null}
+        </div>
       ))}
     </ResumeBlock>
   );
@@ -311,6 +308,18 @@ function ResumePreview({ profile, skills, projects, experiences, customSections,
   };
   const visible = [...sections].filter((item) => item.enabled).sort((a, b) => a.order - b.order);
   const ctx: ResumeRenderCtx = { profile, skills, projects, experiences, customSections, selected };
+  const hasAnyContent = Boolean(
+    profile?.name || skills.length || projects.length || experiences.length || customSections.length,
+  );
+
+  if (!hasAnyContent) {
+    return (
+      <BuilderEmptyState
+        description="Preencha o perfil e cadastre skills, projetos ou experiencias para o curriculo comecar a tomar forma aqui."
+        title="Nada cadastrado ainda"
+      />
+    );
+  }
 
   return (
     <article className="mx-auto min-h-[842px] w-full max-w-[595px] rounded-sm bg-white px-12 py-10 text-[12px] leading-[1.45] text-neutral-900 shadow-[0_1px_0_var(--border)]">

@@ -13,11 +13,11 @@ import { ThemeToggle } from "@/components/ds/theme-toggle";
 import { PublicShell } from "@/components/layout/public-shell";
 import { resolveFileUrl } from "@/core/files/file-url";
 import { AnimatedDisclosure } from "@/features/portfolio/components/animated-disclosure";
-import { PortfolioEntryOverlay } from "@/features/portfolio/components/portfolio-entry-overlay";
 import { PortfolioFloatingMenu } from "@/features/portfolio/components/portfolio-floating-menu";
 import { ProjectCover } from "@/features/portfolio/components/project-cover";
 import { ProjectDetailsDrawer } from "@/features/portfolio/components/project-details-drawer";
 import { ProjectLikeButton } from "@/features/portfolio/components/project-like-button";
+import { SidebarNavLink } from "@/features/portfolio/components/sidebar-nav-link";
 import type {
   ExperienceDto,
   ProjectDto,
@@ -100,12 +100,17 @@ type PortfolioHomeProps = {
   portfolio: PublicPortfolioDto | null;
 };
 
-type PortfolioProject = Pick<ProjectDto, "title" | "summary" | "technologies"> &
+/**
+ * Exportado para o Portfolio Builder reaproveitar as secoes reais no preview
+ * (em vez de uma renderizacao simplificada propria) - ver Fase 8 em
+ * docs/admin-redesign-tasks.md.
+ */
+export type PortfolioProject = Pick<ProjectDto, "title" | "summary" | "technologies"> &
   Partial<
     Pick<ProjectDto, "id" | "coverPath" | "demoUrl" | "likesCount" | "repoUrl">
   >;
 
-type PortfolioProfile = {
+export type PortfolioProfile = {
   name: string;
   headline: string;
   summary: string;
@@ -171,9 +176,8 @@ export function PortfolioHome({ portfolio }: PortfolioHomeProps) {
 
   return (
     <PublicShell>
-      <PortfolioEntryOverlay />
       <PortfolioBackground />
-      <div className="z-10 relative gap-14 lg:gap-x-28 grid lg:grid-cols-[280px_minmax(0,1fr)] mx-auto px-6 py-10 sm:py-16 lg:py-24 w-full max-w-6xl scroll-smooth">
+      <div className="z-10 relative gap-14 lg:gap-x-28 grid lg:grid-cols-[280px_minmax(0,1fr)] mx-auto px-6 py-10 sm:py-16 lg:py-24 w-full max-w-6xl">
         <PortfolioSidebar profile={portfolioProfile} sections={sections} />
         <main className="min-w-0">
           <MobileIntro profile={portfolioProfile} />
@@ -412,7 +416,7 @@ function MobileIntro({ profile }: { profile: PortfolioProfile }) {
   );
 }
 
-function ProjectsSection({ projects }: { projects: PortfolioProject[] }) {
+export function ProjectsSection({ projects }: { projects: PortfolioProject[] }) {
   const visibleProjects = projects.slice(0, 4);
   const hiddenProjects = projects.slice(4);
 
@@ -570,7 +574,7 @@ function ProjectRow({
   );
 }
 
-function TimelineSection({ experiences }: { experiences: ExperienceDto[] }) {
+export function TimelineSection({ experiences }: { experiences: ExperienceDto[] }) {
   if (!experiences.length) return null;
 
   const visible = experiences.slice(0, 5);
@@ -650,9 +654,10 @@ function TimelineList({
               {experience.organization}
             </p>
             {experience.description ? (
-              <p className="mt-4 text-muted-foreground text-sm text-pretty leading-7">
-                {experience.description}
-              </p>
+              <HtmlContent
+                className="mt-4 text-muted-foreground text-sm text-pretty leading-7"
+                html={experience.description}
+              />
             ) : null}
           </article>
         ))}
@@ -661,7 +666,7 @@ function TimelineList({
   );
 }
 
-function SkillsSection({
+export function SkillsSection({
   skills,
 }: {
   skills: Array<Pick<SkillDto, "title" | "startedAt" | "description">>;
@@ -687,7 +692,7 @@ function SkillBadge({
   return (
     <span
       className="inline-flex items-center gap-2 bg-card/80 px-3 py-1.5 border border-border hover:border-primary-accent/50 rounded-full text-muted-foreground hover:text-foreground text-sm transition-colors"
-      title={skill.description}
+      title={stripHtmlToText(skill.description)}
     >
       <BrandLogo name={skill.title} />
       {skill.title}
@@ -695,7 +700,7 @@ function SkillBadge({
   );
 }
 
-function AboutSection({ profile }: { profile: PortfolioProfile }) {
+export function AboutSection({ profile }: { profile: PortfolioProfile }) {
   return (
     <PortfolioSection id="sobre" title="Sobre">
       <p className="mt-5 max-w-2xl text-muted-foreground text-sm text-pretty leading-7">
@@ -705,7 +710,7 @@ function AboutSection({ profile }: { profile: PortfolioProfile }) {
   );
 }
 
-function GitHubSection({
+export function GitHubSection({
   github,
 }: {
   github: NonNullable<PublicPortfolioDto["github"]>;
@@ -887,7 +892,7 @@ function GitHubActivityRow({ activity }: { activity: GitHubActivityItem }) {
   );
 }
 
-function CustomSectionsSection({
+export function CustomSectionsSection({
   sections,
 }: {
   sections: PublicPortfolioDto["customSections"];
@@ -912,7 +917,7 @@ function CustomSectionsSection({
   );
 }
 
-function PagesSection({
+export function PagesSection({
   pages,
 }: {
   pages: NonNullable<PublicPortfolioDto["navigationPages"]>;
@@ -941,7 +946,7 @@ function PagesSection({
   );
 }
 
-function ContactSection({ profile }: { profile: PortfolioProfile }) {
+export function ContactSection({ profile }: { profile: PortfolioProfile }) {
   return (
     <section className="py-16 scroll-mt-16" id="contato">
       <MotionReveal className="relative bg-card/85 p-7 border border-border rounded-2xl overflow-hidden">
@@ -1052,23 +1057,6 @@ function TechPill({ children }: { children: ReactNode }) {
   );
 }
 
-function SidebarNavLink({
-  children,
-  href,
-}: {
-  children: ReactNode;
-  href: string;
-}) {
-  return (
-    <Link
-      className="group flex items-center gap-3 hover:bg-muted px-3 py-1.5 rounded-lg w-fit font-medium hover:text-foreground text-xs transition-colors"
-      href={href}
-    >
-      <span className="group-hover:bg-foreground bg-border w-8 group-hover:w-12 h-px transition-all duration-200" />
-      <span>{children}</span>
-    </Link>
-  );
-}
 
 function GitHubIcon() {
   return (
@@ -1341,6 +1329,10 @@ function formatShortDate(value: string) {
   return date
     .toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })
     .replace(".", "");
+}
+
+function stripHtmlToText(html: string) {
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
 function normalizeHeadline(value: string) {

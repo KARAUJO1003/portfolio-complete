@@ -4,7 +4,8 @@ import { ProjectModel } from "../projects/projects.model";
 import { SkillModel } from "../skills/skills.model";
 import { ContentVersionModel } from "../content-versions/content-versions.model";
 import { CustomSectionModel } from "../custom-sections/custom-sections.model";
-import { bullet, generateClassicAtsPdf, heading, numbered, paragraph, spans, subheading } from "./resume-pdf.generator";
+import { bullet, bulletSpans, generateClassicAtsPdf, heading, numbered, paragraph, spans, subheading } from "./resume-pdf.generator";
+import { htmlToInlineSpans, htmlToPdfLines } from "./html-to-pdf-lines";
 
 type ResumePdfOptions = {
   sections?: string[];
@@ -89,7 +90,7 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
   }
 
   if (enabledSections.has("summary") && profile?.summary) {
-    lines.push(heading("Resumo profissional"), paragraph(profile.summary));
+    lines.push(heading("Resumo profissional"), ...htmlToPdfLines(profile.summary));
   }
 
   const workExperiences = experiences.filter((experience) => experience.type === "work");
@@ -104,7 +105,7 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
           { indent: 20 },
         ),
       );
-      if (experience.description) lines.push(paragraph(experience.description));
+      if (experience.description) lines.push(...htmlToPdfLines(experience.description));
     }
   }
 
@@ -119,7 +120,9 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
 
     if (personalSkills.length) {
       lines.push(subheading("Pessoais:"));
-      personalSkills.forEach((skill) => lines.push(bullet(skill.description || skill.title)));
+      personalSkills.forEach((skill) =>
+        lines.push(bulletSpans(skill.description ? htmlToInlineSpans(skill.description) : [{ text: skill.title }])),
+      );
     }
   }
 
@@ -162,11 +165,11 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
   }
 
   if (enabledSections.has("custom-sections") && customSections.length) {
-    customSections.forEach((section) => lines.push(heading(section.title), paragraph(section.content)));
+    customSections.forEach((section) => lines.push(heading(section.title), ...htmlToPdfLines(section.content)));
   }
 
   if (enabledSections.has("objective") && profile?.objective) {
-    lines.push(heading("Objetivo"), paragraph(profile.objective));
+    lines.push(heading("Objetivo"), ...htmlToPdfLines(profile.objective));
   }
 
   return {
