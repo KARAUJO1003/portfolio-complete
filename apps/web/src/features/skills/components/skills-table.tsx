@@ -42,13 +42,13 @@ export function SkillsTable({ onEdit }: SkillsTableProps) {
 
   const columns = useMemo<ColumnDef<SkillDto, unknown>[]>(
     () => [
-      { accessorKey: "title", header: "Titulo" },
+      { accessorKey: "title", header: "Título" },
       {
         accessorKey: "category",
         header: "Categoria",
         cell: ({ row }) => <Badge tone="muted">{row.original.category}</Badge>,
       },
-      { accessorKey: "startedAt", header: "Inicio" },
+      { accessorKey: "startedAt", header: "Início" },
       {
         id: "visibility",
         header: "Visibilidade",
@@ -57,7 +57,7 @@ export function SkillsTable({ onEdit }: SkillsTableProps) {
           return (
             <div className="flex flex-wrap gap-2">
               {visibility.portfolio && <Badge>Portfolio</Badge>}
-              {visibility.resume && <Badge>Curriculo</Badge>}
+              {visibility.resume && <Badge>Currículo</Badge>}
               {!visibility.portfolio && !visibility.resume && <Badge tone="muted">Oculto</Badge>}
             </div>
           );
@@ -65,7 +65,7 @@ export function SkillsTable({ onEdit }: SkillsTableProps) {
       },
       {
         id: "actions",
-        header: "Acoes",
+        header: "Ações",
         cell: ({ row }) => (
           <div className="flex gap-2">
             <Can can={[SKILLS_PERMISSIONS.update]}>
@@ -103,8 +103,8 @@ export function SkillsTable({ onEdit }: SkillsTableProps) {
   if (skillsQuery.isError) {
     return (
       <ErrorState
-        title="Nao foi possivel carregar habilidades"
-        description="A listagem nao respondeu. Verifique a API e tente novamente."
+        title="Não foi possível carregar habilidades"
+        description="A listagem não respondeu. Verifique a API e tente novamente."
       />
     );
   }
@@ -115,16 +115,16 @@ export function SkillsTable({ onEdit }: SkillsTableProps) {
     <>
       <DataTableFrame
         title="Habilidades cadastradas"
-        description="Busque, filtre e ordene as habilidades que alimentam o portfolio e o curriculo."
+        description="Busque, filtre e ordene as habilidades que alimentam o portfolio e o currículo."
         search={search}
-        searchPlaceholder="Buscar por titulo, categoria ou descricao..."
+        searchPlaceholder="Buscar por título, categoria ou descrição..."
         onSearchChange={setSearch}
         empty={isEmpty}
         emptyTitle={search || category !== "all" ? "Nenhuma habilidade encontrada" : "Nenhuma habilidade cadastrada"}
         emptyDescription={
           search || category !== "all"
             ? "Ajuste os filtros para ampliar a busca."
-            : "Crie a primeira habilidade pelo botao \"Nova habilidade\"."
+            : "Crie a primeira habilidade pelo botão \"Nova habilidade\"."
         }
         filters={
           <Select value={category} onValueChange={(next) => setCategory(next ?? "all")}>
@@ -152,7 +152,7 @@ export function SkillsTable({ onEdit }: SkillsTableProps) {
       <ConfirmDialog
         open={Boolean(pendingDelete)}
         title="Excluir habilidade"
-        description={`Esta acao remove "${pendingDelete?.title}" definitivamente.`}
+        description={`Esta ação remove "${pendingDelete?.title}" definitivamente.`}
         loading={deleteMutation.isPending}
         onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
         onOpenChange={(open) => !open && setPendingDelete(null)}

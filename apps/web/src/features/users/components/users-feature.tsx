@@ -35,13 +35,13 @@ export function UsersFeature() {
     <>
       <PageHeader className="flex-row flex-wrap items-center justify-between gap-3">
         <div>
-          <PageTitle>Usuarios</PageTitle>
+          <PageTitle>Usuários</PageTitle>
           <PageDescription>Convide colaboradores e controle o que cada papel pode acessar no admin.</PageDescription>
         </div>
         <Can can={[USERS_PERMISSIONS.create]}>
           <Button type="button" onClick={openCreate}>
             <PlusIcon className="size-4" />
-            Novo usuario
+            Novo usuário
           </Button>
         </Can>
       </PageHeader>
@@ -49,12 +49,12 @@ export function UsersFeature() {
       <UsersTable onEdit={openEdit} />
 
       <DrawerFormShell
-        description="Papeis definem o conjunto de permissoes automaticamente: owner, admin, editor ou visualizador."
+        description="Papéis definem o conjunto de permissões automaticamente: owner, admin, editor ou visualizador."
         formId={USER_FORM_ID}
         open={drawerOpen}
-        saveLabel={editingUser ? "Salvar alteracoes" : "Criar usuario"}
+        saveLabel={editingUser ? "Salvar alterações" : "Criar usuário"}
         saving={saving}
-        title={editingUser ? "Editar usuario" : "Novo usuario"}
+        title={editingUser ? "Editar usuário" : "Novo usuário"}
         onOpenChange={(open) => (open ? setDrawerOpen(true) : closeDrawer())}
       >
         <UserForm user={editingUser} onDone={closeDrawer} onPendingChange={setSaving} />

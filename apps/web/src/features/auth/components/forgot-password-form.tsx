@@ -32,7 +32,7 @@ export function ForgotPasswordForm() {
       await forgotPasswordRequest(values);
       setSent(true);
     } catch {
-      setServerError("Nao foi possivel processar o pedido. Tente novamente.");
+      setServerError("Não foi possível processar o pedido. Tente novamente.");
     }
   }
 
@@ -49,7 +49,7 @@ export function ForgotPasswordForm() {
       <CardContent>
         {sent ? (
           <p className="text-sm leading-6 text-muted-foreground">
-            Se o email informado tiver uma conta, enviamos um link de redefinicao. Verifique sua caixa de entrada.
+            Se o email informado tiver uma conta, enviamos um link de redefinição. Verifique sua caixa de entrada.
           </p>
         ) : (
           <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>

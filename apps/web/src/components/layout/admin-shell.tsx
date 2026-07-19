@@ -19,6 +19,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import { Page } from "@/components/ds/page";
+import { PageTransition } from "@/components/ds/page-transition";
 import { cn } from "@/lib/utils";
 import { UserMenu } from "@/components/layout/user-menu";
 import { Menu, MenuLinkItem, MenuPopup, MenuTrigger } from "@/components/ui/menu";
@@ -35,26 +36,26 @@ const adminGroups: { label: string; links: AdminLink[] }[] = [
   {
     label: "Base",
     links: [
-      { href: "/admin", label: "Inicio", description: "Visao geral do painel", icon: LayoutDashboardIcon },
+      { href: "/admin", label: "Início", description: "Visão geral do painel", icon: LayoutDashboardIcon },
       { href: "/admin/profile", label: "Perfil", description: "Dados pessoais e contatos", icon: UserIcon },
-      { href: "/admin/account", label: "Minha conta", description: "Senha e preferencias da conta", icon: KeyRoundIcon },
+      { href: "/admin/account", label: "Minha conta", description: "Senha e preferências da conta", icon: KeyRoundIcon },
     ],
   },
   {
-    label: "Conteudo",
+    label: "Conteúdo",
     links: [
       { href: "/admin/projects", label: "Projetos", description: "Cards, repos, tags e visibilidade", icon: FolderKanbanIcon },
-      { href: "/admin/skills", label: "Habilidades", description: "Categoria, nivel e data", icon: SparklesIcon },
-      { href: "/admin/experiences", label: "Trajetoria", description: "Experiencia, formacao e certificacoes", icon: BriefcaseIcon },
-      { href: "/admin/pages", label: "Paginas", description: "Paginas publicas customizadas", icon: FileTextIcon },
-      { href: "/admin/custom-sections", label: "Secoes", description: "Blocos de conteudo livre", icon: LayoutTemplateIcon },
+      { href: "/admin/skills", label: "Habilidades", description: "Categoria, nível e data", icon: SparklesIcon },
+      { href: "/admin/experiences", label: "Trajetória", description: "Experiência, formação e certificações", icon: BriefcaseIcon },
+      { href: "/admin/pages", label: "Páginas", description: "Páginas públicas customizadas", icon: FileTextIcon },
+      { href: "/admin/custom-sections", label: "Seções", description: "Blocos de conteúdo livre", icon: LayoutTemplateIcon },
     ],
   },
   {
-    label: "Publicacao",
+    label: "Publicação",
     links: [
-      { href: "/admin/resume-builder", label: "Curriculo", description: "Builder e PDF do curriculo", icon: ScrollTextIcon },
-      { href: "/admin/portfolio-builder", label: "Portfolio", description: "Builder do site publico", icon: GlobeIcon },
+      { href: "/admin/resume-builder", label: "Currículo", description: "Builder e PDF do currículo", icon: ScrollTextIcon },
+      { href: "/admin/portfolio-builder", label: "Portfolio", description: "Builder do site público", icon: GlobeIcon },
     ],
   },
   {
@@ -86,7 +87,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </span>
               <span>
                 <span className="block text-sm font-semibold leading-5">Portfolio Admin</span>
-                <span className="block text-xs text-muted-foreground">Conteudo, curriculo e publicacao</span>
+                <span className="block text-xs text-muted-foreground">Conteúdo, currículo e publicação</span>
               </span>
             </Link>
             <nav className="flex items-center gap-1">
@@ -138,7 +139,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <UserMenu />
         </div>
       </header>
-      <Page className="py-6">{children}</Page>
+      <Page className="py-6">
+        <PageTransition>{children}</PageTransition>
+      </Page>
     </div>
   );
 }

@@ -110,35 +110,35 @@ export function ExperienceForm({ experience, onDone, onPendingChange }: Experien
 
   return (
     <DsForm id={EXPERIENCE_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-      <FormSection title="Identidade" description="Tipo de item, titulo, organizacao e periodo.">
+      <FormSection title="Identidade" description="Tipo de item, título, organização e período.">
         <div className="grid gap-4 md:grid-cols-2">
           <FormFields.Select
             form={form}
             label="Tipo"
             name="type"
             options={[
-              { label: "Experiencia", value: "work" },
-              { label: "Formacao", value: "education" },
-              { label: "Certificacao", value: "certification" },
+              { label: "Experiência", value: "work" },
+              { label: "Formação", value: "education" },
+              { label: "Certificação", value: "certification" },
               { label: "Link", value: "link" },
             ]}
           />
-          <FormFields.Text form={form} label="Titulo" name="title" />
-          <FormFields.Text form={form} label="Organizacao" name="organization" />
-          <FormFields.Text form={form} label="Localizacao" name="location" />
-          <FormFields.Text form={form} label="Inicio" name="startDate" />
+          <FormFields.Text form={form} label="Título" name="title" />
+          <FormFields.Text form={form} label="Organização" name="organization" />
+          <FormFields.Text form={form} label="Localização" name="location" />
+          <FormFields.Text form={form} label="Início" name="startDate" />
           <FormFields.Text form={form} label="Fim" name="endDate" />
           <FormFields.Text form={form} label="URL" name="url" />
           <FormFields.NumberStepper form={form} label="Ordem" max={maxOrder} name="order" />
         </div>
-        <FormFields.HtmlEditor form={form} label="Descricao" name="description" />
+        <FormFields.HtmlEditor form={form} label="Descrição" name="description" />
       </FormSection>
 
-      <FormSection title="Publicacao e exibicao" description="Controle status atual e onde este item aparece.">
+      <FormSection title="Publicação e exibição" description="Controle status atual e onde este item aparece.">
         <div className="grid gap-3 md:grid-cols-3">
           <FormFields.Switch form={form} label="Atual" name="current" />
-          <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponivel para versoes de portfolio." />
-          <FormFields.Switch form={form} label="Curriculo" name="showOnResume" description="Disponivel para versoes de curriculo." />
+          <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponível para versões de portfolio." />
+          <FormFields.Switch form={form} label="Currículo" name="showOnResume" description="Disponível para versões de currículo." />
         </div>
       </FormSection>
 

@@ -19,3 +19,16 @@ export async function updateProject(id: string, input: UpdateProjectRequest) {
 export async function deleteProject(id: string) {
   await api.delete(`/projects/${id}`);
 }
+
+export type LikesTrendDto = {
+  changePct: number | null;
+  previousCount: number;
+  recentCount: number;
+  trend: "down" | "stable" | "up";
+  windowDays: number;
+};
+
+export async function getLikesTrend() {
+  const response = await api.get<LikesTrendDto>("/projects/likes-trend");
+  return response.data;
+}

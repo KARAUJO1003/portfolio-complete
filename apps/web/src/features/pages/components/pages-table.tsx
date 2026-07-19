@@ -55,7 +55,7 @@ export function PagesTable({ onEdit }: PagesTableProps) {
 
   const columns = useMemo<ColumnDef<CustomPageDto, unknown>[]>(
     () => [
-      { accessorKey: "title", header: "Titulo" },
+      { accessorKey: "title", header: "Título" },
       { accessorKey: "slug", header: "Slug" },
       {
         accessorKey: "status",
@@ -64,7 +64,7 @@ export function PagesTable({ onEdit }: PagesTableProps) {
       },
       {
         id: "publicUrl",
-        header: "Publica",
+        header: "Pública",
         cell: ({ row }) =>
           row.original.status === "published" ? (
             <Link className="underline underline-offset-4" href={`/p/${row.original.slug}`}>
@@ -76,7 +76,7 @@ export function PagesTable({ onEdit }: PagesTableProps) {
       },
       {
         id: "actions",
-        header: "Acoes",
+        header: "Ações",
         cell: ({ row }) => (
           <div className="flex gap-2">
             <Can can={[PAGES_PERMISSIONS.update]}>
@@ -111,8 +111,8 @@ export function PagesTable({ onEdit }: PagesTableProps) {
   if (pagesQuery.isError) {
     return (
       <ErrorState
-        title="Nao foi possivel carregar paginas"
-        description="A listagem nao respondeu. Verifique a API e tente novamente."
+        title="Não foi possível carregar páginas"
+        description="A listagem não respondeu. Verifique a API e tente novamente."
       />
     );
   }
@@ -122,17 +122,17 @@ export function PagesTable({ onEdit }: PagesTableProps) {
   return (
     <>
       <DataTableFrame
-        title="Paginas cadastradas"
-        description="Busque, filtre e ordene as paginas publicas customizadas."
+        title="Páginas cadastradas"
+        description="Busque, filtre e ordene as páginas públicas customizadas."
         search={search}
-        searchPlaceholder="Buscar por titulo, slug ou resumo..."
+        searchPlaceholder="Buscar por título, slug ou resumo..."
         onSearchChange={setSearch}
         empty={isEmpty}
-        emptyTitle={search || status !== "all" ? "Nenhuma pagina encontrada" : "Nenhuma pagina cadastrada"}
+        emptyTitle={search || status !== "all" ? "Nenhuma página encontrada" : "Nenhuma página cadastrada"}
         emptyDescription={
           search || status !== "all"
             ? "Ajuste os filtros para ampliar a busca."
-            : "Crie a primeira pagina pelo botao \"Nova pagina\"."
+            : "Crie a primeira página pelo botão \"Nova página\"."
         }
         filters={
           <Select value={status} onValueChange={(next) => setStatus(next as typeof status)}>
@@ -151,14 +151,14 @@ export function PagesTable({ onEdit }: PagesTableProps) {
         <DataTable
           data={filteredPages}
           columns={columns}
-          emptyLabel="Nenhuma pagina cadastrada."
+          emptyLabel="Nenhuma página cadastrada."
           isLoading={pagesQuery.isLoading}
         />
       </DataTableFrame>
       <ConfirmDialog
         open={Boolean(pendingDelete)}
-        title="Excluir pagina"
-        description={`Esta acao remove "${pendingDelete?.title}" definitivamente. Se estiver publicada, a rota publica deixa de existir.`}
+        title="Excluir página"
+        description={`Esta ação remove "${pendingDelete?.title}" definitivamente. Se estiver publicada, a rota pública deixa de existir.`}
         loading={deleteMutation.isPending}
         onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
         onOpenChange={(open) => !open && setPendingDelete(null)}

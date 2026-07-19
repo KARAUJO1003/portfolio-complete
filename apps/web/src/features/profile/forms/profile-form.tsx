@@ -3,10 +3,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { GlobeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DsForm, FormActions, FormSection } from "@/components/ds/form";
 import { FormFields } from "@/components/ds/form-fields";
+import { GithubIcon, LinkedInIcon } from "@/components/ds/brand-icons";
 import { FormError, FormField, FormLabel } from "@/components/ds/form-field";
 import { typedZodResolver } from "@/core/forms/typed-zod-resolver";
 import { saveMyProfile } from "@/features/profile/api/profile-api";
@@ -75,14 +77,14 @@ export function ProfileForm() {
 
   return (
     <DsForm onSubmit={form.handleSubmit(onSubmit)}>
-      <FormSection title="Dados pessoais" description="Identificacao, contato e localizacao exibidos no portfolio e no curriculo.">
+      <FormSection title="Dados pessoais" description="Identificação, contato e localização exibidos no portfolio e no currículo.">
         <div className="grid gap-4 md:grid-cols-2">
           <FormFields.Text form={form} label="Nome" name="name" />
           <FormFields.Text form={form} label="Headline" name="headline" />
           <FormFields.Text form={form} label="Email" name="email" />
           <FormFields.Text form={form} label="Telefone" name="phone" />
-          <FormFields.Text form={form} label="Localizacao" name="location" />
-          <FormFields.Text form={form} label="Endereco" name="address" />
+          <FormFields.Text form={form} label="Localização" name="location" />
+          <FormFields.Text form={form} label="Endereço" name="address" />
           <FormFields.Text form={form} label="Data de nascimento" name="birthDate" />
           <FormFields.Text form={form} label="CNH" name="driverLicense" />
         </div>
@@ -96,13 +98,13 @@ export function ProfileForm() {
         </FormField>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <FormFields.Text form={form} label="Website" name="website" />
-          <FormFields.Text form={form} label="GitHub" name="github" />
-          <FormFields.Text form={form} label="LinkedIn" name="linkedin" />
+          <FormFields.UrlField form={form} icon={GlobeIcon} label="Website" name="website" />
+          <FormFields.UrlField form={form} icon={GithubIcon} label="GitHub" name="github" />
+          <FormFields.UrlField form={form} icon={LinkedInIcon} label="LinkedIn" name="linkedin" />
         </div>
       </FormSection>
 
-      <FormSection title="Resumo e objetivo" description="Textos usados no curriculo (PDF entende negrito, listas, titulos e citacoes).">
+      <FormSection title="Resumo e objetivo" description="Textos usados no currículo (PDF entende negrito, listas, títulos e citações).">
         <FormFields.HtmlEditor form={form} label="Resumo" name="summary" />
         <FormFields.HtmlEditor form={form} label="Objetivo" name="objective" />
       </FormSection>

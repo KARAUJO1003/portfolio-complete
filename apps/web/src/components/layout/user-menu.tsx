@@ -37,7 +37,7 @@ export function UserMenu() {
           </MenuLinkItem>
           <MenuLinkItem render={<Link href="/" />}>
             <ExternalLinkIcon />
-            Site publico
+            Site público
           </MenuLinkItem>
         </MenuGroup>
         <MenuSeparator />

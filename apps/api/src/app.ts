@@ -5,6 +5,7 @@ import helmet from "helmet";
 import { env } from "./config/env";
 import { errorHandler } from "./shared/errors/error-handler";
 import { notFoundHandler } from "./shared/errors/not-found-handler";
+import { analyticsRoutes, publicAnalyticsRoutes } from "./modules/analytics/analytics.routes";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { contentVersionsRoutes } from "./modules/content-versions/content-versions.routes";
 import { customSectionsRoutes } from "./modules/custom-sections/custom-sections.routes";
@@ -53,6 +54,8 @@ export function createApp() {
   app.use(env.filesBasePath, express.static(env.uploadsRoot));
 
   app.use("/health", healthRoutes);
+  app.use("/analytics", analyticsRoutes);
+  app.use("/public/analytics", publicAnalyticsRoutes);
   app.use("/auth", authRoutes);
   app.use("/content-versions", contentVersionsRoutes);
   app.use("/custom-sections", customSectionsRoutes);

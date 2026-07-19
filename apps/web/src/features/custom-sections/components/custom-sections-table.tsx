@@ -57,7 +57,7 @@ export function CustomSectionsTable({ onEdit }: CustomSectionsTableProps) {
 
   const columns = useMemo<ColumnDef<CustomSectionDto, unknown>[]>(
     () => [
-      { accessorKey: "title", header: "Titulo" },
+      { accessorKey: "title", header: "Título" },
       { accessorKey: "key", header: "Chave" },
       {
         accessorKey: "status",
@@ -72,7 +72,7 @@ export function CustomSectionsTable({ onEdit }: CustomSectionsTableProps) {
           return (
             <div className="flex flex-wrap gap-2">
               {visibility.portfolio && <Badge>Portfolio</Badge>}
-              {visibility.resume && <Badge>Curriculo</Badge>}
+              {visibility.resume && <Badge>Currículo</Badge>}
               {!visibility.portfolio && !visibility.resume && <Badge tone="muted">Oculto</Badge>}
             </div>
           );
@@ -80,7 +80,7 @@ export function CustomSectionsTable({ onEdit }: CustomSectionsTableProps) {
       },
       {
         id: "actions",
-        header: "Acoes",
+        header: "Ações",
         cell: ({ row }) => (
           <div className="flex gap-2">
             <Can can={[CUSTOM_SECTIONS_PERMISSIONS.update]}>
@@ -114,8 +114,8 @@ export function CustomSectionsTable({ onEdit }: CustomSectionsTableProps) {
   if (query.isError) {
     return (
       <ErrorState
-        title="Nao foi possivel carregar as secoes"
-        description="A listagem nao respondeu. Verifique a API e tente novamente."
+        title="Não foi possível carregar as seções"
+        description="A listagem não respondeu. Verifique a API e tente novamente."
       />
     );
   }
@@ -125,17 +125,17 @@ export function CustomSectionsTable({ onEdit }: CustomSectionsTableProps) {
   return (
     <>
       <DataTableFrame
-        title="Secoes cadastradas"
-        description="Busque, filtre e ordene os blocos livres do portfolio e do curriculo."
+        title="Seções cadastradas"
+        description="Busque, filtre e ordene os blocos livres do portfolio e do currículo."
         search={search}
-        searchPlaceholder="Buscar por titulo ou chave..."
+        searchPlaceholder="Buscar por título ou chave..."
         onSearchChange={setSearch}
         empty={isEmpty}
-        emptyTitle={search || status !== "all" ? "Nenhuma secao encontrada" : "Nenhuma secao cadastrada"}
+        emptyTitle={search || status !== "all" ? "Nenhuma seção encontrada" : "Nenhuma seção cadastrada"}
         emptyDescription={
           search || status !== "all"
             ? "Ajuste os filtros para ampliar a busca."
-            : "Crie a primeira secao pelo botao \"Nova secao\"."
+            : "Crie a primeira seção pelo botão \"Nova seção\"."
         }
         filters={
           <Select value={status} onValueChange={(next) => setStatus(next as typeof status)}>
@@ -154,14 +154,14 @@ export function CustomSectionsTable({ onEdit }: CustomSectionsTableProps) {
         <DataTable
           data={filteredSections}
           columns={columns}
-          emptyLabel="Nenhuma secao cadastrada."
+          emptyLabel="Nenhuma seção cadastrada."
           isLoading={query.isLoading}
         />
       </DataTableFrame>
       <ConfirmDialog
         open={Boolean(pendingDelete)}
-        title="Excluir secao"
-        description={`Esta acao remove "${pendingDelete?.title}" definitivamente.`}
+        title="Excluir seção"
+        description={`Esta ação remove "${pendingDelete?.title}" definitivamente.`}
         loading={deleteMutation.isPending}
         onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
         onOpenChange={(open) => !open && setPendingDelete(null)}

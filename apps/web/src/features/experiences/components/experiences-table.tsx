@@ -20,9 +20,9 @@ import {
 import { EXPERIENCES_PERMISSIONS } from "@/features/experiences/permissions";
 
 const typeLabel: Record<ExperienceDto["type"], string> = {
-  work: "Experiencia",
-  education: "Formacao",
-  certification: "Certificacao",
+  work: "Experiência",
+  education: "Formação",
+  certification: "Certificação",
   link: "Link",
 };
 
@@ -57,9 +57,9 @@ export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
         header: "Tipo",
         cell: ({ row }) => <Badge tone="muted">{typeLabel[row.original.type]}</Badge>,
       },
-      { accessorKey: "title", header: "Titulo" },
-      { accessorKey: "organization", header: "Organizacao" },
-      { accessorKey: "startDate", header: "Inicio" },
+      { accessorKey: "title", header: "Título" },
+      { accessorKey: "organization", header: "Organização" },
+      { accessorKey: "startDate", header: "Início" },
       {
         id: "visibility",
         header: "Visibilidade",
@@ -68,7 +68,7 @@ export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
           return (
             <div className="flex flex-wrap gap-2">
               {visibility.portfolio && <Badge>Portfolio</Badge>}
-              {visibility.resume && <Badge>Curriculo</Badge>}
+              {visibility.resume && <Badge>Currículo</Badge>}
               {!visibility.portfolio && !visibility.resume && <Badge tone="muted">Oculto</Badge>}
             </div>
           );
@@ -76,7 +76,7 @@ export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
       },
       {
         id: "actions",
-        header: "Acoes",
+        header: "Ações",
         cell: ({ row }) => (
           <div className="flex gap-2">
             <Can can={[EXPERIENCES_PERMISSIONS.update]}>
@@ -114,8 +114,8 @@ export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
   if (experiencesQuery.isError) {
     return (
       <ErrorState
-        title="Nao foi possivel carregar a trajetoria"
-        description="A listagem nao respondeu. Verifique a API e tente novamente."
+        title="Não foi possível carregar a trajetória"
+        description="A listagem não respondeu. Verifique a API e tente novamente."
       />
     );
   }
@@ -126,16 +126,16 @@ export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
     <>
       <DataTableFrame
         title="Itens cadastrados"
-        description="Busque, filtre e ordene experiencias, formacao, certificacoes e links."
+        description="Busque, filtre e ordene experiências, formação, certificações e links."
         search={search}
-        searchPlaceholder="Buscar por titulo, organizacao ou descricao..."
+        searchPlaceholder="Buscar por título, organização ou descrição..."
         onSearchChange={setSearch}
         empty={isEmpty}
         emptyTitle={search || type !== "all" ? "Nenhum item encontrado" : "Nenhum item cadastrado"}
         emptyDescription={
           search || type !== "all"
             ? "Ajuste os filtros para ampliar a busca."
-            : "Crie o primeiro item pelo botao \"Novo item\"."
+            : "Crie o primeiro item pelo botão \"Novo item\"."
         }
         filters={
           <Select value={type} onValueChange={(next) => setType(next as typeof type)}>
@@ -144,9 +144,9 @@ export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
             </SelectTrigger>
             <SelectPopup>
               <SelectItem value="all">Todos os tipos</SelectItem>
-              <SelectItem value="work">Experiencia</SelectItem>
-              <SelectItem value="education">Formacao</SelectItem>
-              <SelectItem value="certification">Certificacao</SelectItem>
+              <SelectItem value="work">Experiência</SelectItem>
+              <SelectItem value="education">Formação</SelectItem>
+              <SelectItem value="certification">Certificação</SelectItem>
               <SelectItem value="link">Link</SelectItem>
             </SelectPopup>
           </Select>
@@ -162,7 +162,7 @@ export function ExperiencesTable({ onEdit }: ExperiencesTableProps) {
       <ConfirmDialog
         open={Boolean(pendingDelete)}
         title="Excluir item"
-        description={`Esta acao remove "${pendingDelete?.title}" definitivamente.`}
+        description={`Esta ação remove "${pendingDelete?.title}" definitivamente.`}
         loading={deleteMutation.isPending}
         onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
         onOpenChange={(open) => !open && setPendingDelete(null)}

@@ -1,9 +1,10 @@
+import { AuthShell } from "@/components/layout/auth-shell";
 import { ForgotPasswordForm } from "@/features/auth/components/forgot-password-form";
 
 export default function ForgotPasswordPage() {
   return (
-    <main className="admin-shell grid min-h-dvh place-items-center bg-background-subtle px-4 py-10 text-foreground">
+    <AuthShell>
       <ForgotPasswordForm />
-    </main>
+    </AuthShell>
   );
 }

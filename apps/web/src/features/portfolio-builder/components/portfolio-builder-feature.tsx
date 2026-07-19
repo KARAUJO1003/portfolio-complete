@@ -8,13 +8,10 @@ import { toast } from "sonner";
 import {
   BuilderBrowserBar,
   BuilderEmptyState,
-  BuilderItem,
-  BuilderItemContent,
-  BuilderItemDescription,
-  BuilderItemTitle,
   BuilderLayout,
   BuilderPanel,
   BuilderPreview,
+  BuilderSectionCard,
   BuilderSectionItemsPicker,
   BuilderSortableList,
   BuilderStatus,
@@ -44,6 +41,7 @@ import {
   CustomSectionsSection,
   GitHubSection,
   PagesSection,
+  PortfolioBackground,
   ProjectsSection,
   SkillsSection,
   TimelineSection,
@@ -112,9 +110,9 @@ export function PortfolioBuilderFeature() {
     onSuccess: async (version) => {
       setVersionId(version.id);
       await queryClient.invalidateQueries({ queryKey: contentVersionKeys.list("portfolio") });
-      toast.success("Versao salva como rascunho.");
+      toast.success("Versão salva como rascunho.");
     },
-    onError: () => toast.error("Nao foi possivel salvar a versao."),
+    onError: () => toast.error("Não foi possível salvar a versão."),
   });
 
   const publishMutation = useMutation({
@@ -127,7 +125,7 @@ export function PortfolioBuilderFeature() {
       ]);
       toast.success("Portfolio publicado.");
     },
-    onError: () => toast.error("Nao foi possivel publicar o portfolio."),
+    onError: () => toast.error("Não foi possível publicar o portfolio."),
   });
 
   function loadVersion(id: string) {
@@ -140,7 +138,7 @@ export function PortfolioBuilderFeature() {
 
   function newVersion() {
     setVersionId("");
-    setName("Nova versao");
+    setName("Nova versão");
     setSections(defaultSections.map((item) => ({ ...item, itemIds: [] })));
   }
 
@@ -167,8 +165,8 @@ export function PortfolioBuilderFeature() {
   return (
     <>
       <PageHeader>
-        <PageTitle>Publicacao de portfolio</PageTitle>
-        <PageDescription>Crie versoes, escolha secoes e itens, ordene e publique a home imediatamente.</PageDescription>
+        <PageTitle>Publicação de portfolio</PageTitle>
+        <PageDescription>Crie versões, escolha seções e itens, ordene e publique a home imediatamente.</PageDescription>
       </PageHeader>
 
       <BuilderLayout>
@@ -180,19 +178,17 @@ export function PortfolioBuilderFeature() {
             onNew={newVersion}
             onSelect={loadVersion}
           />
-          <Input aria-label="Nome da versao" value={name} onChange={(event) => setName(event.target.value)} />
+          <Input aria-label="Nome da versão" value={name} onChange={(event) => setName(event.target.value)} />
 
           <BuilderSortableList
             items={[...sections].sort((a, b) => a.order - b.order)}
             renderItem={(item) => (
-              <div className="rounded-md border border-border bg-background p-3">
-                <BuilderItem className="border-0 bg-transparent p-0">
-                  <input checked={item.enabled} className="mt-1 size-4" type="checkbox" onChange={() => updateSection(item.id, { enabled: !item.enabled })} />
-                  <BuilderItemContent>
-                    <BuilderItemTitle>{item.label}</BuilderItemTitle>
-                    <BuilderItemDescription>{items[item.id]?.length ? `${items[item.id].length} itens disponiveis` : "Secao de perfil"}</BuilderItemDescription>
-                  </BuilderItemContent>
-                </BuilderItem>
+              <BuilderSectionCard
+                description={items[item.id]?.length ? `${items[item.id].length} itens disponíveis` : "Seção de perfil"}
+                enabled={item.enabled}
+                label={item.label}
+                onToggleEnabled={() => updateSection(item.id, { enabled: !item.enabled })}
+              >
                 {items[item.id]?.length > 0 && (
                   <BuilderSectionItemsPicker
                     items={items[item.id]}
@@ -204,7 +200,7 @@ export function PortfolioBuilderFeature() {
                     onToggleItem={(optionId) => toggleItem(item.id, optionId)}
                   />
                 )}
-              </div>
+              </BuilderSectionCard>
             )}
             onReorder={reorderSections}
           />
@@ -214,15 +210,18 @@ export function PortfolioBuilderFeature() {
             <Button disabled={busy} variant="secondary" onClick={() => publishMutation.mutate()}>{publishMutation.isPending ? "Publicando..." : "Publicar"}</Button>
             <Button asChild variant="ghost"><Link href="/">Abrir portfolio</Link></Button>
           </div>
-          <BuilderStatus>A versao publicada substitui a anterior e reflete imediatamente no site.</BuilderStatus>
+          <BuilderStatus>A versão publicada substitui a anterior e reflete imediatamente no site.</BuilderStatus>
         </BuilderPanel>
 
         <BuilderPreview className="overflow-hidden p-0">
           <BuilderBrowserBar url={displayUrl(env.appUrl)} />
-          <div className="flex min-h-[620px] flex-col gap-8 bg-background p-6">
-            {[...sections].filter((item) => item.enabled).sort((a, b) => a.order - b.order).map((item) => (
-              <PortfolioPreviewSection key={item.id} id={item.id} portfolio={portfolioQuery.data} />
-            ))}
+          <div className="relative min-h-[620px] overflow-hidden bg-background">
+            <PortfolioBackground variant="absolute" />
+            <div className="relative z-10 flex flex-col gap-8 p-6">
+              {[...sections].filter((item) => item.enabled).sort((a, b) => a.order - b.order).map((item) => (
+                <PortfolioPreviewSection key={item.id} id={item.id} portfolio={portfolioQuery.data} />
+              ))}
+            </div>
           </div>
         </BuilderPreview>
       </BuilderLayout>
@@ -261,7 +260,7 @@ const portfolioPreviewRegistry: Record<string, (portfolio: PortfolioData | undef
     return (
       <section className="flex min-h-48 flex-col justify-center gap-3">
         <p className="text-sm text-muted-foreground">{profile.name || "Seu nome"}</p>
-        <h2 className="text-4xl font-semibold">{profile.headline || "Seu titulo aqui"}</h2>
+        <h2 className="text-4xl font-semibold">{profile.headline || "Seu título aqui"}</h2>
       </section>
     );
   },
@@ -270,37 +269,37 @@ const portfolioPreviewRegistry: Record<string, (portfolio: PortfolioData | undef
     portfolio?.skills.length ? (
       <SkillsSection skills={portfolio.skills} />
     ) : (
-      <BuilderEmptyState description="Cadastre habilidades e marque-as como visiveis no portfolio para aparecerem aqui." title="Nenhuma habilidade" />
+      <BuilderEmptyState description="Cadastre habilidades e marque-as como visíveis no portfolio para aparecerem aqui." title="Nenhuma habilidade" />
     ),
   projects: (portfolio) =>
     portfolio?.projects.length ? (
       <ProjectsSection projects={portfolio.projects} />
     ) : (
-      <BuilderEmptyState description="Cadastre projetos e marque-os como visiveis no portfolio para aparecerem aqui." title="Nenhum projeto" />
+      <BuilderEmptyState description="Cadastre projetos e marque-os como visíveis no portfolio para aparecerem aqui." title="Nenhum projeto" />
     ),
   experiences: (portfolio) =>
     portfolio?.experiences.length ? (
       <TimelineSection experiences={portfolio.experiences} />
     ) : (
-      <BuilderEmptyState description="Cadastre experiencias e marque-as como visiveis no portfolio para aparecerem aqui." title="Nenhuma experiencia" />
+      <BuilderEmptyState description="Cadastre experiências e marque-as como visíveis no portfolio para aparecerem aqui." title="Nenhuma experiência" />
     ),
   pages: (portfolio) =>
     portfolio?.navigationPages.length ? (
       <PagesSection pages={portfolio.navigationPages} />
     ) : (
-      <BuilderEmptyState description="Publique paginas com 'Exibir na navegacao' ativado para aparecerem aqui." title="Nenhuma pagina" />
+      <BuilderEmptyState description="Publique páginas com 'Exibir na navegação' ativado para aparecerem aqui." title="Nenhuma página" />
     ),
   "custom-sections": (portfolio) =>
     portfolio?.customSections.length ? (
       <CustomSectionsSection sections={portfolio.customSections} />
     ) : (
-      <BuilderEmptyState description="Publique secoes customizadas e marque-as como visiveis no portfolio para aparecerem aqui." title="Nenhuma secao" />
+      <BuilderEmptyState description="Publique seções customizadas e marque-as como visíveis no portfolio para aparecerem aqui." title="Nenhuma seção" />
     ),
   github: (portfolio) =>
     portfolio?.github ? (
       <GitHubSection github={portfolio.github} />
     ) : (
-      <BuilderEmptyState description="Informe seu usuario do GitHub no Perfil para exibir estatisticas aqui." title="GitHub nao conectado" />
+      <BuilderEmptyState description="Informe seu usuário do GitHub no Perfil para exibir estatísticas aqui." title="GitHub não conectado" />
     ),
   contact: (portfolio) => <ContactSection profile={toPortfolioProfile(portfolio)} />,
 };

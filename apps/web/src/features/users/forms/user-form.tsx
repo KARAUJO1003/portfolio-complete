@@ -87,7 +87,7 @@ export function UserForm({ onDone, onPendingChange, user }: UserFormProps) {
 
   return (
     <DsForm id={USER_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-      <FormSection title="Identidade" description="Nome e email do usuario. O email nao pode ser alterado depois de criado.">
+      <FormSection title="Identidade" description="Nome e email do usuário. O email não pode ser alterado depois de criado.">
         <div className="grid gap-4 md:grid-cols-2">
           <FormFields.Text form={form} label="Nome" name="name" />
           {user ? (
@@ -103,7 +103,7 @@ export function UserForm({ onDone, onPendingChange, user }: UserFormProps) {
         </div>
         {!user && (
           <FormFields.Text
-            description="Minimo 8 caracteres. O usuario pode trocar depois em Esqueci minha senha."
+            description="Mínimo 8 caracteres. O usuário pode trocar depois em Esqueci minha senha."
             form={form}
             label="Senha inicial"
             name="password"
@@ -112,7 +112,7 @@ export function UserForm({ onDone, onPendingChange, user }: UserFormProps) {
         )}
       </FormSection>
 
-      <FormSection title="Acesso" description="O papel define o conjunto de permissoes do usuario.">
+      <FormSection title="Acesso" description="O papel define o conjunto de permissões do usuário.">
         <FormFields.Select
           form={form}
           label="Papel"
@@ -121,7 +121,7 @@ export function UserForm({ onDone, onPendingChange, user }: UserFormProps) {
         />
       </FormSection>
 
-      {mutation.isError && <FormError>Erro ao salvar usuario.</FormError>}
+      {mutation.isError && <FormError>Erro ao salvar usuário.</FormError>}
     </DsForm>
   );
 }

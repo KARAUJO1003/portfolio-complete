@@ -10,7 +10,7 @@ export const projectFormSchema = z.object({
   repoUrl: z.string().url().or(z.literal("")).default(""),
   technologiesText: z.string().default(""),
   featured: z.boolean().default(false),
-  order: z.coerce.number().int("Ordem deve ser um numero inteiro.").min(0, "Ordem nao pode ser negativa.").default(0),
+  order: z.coerce.number().int("Ordem deve ser um número inteiro.").min(0, "Ordem não pode ser negativa.").default(0),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   showOnPortfolio: z.boolean().default(true),
   showOnResume: z.boolean().default(false),

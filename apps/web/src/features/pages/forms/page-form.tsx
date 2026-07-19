@@ -77,20 +77,20 @@ export function PageForm({ onDone, onPendingChange, page }: PageFormProps) {
 
   return (
     <DsForm id={PAGE_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-      <FormSection title="Identidade" description="Titulo, slug e resumo exibidos na navegacao e listagens.">
+      <FormSection title="Identidade" description="Título, slug e resumo exibidos na navegação e listagens.">
         <div className="grid gap-4 md:grid-cols-2">
-          <FormFields.Text form={form} label="Titulo" name="title" />
+          <FormFields.Text form={form} label="Título" name="title" />
           <FormFields.Text form={form} label="Slug" name="slug" />
           <FormFields.Text form={form} label="Resumo" name="excerpt" />
           <FormFields.NumberStepper form={form} label="Ordem" name="order" />
         </div>
       </FormSection>
 
-      <FormSection title="Conteudo" description="Texto da pagina e formato de persistencia.">
-        <FormFields.HtmlEditor form={form} label="Conteudo" name="content" />
+      <FormSection title="Conteúdo" description="Texto da página e formato de persistência.">
+        <FormFields.HtmlEditor form={form} label="Conteúdo" name="content" />
         <FormFields.Select
           form={form}
-          label="Formato do conteudo"
+          label="Formato do conteúdo"
           name="contentFormat"
           options={[
             { label: "HTML string", value: "html" },
@@ -99,12 +99,12 @@ export function PageForm({ onDone, onPendingChange, page }: PageFormProps) {
         />
       </FormSection>
 
-      <FormSection title="Publicacao e exibicao" description="Status da pagina e presenca na navegacao publica.">
+      <FormSection title="Publicação e exibição" description="Status da página e presença na navegação pública.">
         <FormFields.StatusToggle form={form} label="Status" name="status" />
-        <FormFields.Switch form={form} label="Navegacao publica" name="showInNavigation" description="Exibe esta pagina no menu publico." />
+        <FormFields.Switch form={form} label="Navegação pública" name="showInNavigation" description="Exibe esta página no menu público." />
       </FormSection>
 
-      {mutation.isError && <FormError>Erro ao salvar pagina.</FormError>}
+      {mutation.isError && <FormError>Erro ao salvar página.</FormError>}
     </DsForm>
   );
 }

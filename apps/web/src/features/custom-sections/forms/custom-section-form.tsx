@@ -93,19 +93,19 @@ export function CustomSectionForm({ onDone, onPendingChange, section }: CustomSe
 
   return (
     <DsForm id={CUSTOM_SECTION_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-      <FormSection title="Identidade" description="Titulo, chave unica e ordem de exibicao.">
+      <FormSection title="Identidade" description="Título, chave única e ordem de exibição.">
         <div className="grid gap-4 md:grid-cols-3">
-          <FormFields.Text form={form} label="Titulo" name="title" />
+          <FormFields.Text form={form} label="Título" name="title" />
           <FormFields.Text form={form} label="Chave" name="key" />
           <FormFields.NumberStepper form={form} label="Ordem" max={maxOrder} name="order" />
         </div>
       </FormSection>
 
-      <FormSection title="Conteudo" description="Editor rico: o conteudo e salvo como HTML.">
-        <FormFields.HtmlEditor form={form} label="Conteudo" name="content" />
+      <FormSection title="Conteúdo" description="Editor rico: o conteúdo é salvo como HTML.">
+        <FormFields.HtmlEditor form={form} label="Conteúdo" name="content" />
         <FormFields.Select
           form={form}
-          label="Formato do conteudo"
+          label="Formato do conteúdo"
           name="contentFormat"
           options={[
             { label: "HTML string", value: "html" },
@@ -114,15 +114,15 @@ export function CustomSectionForm({ onDone, onPendingChange, section }: CustomSe
         />
       </FormSection>
 
-      <FormSection title="Publicacao e exibicao" description="Status e onde esta secao aparece.">
+      <FormSection title="Publicação e exibição" description="Status e onde esta seção aparece.">
         <FormFields.StatusToggle form={form} label="Status" name="status" />
         <div className="grid gap-3 md:grid-cols-2">
-          <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponivel para versoes de portfolio." />
-          <FormFields.Switch form={form} label="Curriculo" name="showOnResume" description="Disponivel para versoes de curriculo." />
+          <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponível para versões de portfolio." />
+          <FormFields.Switch form={form} label="Currículo" name="showOnResume" description="Disponível para versões de currículo." />
         </div>
       </FormSection>
 
-      {mutation.isError && <FormError>Erro ao salvar secao.</FormError>}
+      {mutation.isError && <FormError>Erro ao salvar seção.</FormError>}
     </DsForm>
   );
 }

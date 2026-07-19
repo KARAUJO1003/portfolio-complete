@@ -20,6 +20,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, InboxIcon } from "lucide-react";
 import { useId } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
@@ -30,7 +31,7 @@ export function BuilderLayout({ className, ...props }: React.HTMLAttributes<HTML
 export function BuilderPanel({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("flex flex-col gap-4 rounded-lg border border-border bg-card p-5", className)}
+      className={cn("flex flex-col gap-4 rounded-lg border border-border bg-card p-4", className)}
       {...props}
     />
   );
@@ -69,18 +70,6 @@ export function BuilderBrowserBar({ className, url, ...props }: React.HTMLAttrib
   );
 }
 
-export function BuilderItem({ className, ...props }: React.HTMLAttributes<HTMLLabelElement>) {
-  return (
-    <label
-      className={cn(
-        "flex cursor-pointer items-start gap-3 rounded-md border border-border bg-background p-3 text-sm",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
 export function BuilderItemContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("flex min-w-0 flex-1 flex-col gap-1", className)} {...props} />;
 }
@@ -96,9 +85,52 @@ export function BuilderItemDescription({ className, ...props }: React.HTMLAttrib
 export function BuilderItemOptions({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("mt-2 grid max-h-40 gap-2 overflow-y-auto border-t border-border pt-2", className)}
+      className={cn(
+        "grid max-h-40 gap-1.5 overflow-y-auto border-t border-border px-3 pb-3 pt-2.5",
+        className,
+      )}
       {...props}
     />
+  );
+}
+
+/**
+ * Card de secao arrastavel dos builders (Portfolio/Curriculo): checkbox real
+ * (nao input nativo sem estilo) + titulo/descricao que esmaecem quando a
+ * secao esta desativada + slot opcional para o picker de itens. Substitui o
+ * padrao antigo de cada feature montar sua propria div+BuilderItem na mao
+ * (duplicado identico nos dois builders). Ver docs/admin-redesign-tasks.md,
+ * refino visual pos-Fase 8.
+ */
+export function BuilderSectionCard({
+  children,
+  description,
+  enabled,
+  label,
+  onToggleEnabled,
+}: {
+  children?: React.ReactNode;
+  description: string;
+  enabled: boolean;
+  label: string;
+  onToggleEnabled: () => void;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-md border border-border bg-background transition-colors",
+        enabled ? "hover:border-foreground/25" : "opacity-60 hover:opacity-100",
+      )}
+    >
+      <label className="flex cursor-pointer items-start gap-3 p-3 text-sm">
+        <Checkbox checked={enabled} className="mt-0.5" onCheckedChange={onToggleEnabled} />
+        <BuilderItemContent>
+          <BuilderItemTitle>{label}</BuilderItemTitle>
+          <BuilderItemDescription>{description}</BuilderItemDescription>
+        </BuilderItemContent>
+      </label>
+      {children}
+    </div>
   );
 }
 
@@ -147,10 +179,10 @@ export function BuilderVersionSwitcher({
       <div className="grid grid-cols-[1fr_auto] gap-2">
         <Select value={currentVersion?.id ?? ""} onValueChange={(next) => onSelect(next ?? "")}>
           <SelectTrigger>
-            <SelectValue>{() => (currentVersion ? `${currentVersion.name} (${currentVersion.status})` : "Nova versao")}</SelectValue>
+            <SelectValue>{() => (currentVersion ? `${currentVersion.name} (${currentVersion.status})` : "Nova versão")}</SelectValue>
           </SelectTrigger>
           <SelectPopup>
-            <SelectItem value="">Nova versao</SelectItem>
+            <SelectItem value="">Nova versão</SelectItem>
             {versions.map((version) => (
               <SelectItem key={version.id} value={version.id}>
                 {version.name} ({version.status})
@@ -163,13 +195,13 @@ export function BuilderVersionSwitcher({
         </Button>
       </div>
       {isNew ? (
-        <p className="text-xs leading-5 text-muted-foreground">Uma versao nova sera criada ao salvar.</p>
+        <p className="text-xs leading-5 text-muted-foreground">Uma versão nova será criada ao salvar.</p>
       ) : !isEditingLive && liveVersion ? (
         <p className="rounded-md border border-warning/30 bg-warning/10 px-2.5 py-1.5 text-xs leading-5 text-warning">
-          Voce esta editando um rascunho - o site publico ainda mostra &quot;{liveVersion.name}&quot;.
+          Você está editando um rascunho - o site público ainda mostra &quot;{liveVersion.name}&quot;.
         </p>
       ) : isEditingLive ? (
-        <p className="text-xs leading-5 text-muted-foreground">Esta e a versao publicada atualmente.</p>
+        <p className="text-xs leading-5 text-muted-foreground">Esta é a versão publicada atualmente.</p>
       ) : null}
     </div>
   );
@@ -251,30 +283,29 @@ export function BuilderSectionItemsPicker({
   return (
     <BuilderItemOptions>
       <label className="flex items-center gap-2 text-xs font-medium">
-        <input checked={section.selectionMode === "all"} type="checkbox" onChange={onToggleAll} />
-        Usar todos os itens visiveis
+        <Checkbox checked={section.selectionMode === "all"} onCheckedChange={onToggleAll} />
+        Usar todos os itens visíveis
       </label>
       {section.selectionMode === "selected" && (
         <>
           {items.map((option) => (
             <label key={option.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-              <input
+              <Checkbox
                 checked={section.itemIds.includes(option.id)}
-                type="checkbox"
-                onChange={() => onToggleItem(option.id)}
+                onCheckedChange={() => onToggleItem(option.id)}
               />
               {option.label}
             </label>
           ))}
           {selectedItems.length > 1 && (
-            <div className="mt-2 border-t border-border pt-2">
+            <div className="mt-1 border-t border-border pt-2.5">
               <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                Ordem de exibicao
+                Ordem de exibição
               </p>
               <BuilderSortableList
                 items={selectedItems}
                 renderItem={(item) => (
-                  <div className="rounded-md border border-border bg-background px-3 py-2 text-xs">
+                  <div className="rounded-md border border-border bg-surface-raised/60 px-3 py-1.5 text-xs transition-colors hover:border-foreground/20">
                     {item.label}
                   </div>
                 )}
@@ -290,20 +321,24 @@ export function BuilderSectionItemsPicker({
 
 function BuilderSortableRow({ id, children }: { id: string; children: React.ReactNode }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.6 : 1 };
+  const style = { transform: CSS.Transform.toString(transform), transition };
 
   return (
-    <div ref={setNodeRef} className="relative" style={style}>
+    <div
+      ref={setNodeRef}
+      className={cn("relative", isDragging && "z-20 opacity-90")}
+      style={style}
+    >
       <button
         aria-label="Arrastar para reordenar"
-        className="absolute left-2 top-3 z-10 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
+        className="absolute left-1.5 top-2.5 z-10 grid size-6 cursor-grab touch-none place-items-center rounded-md text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing"
         type="button"
         {...attributes}
         {...listeners}
       >
-        <GripVertical className="size-4" />
+        <GripVertical className="size-3.5" />
       </button>
-      <div className="pl-7">{children}</div>
+      <div className="pl-8">{children}</div>
     </div>
   );
 }

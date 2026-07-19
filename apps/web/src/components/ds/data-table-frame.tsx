@@ -1,7 +1,8 @@
 "use client";
 
+import { SearchIcon } from "lucide-react";
 import { EmptyState, PageFrame, PageFrameContent, PageFrameDescription, PageFrameHeader, PageFrameTitle, Toolbar } from "@/components/ds/admin-primitives";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 
 type DataTableFrameProps = {
   actions?: React.ReactNode;
@@ -37,12 +38,16 @@ export function DataTableFrame({
       {hasToolbar && (
         <Toolbar>
           {onSearchChange && (
-            <Input
-              className="min-w-64 max-w-sm"
-              placeholder={searchPlaceholder}
-              value={search ?? ""}
-              onChange={(event) => onSearchChange(event.target.value)}
-            />
+            <InputGroup className="min-w-64 max-w-sm">
+              <InputGroupAddon>
+                <SearchIcon className="size-3.5" />
+              </InputGroupAddon>
+              <InputGroupInput
+                placeholder={searchPlaceholder}
+                value={search ?? ""}
+                onChange={(event) => onSearchChange(event.target.value)}
+              />
+            </InputGroup>
           )}
           {filters}
         </Toolbar>

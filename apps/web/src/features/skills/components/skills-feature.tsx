@@ -35,7 +35,7 @@ export function SkillsFeature() {
         <div>
           <PageTitle>Habilidades</PageTitle>
           <PageDescription>
-            Cadastre habilidades com data, descricao e controle de exibicao no portfolio/curriculo.
+            Cadastre habilidades com data, descrição e controle de exibição no portfolio/currículo.
           </PageDescription>
         </div>
         <Button type="button" onClick={openCreate}>
@@ -47,10 +47,10 @@ export function SkillsFeature() {
       <SkillsTable onEdit={openEdit} />
 
       <DrawerFormShell
-        description="Nome, categoria, data de inicio e controle de exibicao no portfolio/curriculo."
+        description="Nome, categoria, data de início e controle de exibição no portfolio/currículo."
         formId={SKILL_FORM_ID}
         open={drawerOpen}
-        saveLabel={editingSkill ? "Salvar alteracoes" : "Criar habilidade"}
+        saveLabel={editingSkill ? "Salvar alterações" : "Criar habilidade"}
         saving={saving}
         title={editingSkill ? "Editar habilidade" : "Nova habilidade"}
         onOpenChange={(open) => (open ? setDrawerOpen(true) : closeDrawer())}

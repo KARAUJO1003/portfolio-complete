@@ -33,27 +33,27 @@ export function PagesFeature() {
     <>
       <PageHeader className="flex-row flex-wrap items-center justify-between gap-3">
         <div>
-          <PageTitle>Paginas</PageTitle>
+          <PageTitle>Páginas</PageTitle>
           <PageDescription>
-            Crie paginas publicas customizadas para cases, textos ou secoes extras.
+            Crie páginas públicas customizadas para cases, textos ou seções extras.
           </PageDescription>
         </div>
         <Button type="button" onClick={openCreate}>
           <PlusIcon className="size-4" />
-          Nova pagina
+          Nova página
         </Button>
       </PageHeader>
 
       <PagesTable onEdit={openEdit} />
 
       <DrawerFormShell
-        description="Conteudo livre nesta fase; suporte completo a Markdown/MDX pode entrar depois."
+        description="Conteúdo livre nesta fase; suporte completo a Markdown/MDX pode entrar depois."
         formId={PAGE_FORM_ID}
         maxWidth="max-w-3xl"
         open={drawerOpen}
-        saveLabel={editingPage ? "Salvar alteracoes" : "Criar pagina"}
+        saveLabel={editingPage ? "Salvar alterações" : "Criar página"}
         saving={saving}
-        title={editingPage ? "Editar pagina" : "Nova pagina"}
+        title={editingPage ? "Editar página" : "Nova página"}
         onOpenChange={(open) => (open ? setDrawerOpen(true) : closeDrawer())}
       >
         <PageForm page={editingPage} onDone={closeDrawer} onPendingChange={setSaving} />

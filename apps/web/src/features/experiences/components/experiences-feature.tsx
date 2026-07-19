@@ -33,9 +33,9 @@ export function ExperiencesFeature() {
     <>
       <PageHeader className="flex-row flex-wrap items-center justify-between gap-3">
         <div>
-          <PageTitle>Trajetoria</PageTitle>
+          <PageTitle>Trajetória</PageTitle>
           <PageDescription>
-            Gerencie experiencias, formacao, certificacoes e links reutilizaveis no curriculo.
+            Gerencie experiências, formação, certificações e links reutilizáveis no currículo.
           </PageDescription>
         </div>
         <Button type="button" onClick={openCreate}>
@@ -47,10 +47,10 @@ export function ExperiencesFeature() {
       <ExperiencesTable onEdit={openEdit} />
 
       <DrawerFormShell
-        description="Use visibilidade para controlar se o item entra no portfolio, curriculo ou ambos."
+        description="Use visibilidade para controlar se o item entra no portfolio, currículo ou ambos."
         formId={EXPERIENCE_FORM_ID}
         open={drawerOpen}
-        saveLabel={editingExperience ? "Salvar alteracoes" : "Criar item"}
+        saveLabel={editingExperience ? "Salvar alterações" : "Criar item"}
         saving={saving}
         title={editingExperience ? "Editar item" : "Novo item"}
         onOpenChange={(open) => (open ? setDrawerOpen(true) : closeDrawer())}

@@ -7,7 +7,7 @@ export const changePasswordFormSchema = z
     confirmNewPassword: z.string().min(8),
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "As senhas nao coincidem.",
+    message: "As senhas não coincidem.",
     path: ["confirmNewPassword"],
   });
 

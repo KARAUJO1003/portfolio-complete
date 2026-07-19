@@ -4,6 +4,7 @@ import { Controller, type FieldValues, type Path, type PathValue, type UseFormRe
 import { FormDescription, FormError, FormField, FormLabel } from "@/components/ds/form-field";
 import { RichTextEditor } from "@/components/ds/rich-text-editor";
 import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import {
   NumberField,
   NumberFieldDecrement,
@@ -44,6 +45,37 @@ function Text<TValues extends FieldValues>({
     <FormField className={className}>
       <FormLabel htmlFor={name}>{label}</FormLabel>
       <Input id={name} type={type} {...form.register(name)} />
+      {description && <FormDescription>{description}</FormDescription>}
+      {error && <FormError>{error}</FormError>}
+    </FormField>
+  );
+}
+
+/**
+ * Campo de URL com icone fixo dentro do input (InputGroup, adaptado do
+ * particle `@coss/input-group`) - usado em campos como Demo URL/Repo URL/
+ * Website/GitHub/LinkedIn, onde o icone reforca o tipo de link sem precisar
+ * de um label mais verboso. Ver docs/admin-redesign-tasks.md, Fase 11.
+ */
+function UrlField<TValues extends FieldValues>({
+  className,
+  description,
+  form,
+  icon: Icon,
+  label,
+  name,
+}: BaseFieldProps<TValues> & { icon: React.ComponentType<{ className?: string }> }) {
+  const error = fieldError(form, name);
+
+  return (
+    <FormField className={className}>
+      <FormLabel htmlFor={name}>{label}</FormLabel>
+      <InputGroup>
+        <InputGroupAddon>
+          <Icon className="size-3.5" />
+        </InputGroupAddon>
+        <InputGroupInput id={name} placeholder="https://" type="url" {...form.register(name)} />
+      </InputGroup>
       {description && <FormDescription>{description}</FormDescription>}
       {error && <FormError>{error}</FormError>}
     </FormField>
@@ -274,4 +306,5 @@ export const FormFields = {
   TagInput,
   Text,
   Textarea: TextareaField,
+  UrlField,
 };

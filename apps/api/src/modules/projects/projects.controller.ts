@@ -44,3 +44,13 @@ export const deleteProject: RequestHandler = async (request, response, next) => 
     next(error);
   }
 };
+
+export const getLikesTrend: RequestHandler = async (request, response, next) => {
+  try {
+    if (!request.user) throw new ApiError("Unauthenticated", 401);
+    const trend = await service.getLikesTrend(request.user.id);
+    response.json(trend);
+  } catch (error) {
+    next(error);
+  }
+};

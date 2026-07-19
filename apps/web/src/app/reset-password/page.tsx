@@ -1,12 +1,13 @@
 import { Suspense } from "react";
+import { AuthShell } from "@/components/layout/auth-shell";
 import { ResetPasswordForm } from "@/features/auth/components/reset-password-form";
 
 export default function ResetPasswordPage() {
   return (
-    <main className="admin-shell grid min-h-dvh place-items-center bg-background-subtle px-4 py-10 text-foreground">
+    <AuthShell>
       <Suspense fallback={null}>
         <ResetPasswordForm />
       </Suspense>
-    </main>
+    </AuthShell>
   );
 }

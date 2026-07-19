@@ -174,113 +174,20 @@ body {
     sans-serif;
 }
 
-.bg-background {
-  background: var(--background);
-}
-
-.bg-background-subtle {
-  background: var(--background-subtle);
-}
-
-.text-foreground {
-  color: var(--foreground);
-}
-
-.text-foreground-muted {
-  color: var(--foreground-muted);
-}
-
-.text-foreground-subtle {
-  color: var(--foreground-subtle);
-}
-
-.bg-foreground {
-  background: var(--foreground);
-}
-
-.text-background {
-  color: var(--background);
-}
-
-.bg-muted {
-  background: var(--muted);
-}
-
-.text-muted-foreground {
-  color: var(--muted-foreground);
-}
-
-.border-border {
-  border-color: var(--border);
-}
-
-.bg-card {
-  background: var(--card);
-}
-
-.bg-surface {
-  background: var(--surface);
-}
-
-.bg-surface-raised {
-  background: var(--surface-raised);
-}
-
-.bg-surface-muted {
-  background: var(--surface-muted);
-}
-
-.text-card-foreground {
-  color: var(--card-foreground);
-}
-
-.bg-primary {
-  background: var(--primary);
-}
-
-.text-primary {
-  color: var(--primary);
-}
-
-.text-primary-foreground {
-  color: var(--primary-foreground);
-}
-
-.bg-primary-tint {
-  background: var(--primary-tint);
-}
-
-.text-primary-accent {
-  color: var(--primary-accent);
-}
-
-.border-primary-accent {
-  border-color: var(--primary-accent);
-}
-
-.bg-secondary {
-  background: var(--secondary);
-}
-
-.text-secondary {
-  color: var(--secondary);
-}
-
-.text-secondary-foreground {
-  color: var(--secondary-foreground);
-}
-
-.text-success {
-  color: var(--success);
-}
-
-.text-warning {
-  color: var(--warning);
-}
-
-.text-danger {
-  color: var(--danger);
-}
+/*
+ * Ate 2026-07-19 esta area tinha ~30 utilitarias de cor duplicadas a mao
+ * (`.bg-primary`, `.bg-background`, `.text-foreground` etc.), uma por token
+ * ja registrado em `@theme inline` acima. Elas eram redundantes (o Tailwind
+ * ja gera as mesmas classes a partir do `@theme inline`) e, pior, **quebravam
+ * silenciosamente qualquer variante condicional** (`data-[checked]:bg-primary`,
+ * `hover:bg-muted` etc.) que competisse pela mesma propriedade: por serem
+ * regras soltas fora de qualquer `@layer`, o CSS Cascade Layers spec faz
+ * qualquer regra sem layer vencer QUALQUER regra em layer, independente de
+ * especificidade. Foi assim que o Checkbox marcado ficava visualmente igual
+ * ao desmarcado (achado testando o Portfolio Builder de verdade no navegador,
+ * nao só lendo o código). Removidas; o Tailwind gera as mesmas classes,
+ * corretamente dentro de `@layer utilities`, a partir do bloco acima.
+ */
 
 /*
  * Motion de dialog escrito na mao: o projeto nao usa tailwindcss-animate,

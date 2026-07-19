@@ -12,6 +12,7 @@ import { HtmlContent } from "@/components/ds/html-content";
 import { ThemeToggle } from "@/components/ds/theme-toggle";
 import { PublicShell } from "@/components/layout/public-shell";
 import { resolveFileUrl } from "@/core/files/file-url";
+import { cn } from "@/lib/utils";
 import { AnimatedDisclosure } from "@/features/portfolio/components/animated-disclosure";
 import { PortfolioFloatingMenu } from "@/features/portfolio/components/portfolio-floating-menu";
 import { ProjectCover } from "@/features/portfolio/components/project-cover";
@@ -240,11 +241,14 @@ export function PortfolioHome({ portfolio }: PortfolioHomeProps) {
   );
 }
 
-function PortfolioBackground() {
+export function PortfolioBackground({ variant = "fixed" }: { variant?: "fixed" | "absolute" }) {
   return (
     <div
       aria-hidden="true"
-      className="z-0 fixed inset-0 bg-background overflow-hidden pointer-events-none"
+      className={cn(
+        "z-0 inset-0 bg-background overflow-hidden pointer-events-none",
+        variant === "fixed" ? "fixed" : "absolute",
+      )}
     >
       <div className="top-0 absolute inset-x-0 h-[110px] overflow-hidden [mask-image:linear-gradient(to_bottom,black,transparent)]">
         <div className="opacity-35 size-full [background-image:radial-gradient(circle,rgba(255,255,255,0.22)_1px,transparent_1px)] [background-size:18px_18px]" />

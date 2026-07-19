@@ -4,6 +4,7 @@ import type { ProjectDto } from "@portfolio/contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { GitBranchIcon, LinkIcon } from "lucide-react";
 import { AsyncImageFrame } from "@/components/ds/async-image-frame";
 import { FormFields } from "@/components/ds/form-fields";
 import { DsForm, FormAside, FormPreviewFrame, FormSection, FormStep } from "@/components/ds/form";
@@ -125,19 +126,19 @@ export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormPro
   return (
     <DsForm id={PROJECT_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
       <div className="flex flex-wrap gap-2">
-        <FormStep active index={1} label="Conteudo" />
-        <FormStep active={Boolean(preview.coverPath)} index={2} label="Midia" />
-        <FormStep active={preview.status === "published"} index={3} label="Publicacao" />
+        <FormStep active index={1} label="Conteúdo" />
+        <FormStep active={Boolean(preview.coverPath)} index={2} label="Mídia" />
+        <FormStep active={preview.status === "published"} index={3} label="Publicação" />
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="grid gap-5">
           <FormSection
             title="Identidade do projeto"
-            description="Defina o nome publico, URL e resumo que aparecem nos cards do portfolio."
+            description="Defina o nome público, URL e resumo que aparecem nos cards do portfolio."
           >
             <div className="grid gap-4 md:grid-cols-2">
-              <FormFields.Text form={form} label="Titulo" name="title" />
+              <FormFields.Text form={form} label="Título" name="title" />
               <FormFields.Text form={form} label="Slug" name="slug" />
             </div>
             <FormFields.Textarea
@@ -145,19 +146,19 @@ export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormPro
               label="Resumo curto"
               name="summary"
               rows={3}
-              description="Use uma frase objetiva. O card publico trunca o texto e o drawer mostra detalhes."
+              description="Use uma frase objetiva. O card público trunca o texto e o drawer mostra detalhes."
             />
             <FormFields.HtmlEditor
               form={form}
-              label="Descricao longa"
+              label="Descrição longa"
               name="description"
-              description="Texto completo para drawer e futuras paginas detalhadas. Nao alimenta o PDF do curriculo (que usa o Resumo curto)."
+              description="Texto completo para drawer e futuras páginas detalhadas. Não alimenta o PDF do currículo (que usa o Resumo curto)."
             />
           </FormSection>
 
           <FormSection
-            title="Midia e links"
-            description="A imagem usa path relativo salvo no banco. O front concatena com a base publica de arquivos."
+            title="Mídia e links"
+            description="A imagem usa path relativo salvo no banco. O front concatena com a base pública de arquivos."
           >
             <FormField>
               <FormLabel htmlFor="coverPath">Capa do projeto</FormLabel>
@@ -168,18 +169,18 @@ export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormPro
                   onUploaded={(path) => form.setValue("coverPath", path, { shouldDirty: true })}
                 />
               </div>
-              <FormDescription>Prefira imagens largas em proporcao 16:10 ou 4:3.</FormDescription>
+              <FormDescription>Prefira imagens largas em proporção 16:10 ou 4:3.</FormDescription>
             </FormField>
             <div className="grid gap-4 md:grid-cols-2">
-              <FormFields.Text form={form} label="Demo URL" name="demoUrl" />
-              <FormFields.Text form={form} label="Repo URL" name="repoUrl" />
+              <FormFields.UrlField form={form} icon={LinkIcon} label="Demo URL" name="demoUrl" />
+              <FormFields.UrlField form={form} icon={GitBranchIcon} label="Repo URL" name="repoUrl" />
             </div>
             <FormFields.TagInput form={form} label="Tecnologias" name="technologiesText" />
           </FormSection>
 
           <FormSection
-            title="Publicacao e exibicao"
-            description="Controle onde este projeto aparece e como ele participa das versoes publicadas."
+            title="Publicação e exibição"
+            description="Controle onde este projeto aparece e como ele participa das versões publicadas."
           >
             <div className="grid gap-3 md:grid-cols-3">
               <FormFields.Switch
@@ -192,13 +193,13 @@ export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormPro
                 form={form}
                 label="Portfolio"
                 name="showOnPortfolio"
-                description="Disponivel para versoes de portfolio."
+                description="Disponível para versões de portfolio."
               />
               <FormFields.Switch
                 form={form}
-                label="Curriculo"
+                label="Currículo"
                 name="showOnResume"
-                description="Disponivel para versoes de curriculo."
+                description="Disponível para versões de currículo."
               />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
@@ -216,7 +217,7 @@ export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormPro
               className="aspect-[16/10] bg-surface-muted"
               fallback={
                 <div className="flex size-full items-center justify-center bg-surface-muted text-xs text-muted-foreground">
-                  Capa nao definida
+                  Capa não definida
                 </div>
               }
               src={coverUrl}
@@ -227,7 +228,7 @@ export function ProjectForm({ onDone, onPendingChange, project }: ProjectFormPro
                 <span className="text-xs text-muted-foreground">#{preview.order || 0}</span>
               </div>
               <div>
-                <h3 className="line-clamp-2 text-lg font-semibold">{preview.title || "Titulo do projeto"}</h3>
+                <h3 className="line-clamp-2 text-lg font-semibold">{preview.title || "Título do projeto"}</h3>
                 <p className="mt-2 line-clamp-4 text-sm leading-6 text-muted-foreground">
                   {preview.summary || "Resumo curto do projeto para validar o card antes de salvar."}
                 </p>

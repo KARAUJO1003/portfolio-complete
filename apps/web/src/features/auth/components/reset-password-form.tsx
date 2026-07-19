@@ -34,7 +34,7 @@ export function ResetPasswordForm() {
       setDone(true);
       setTimeout(() => router.push("/login"), 2000);
     } catch {
-      setServerError("Link invalido ou expirado. Peca um novo link.");
+      setServerError("Link inválido ou expirado. Peça um novo link.");
     }
   }
 
@@ -42,9 +42,9 @@ export function ResetPasswordForm() {
     return (
       <Card className="w-full max-w-md border-border bg-card/95 shadow-2xl shadow-black/10">
         <CardHeader>
-          <CardTitle className="text-2xl">Link invalido</CardTitle>
+          <CardTitle className="text-2xl">Link inválido</CardTitle>
           <CardDescription className="mt-2 leading-6">
-            Este link de redefinicao esta incompleto. Solicite um novo em{" "}
+            Este link de redefinição está incompleto. Solicite um novo em{" "}
             <Link className="underline underline-offset-4" href="/forgot-password">
               esqueci minha senha
             </Link>

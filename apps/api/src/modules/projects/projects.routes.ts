@@ -13,6 +13,13 @@ projectsRoutes.get(
   controller.listProjects,
 );
 
+projectsRoutes.get(
+  "/likes-trend",
+  authenticate,
+  requirePermission(PROJECTS_PERMISSIONS.view),
+  controller.getLikesTrend,
+);
+
 projectsRoutes.post(
   "/",
   authenticate,

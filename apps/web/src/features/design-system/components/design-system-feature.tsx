@@ -62,7 +62,7 @@ export function DesignSystemFeature() {
             Base visual minimalista, moderna e premium.
           </PageTitle>
           <PageDescription className="mt-4">
-            Esta tela sera a vitrine interna para tokens, tipografia, componentes, grids, layouts,
+            Esta tela será a vitrine interna para tokens, tipografia, componentes, grids, layouts,
             states e motion patterns do projeto.
           </PageDescription>
         </PageHeader>
@@ -79,7 +79,7 @@ export function DesignSystemFeature() {
                 <div className={`rounded-xl border border-border p-4 ${token.className} ${token.text}`}>
                   <div className="h-16 rounded-lg border border-white/10 bg-white/5" />
                   <p className="mt-4 text-sm font-medium">--{token.name}</p>
-                  <p className="mt-1 text-xs opacity-70">token semantico</p>
+                  <p className="mt-1 text-xs opacity-70">token semântico</p>
                 </div>
               </MotionHoverCard>
             </MotionItem>
@@ -101,7 +101,7 @@ export function DesignSystemFeature() {
               <Badge>Default</Badge>
               <Badge tone="success">Publicado</Badge>
               <Badge tone="muted">Rascunho</Badge>
-              <Badge tone="warning">Atencao</Badge>
+              <Badge tone="warning">Atenção</Badge>
               <Badge tone="danger">Erro</Badge>
               <Badge dot tone="success">On Time</Badge>
               <Badge dot tone="warning">Delayed</Badge>
@@ -111,12 +111,12 @@ export function DesignSystemFeature() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Botoes</CardTitle>
-              <CardDescription>Acoes claras, sem excesso visual.</CardDescription>
+              <CardTitle>Botões</CardTitle>
+              <CardDescription>Ações claras, sem excesso visual.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
-              <Button>Primario</Button>
-              <Button variant="secondary">Secundario</Button>
+              <Button>Primário</Button>
+              <Button variant="secondary">Secundário</Button>
               <Button variant="outline">Outline</Button>
               <Button variant="ghost">Ghost</Button>
               <Button variant="destructive">Destrutivo</Button>
@@ -126,11 +126,11 @@ export function DesignSystemFeature() {
           <Card>
             <CardHeader>
               <CardTitle>Cards</CardTitle>
-              <CardDescription>Superficies para conteudo editavel.</CardDescription>
+              <CardDescription>Superfícies para conteúdo editável.</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm leading-6 text-muted-foreground">
-                Cards devem ser objetivos no admin e mais editoriais no portfolio publico.
+                Cards devem ser objetivos no admin e mais editoriais no portfolio público.
               </p>
             </CardContent>
           </Card>
@@ -146,13 +146,13 @@ export function DesignSystemFeature() {
             <PageFrameHeader>
               <div>
                 <PageFrameTitle>PageFrame</PageFrameTitle>
-                <PageFrameDescription>Container padrao para formularios, listagens e builders.</PageFrameDescription>
+                <PageFrameDescription>Container padrão para formulários, listagens e builders.</PageFrameDescription>
               </div>
               <Badge tone="success">Novo</Badge>
             </PageFrameHeader>
             <PageFrameContent className="grid gap-3">
               <ActionBar>
-                <span className="text-sm font-medium">Barra de acao</span>
+                <span className="text-sm font-medium">Barra de ação</span>
                 <Toolbar>
                   <Button>Salvar</Button>
                   <Button variant="ghost">Cancelar</Button>
@@ -160,7 +160,7 @@ export function DesignSystemFeature() {
               </ActionBar>
               <EmptyState
                 title="Estado vazio"
-                description="Todos os CRUDs devem ter uma mensagem util e uma acao primaria quando fizer sentido."
+                description="Todos os CRUDs devem ter uma mensagem útil e uma ação primária quando fizer sentido."
               />
             </PageFrameContent>
           </PageFrame>
@@ -168,33 +168,33 @@ export function DesignSystemFeature() {
           <PageFrame>
             <PageFrameHeader>
               <div>
-                <PageFrameTitle>Formularios complexos</PageFrameTitle>
+                <PageFrameTitle>Formulários complexos</PageFrameTitle>
                 <PageFrameDescription>
-                  Projetos, Skills, Trajetoria, Paginas, Secoes e Usuarios vivem em `Drawer` bottom;
-                  a acao principal fica no header do drawer (toolbar), nao mais num rodape flutuante.
-                  `FormSection` nao usa mais card (fundo/borda) - so titulo, descricao e um divisor fino
-                  entre secoes. Ver `docs/admin-visual-references.md`.
+                  Projetos, Skills, Trajetória, Páginas, Seções e Usuários vivem em `Drawer` bottom;
+                  a ação principal fica no header do drawer (toolbar), não mais num rodapé flutuante.
+                  `FormSection` não usa mais card (fundo/borda) - só título, descrição e um divisor fino
+                  entre seções. Ver `docs/admin-visual-references.md`.
                 </PageFrameDescription>
               </div>
             </PageFrameHeader>
             <PageFrameContent className="grid gap-4">
               <div className="flex flex-wrap gap-2">
-                <FormStep active index={1} label="Conteudo" />
-                <FormStep active index={2} label="Midia" />
-                <FormStep index={3} label="Publicacao" />
+                <FormStep active index={1} label="Conteúdo" />
+                <FormStep active index={2} label="Mídia" />
+                <FormStep index={3} label="Publicação" />
               </div>
-              <FormSection title="Secao de formulario" description="Agrupa campos relacionados e explica o impacto.">
+              <FormSection title="Seção de formulário" description="Agrupa campos relacionados e explica o impacto.">
                 <div className="h-7 rounded-md border border-input bg-input/20" />
               </FormSection>
               <div className="grid gap-3 md:grid-cols-2">
-                <FormAside>Aside para contexto, dicas e resumo (Projetos usa; Skills/Paginas/Secoes/Usuarios nao precisam).</FormAside>
+                <FormAside>Aside para contexto, dicas e resumo (Projetos usa; Skills/Páginas/Seções/Usuários não precisam).</FormAside>
                 <FormPreviewFrame className="grid min-h-24 place-items-center text-sm text-muted-foreground">
                   Preview
                 </FormPreviewFrame>
               </div>
               <FormActions className="static shadow-none">
                 <span className="text-xs text-muted-foreground">
-                  `FormActions` agora so aparece no rodape em forms inline sem Drawer (Perfil, Minha conta); mostra so o erro de validacao quando falha.
+                  `FormActions` agora só aparece no rodapé em forms inline sem Drawer (Perfil, Minha conta); mostra só o erro de validação quando falha.
                 </span>
               </FormActions>
             </PageFrameContent>
@@ -208,7 +208,7 @@ export function DesignSystemFeature() {
         </SectionHeader>
         <DataTableFrame
           title="DataTableFrame"
-          description="Frame padrao para busca, filtros, ordenacao, estados e acoes."
+          description="Frame padrão para busca, filtros, ordenação, estados e ações."
           search=""
           onSearchChange={() => undefined}
           filters={<Button variant="ghost">Filtro</Button>}
@@ -239,7 +239,7 @@ export function DesignSystemFeature() {
                 <TableCell>
                   <Checkbox aria-label="Selecionar linha" />
                 </TableCell>
-                <TableCell className="font-medium">Curriculo Builder</TableCell>
+                <TableCell className="font-medium">Currículo Builder</TableCell>
                 <TableCell>
                   <Badge dot tone="warning">
                     Rascunho
@@ -251,8 +251,8 @@ export function DesignSystemFeature() {
         </DataTableFrame>
         <p className="text-[13px] leading-5 text-muted-foreground">
           `Table`/`Checkbox` adaptados do particle `p-table-8` (Coss/Base UI). A busca/filtro do
-          `DataTableFrame` fica sempre fora do frame, como um irmao acima (nao um filho). Todos os
-          CRUDs administrativos (Projetos, Skills, Trajetoria, Paginas, Secoes, Usuarios) ja usam
+          `DataTableFrame` fica sempre fora do frame, como um irmão acima (não um filho). Todos os
+          CRUDs administrativos (Projetos, Skills, Trajetória, Páginas, Seções, Usuários) já usam
           `DataTableFrame` com TanStack Table de verdade.
         </p>
       </Section>
@@ -264,11 +264,11 @@ export function DesignSystemFeature() {
         <SectionContent className="grid gap-3">
           <StatGrid>
             <Stat label="Projetos publicados" value="12" delta="+2 no mes" deltaTone="success" />
-            <Stat label="Rascunhos" value="3" delta="aguardando revisao" />
-            <Stat label="Versao publica" value="v4" delta="ha 6 dias" />
+            <Stat label="Rascunhos" value="3" delta="aguardando revisão" />
+            <Stat label="Versão pública" value="v4" delta="há 6 dias" />
           </StatGrid>
           <p className="text-[13px] leading-5 text-muted-foreground">
-            O numero e o protagonista e o rotulo se apaga. Cor so entra no delta quando carrega
+            O número é o protagonista e o rótulo se apaga. Cor só entra no delta quando carrega
             significado. Ver `docs/admin-visual-references.md`.
           </p>
         </SectionContent>
@@ -282,13 +282,13 @@ export function DesignSystemFeature() {
           <EmptyState
             icon={FolderPlusIcon}
             title="Nenhum projeto ainda"
-            description="Cadastre o primeiro projeto para ele aparecer no portfolio publico."
+            description="Cadastre o primeiro projeto para ele aparecer no portfolio público."
             action={<Button>Novo projeto</Button>}
           />
           <LoadingState label="Carregando projetos..." />
           <ErrorState
-            title="Nao foi possivel carregar"
-            description="A API nao respondeu. Verifique a conexao e tente novamente."
+            title="Não foi possível carregar"
+            description="A API não respondeu. Verifique a conexão e tente novamente."
             action={
               <Button variant="outline">Tentar novamente</Button>
             }
@@ -305,8 +305,8 @@ export function DesignSystemFeature() {
             <div>
               <PageFrameTitle>ConfirmDialog</PageFrameTitle>
               <PageFrameDescription>
-                Caminho unico para acao destrutiva. Foco preso, ESC e aria vem do Base UI; a descricao
-                da consequencia e obrigatoria.
+                Caminho único para ação destrutiva. Foco preso, ESC e aria vêm do Base UI; a descrição
+                da consequência é obrigatória.
               </PageFrameDescription>
             </div>
           </PageFrameHeader>
@@ -322,7 +322,7 @@ export function DesignSystemFeature() {
               onOpenChange={setConfirmOpen}
               onConfirm={() => setConfirmOpen(false)}
               title="Remover projeto?"
-              description="O projeto sai do portfolio publico imediatamente. Esta acao nao pode ser desfeita."
+              description="O projeto sai do portfolio público imediatamente. Esta ação não pode ser desfeita."
               confirmLabel="Remover"
             />
           </PageFrameContent>
@@ -339,8 +339,8 @@ export function DesignSystemFeature() {
               <PageFrameTitle>Menu</PageFrameTitle>
               <PageFrameDescription>
                 Base UI Menu (`components/ui/menu.tsx`, adaptado do `@coss/menu`). Usado no `UserMenu`
-                (avatar com Minha conta/Site publico/tema/Sair) e na nav principal (mega-menu por
-                grupo, hover com `openOnHover`). Popup usa `bg-card`/`border-border` (o projeto nao
+                (avatar com Minha conta/Site público/tema/Sair) e na nav principal (mega-menu por
+                grupo, hover com `openOnHover`). Popup usa `bg-card`/`border-border` (o projeto não
                 tem tokens `--popover`/`--accent`); item destacado usa `bg-muted`.
               </PageFrameDescription>
             </div>
@@ -359,7 +359,7 @@ export function DesignSystemFeature() {
                   </MenuItem>
                   <MenuItem>
                     <SettingsIcon />
-                    Preferencias
+                    Preferências
                   </MenuItem>
                 </MenuGroup>
                 <MenuSeparator />
@@ -384,7 +384,7 @@ export function DesignSystemFeature() {
                 <div className="rounded-xl border border-border bg-card p-4">
                   <p className="text-sm font-medium">{pattern}</p>
                   <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                    Pattern reutilizavel para telas do portfolio/admin.
+                    Pattern reutilizável para telas do portfolio/admin.
                   </p>
                 </div>
               </MotionItem>

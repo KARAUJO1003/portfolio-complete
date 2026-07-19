@@ -4,6 +4,7 @@ import type { ProjectDto } from "@portfolio/contracts";
 import { HeartIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { AsyncImageFrame } from "@/components/ds/async-image-frame";
 import { Badge } from "@/components/ds/badge";
+import { MiniBar } from "@/components/ds/chart";
 import { Button } from "@/components/ui/button";
 import { Can } from "@/core/auth/components/can";
 import { resolveFileUrl } from "@/core/files/file-url";
@@ -22,12 +23,13 @@ const statusTone: Record<ProjectDto["status"], "muted" | "success" | "warning"> 
 };
 
 type ProjectCardProps = {
+  maxLikes?: number;
   onDelete: (project: ProjectDto) => void;
   onEdit: (project: ProjectDto) => void;
   project: ProjectDto;
 };
 
-export function ProjectCard({ onDelete, onEdit, project }: ProjectCardProps) {
+export function ProjectCard({ maxLikes = 0, onDelete, onEdit, project }: ProjectCardProps) {
   const coverUrl = resolveFileUrl(project.coverPath);
 
   return (
@@ -64,9 +66,12 @@ export function ProjectCard({ onDelete, onEdit, project }: ProjectCardProps) {
           </div>
         )}
         <div className="mt-auto flex items-center justify-between gap-2 border-t border-border pt-3">
-          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-            <HeartIcon className="size-3" />
-            <span className="font-mono">{project.likesCount ?? 0}</span>
+          <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <HeartIcon className="size-3" />
+              <span className="font-mono">{project.likesCount ?? 0}</span>
+            </span>
+            {maxLikes > 0 ? <MiniBar max={maxLikes} value={project.likesCount ?? 0} /> : null}
           </span>
           <div className="flex items-center gap-1">
             <Can can={[PROJECTS_PERMISSIONS.update]}>

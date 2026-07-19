@@ -36,7 +36,7 @@ export function LoginForm() {
       const next = new URLSearchParams(window.location.search).get("next");
       router.push(next?.startsWith("/admin") ? next : "/admin");
     } catch {
-      setServerError("Credenciais invalidas.");
+      setServerError("Credenciais inválidas.");
     }
   }
 
@@ -45,12 +45,12 @@ export function LoginForm() {
       <CardHeader className="gap-4">
         <div className="flex items-center justify-between gap-3">
           <Badge tone="muted">Credenciais</Badge>
-          <span className="text-xs text-muted-foreground">Sessao segura</span>
+          <span className="text-xs text-muted-foreground">Sessão segura</span>
         </div>
         <div>
           <CardTitle className="text-2xl">Entrar no admin</CardTitle>
           <CardDescription className="mt-2 leading-6">
-            Acesse o painel para editar portfolio, curriculo, projetos e publicacoes.
+            Acesse o painel para editar portfolio, currículo, projetos e publicações.
           </CardDescription>
         </div>
       </CardHeader>

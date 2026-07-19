@@ -44,7 +44,7 @@ export function RichTextEditor({ value, onChange, placeholder, className, minHei
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] } }),
       TiptapLink.configure({ autolink: true, openOnClick: false }),
-      Placeholder.configure({ placeholder: placeholder ?? "Escreva o conteudo..." }),
+      Placeholder.configure({ placeholder: placeholder ?? "Escreva o conteúdo..." }),
       Callout,
     ],
     content: value,
@@ -105,7 +105,7 @@ export function RichTextEditor({ value, onChange, placeholder, className, minHei
               Cancelar
             </Button>
             <Button className="h-8 px-3 text-xs" type="button" onClick={applyMarkdownImport}>
-              Converter e substituir conteudo
+              Converter e substituir conteúdo
             </Button>
           </div>
         </div>
@@ -129,20 +129,20 @@ function RichTextToolbar({
       <ToolbarToggle active={editor.isActive("bold")} label="Negrito" onClick={() => editor.chain().focus().toggleBold().run()}>
         <BoldIcon className="size-4" />
       </ToolbarToggle>
-      <ToolbarToggle active={editor.isActive("italic")} label="Italico" onClick={() => editor.chain().focus().toggleItalic().run()}>
+      <ToolbarToggle active={editor.isActive("italic")} label="Itálico" onClick={() => editor.chain().focus().toggleItalic().run()}>
         <ItalicIcon className="size-4" />
       </ToolbarToggle>
       <ToolbarSeparator />
       <ToolbarToggle
         active={editor.isActive("heading", { level: 2 })}
-        label="Titulo 2"
+        label="Título 2"
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
         <Heading2Icon className="size-4" />
       </ToolbarToggle>
       <ToolbarToggle
         active={editor.isActive("heading", { level: 3 })}
-        label="Titulo 3"
+        label="Título 3"
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
       >
         <Heading3Icon className="size-4" />
@@ -164,7 +164,7 @@ function RichTextToolbar({
       </ToolbarToggle>
       <ToolbarToggle
         active={editor.isActive("blockquote")}
-        label="Citacao"
+        label="Citação"
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
       >
         <TextQuoteIcon className="size-4" />
@@ -191,7 +191,7 @@ function RichTextToolbar({
         }}
       >
         <SelectTrigger className="h-8 w-auto text-xs text-muted-foreground">
-          <SelectValue>{() => "Inserir variavel..."}</SelectValue>
+          <SelectValue>{() => "Inserir variável..."}</SelectValue>
         </SelectTrigger>
         <SelectPopup>
           {CONTENT_VARIABLES.map((variable) => (

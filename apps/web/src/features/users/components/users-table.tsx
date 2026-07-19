@@ -46,7 +46,7 @@ export function UsersTable({ onEdit }: UsersTableProps) {
       },
       {
         id: "actions",
-        header: "Acoes",
+        header: "Ações",
         cell: ({ row }) => {
           const isSelf = row.original.id === currentUser?.id;
 
@@ -60,7 +60,7 @@ export function UsersTable({ onEdit }: UsersTableProps) {
               <Can can={[USERS_PERMISSIONS.delete]}>
                 <Button
                   disabled={isSelf}
-                  title={isSelf ? "Voce nao pode excluir a propria conta" : undefined}
+                  title={isSelf ? "Você não pode excluir a própria conta" : undefined}
                   type="button"
                   variant="ghost"
                   onClick={() => setPendingDelete(row.original)}
@@ -87,8 +87,8 @@ export function UsersTable({ onEdit }: UsersTableProps) {
   if (usersQuery.isError) {
     return (
       <ErrorState
-        title="Nao foi possivel carregar usuarios"
-        description="A listagem nao respondeu. Verifique a API e tente novamente."
+        title="Não foi possível carregar usuários"
+        description="A listagem não respondeu. Verifique a API e tente novamente."
       />
     );
   }
@@ -98,28 +98,28 @@ export function UsersTable({ onEdit }: UsersTableProps) {
   return (
     <>
       <DataTableFrame
-        title="Usuarios cadastrados"
+        title="Usuários cadastrados"
         description="Busque e gerencie as contas com acesso ao admin."
         search={search}
         searchPlaceholder="Buscar por nome ou email..."
         onSearchChange={setSearch}
         empty={isEmpty}
-        emptyTitle={search ? "Nenhum usuario encontrado" : "Nenhum usuario cadastrado"}
+        emptyTitle={search ? "Nenhum usuário encontrado" : "Nenhum usuário cadastrado"}
         emptyDescription={
-          search ? "Ajuste a busca para ampliar os resultados." : "Crie o primeiro usuario pelo botao \"Novo usuario\"."
+          search ? "Ajuste a busca para ampliar os resultados." : "Crie o primeiro usuário pelo botão \"Novo usuário\"."
         }
       >
         <DataTable
           data={filteredUsers}
           columns={columns}
-          emptyLabel="Nenhum usuario cadastrado."
+          emptyLabel="Nenhum usuário cadastrado."
           isLoading={usersQuery.isLoading}
         />
       </DataTableFrame>
       <ConfirmDialog
         open={Boolean(pendingDelete)}
-        title="Excluir usuario"
-        description={`Esta acao remove o acesso de "${pendingDelete?.name}" imediatamente.`}
+        title="Excluir usuário"
+        description={`Esta ação remove o acesso de "${pendingDelete?.name}" imediatamente.`}
         loading={deleteMutation.isPending}
         onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
         onOpenChange={(open) => !open && setPendingDelete(null)}

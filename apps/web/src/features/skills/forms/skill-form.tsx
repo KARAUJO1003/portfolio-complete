@@ -93,23 +93,23 @@ export function SkillForm({ onDone, onPendingChange, skill }: SkillFormProps) {
 
   return (
     <DsForm id={SKILL_FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-      <FormSection title="Identidade" description="Nome, categoria e desde quando a habilidade e praticada.">
+      <FormSection title="Identidade" description="Nome, categoria e desde quando a habilidade é praticada.">
         <div className="grid gap-4 md:grid-cols-2">
-          <FormFields.Text form={form} label="Titulo" name="title" />
+          <FormFields.Text form={form} label="Título" name="title" />
           <FormFields.Text form={form} label="Categoria" name="category" />
-          <FormFields.Text form={form} label="Data de inicio" name="startedAt" />
-          <FormFields.Text form={form} label="Icone" name="icon" />
+          <FormFields.Text form={form} label="Data de início" name="startedAt" />
+          <FormFields.Text form={form} label="Ícone" name="icon" />
         </div>
-        <FormFields.HtmlEditor form={form} label="Descricao" name="description" />
+        <FormFields.HtmlEditor form={form} label="Descrição" name="description" />
       </FormSection>
 
-      <FormSection title="Publicacao e exibicao" description="Controle onde esta habilidade aparece.">
+      <FormSection title="Publicação e exibição" description="Controle onde esta habilidade aparece.">
         <div className="grid gap-4 md:grid-cols-2">
           <FormFields.NumberStepper form={form} label="Ordem" max={maxOrder} name="order" />
         </div>
         <div className="grid gap-3 md:grid-cols-2">
-          <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponivel para versoes de portfolio." />
-          <FormFields.Switch form={form} label="Curriculo" name="showOnResume" description="Disponivel para versoes de curriculo." />
+          <FormFields.Switch form={form} label="Portfolio" name="showOnPortfolio" description="Disponível para versões de portfolio." />
+          <FormFields.Switch form={form} label="Currículo" name="showOnResume" description="Disponível para versões de currículo." />
         </div>
       </FormSection>
 

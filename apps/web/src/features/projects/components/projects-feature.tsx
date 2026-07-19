@@ -42,7 +42,7 @@ export function ProjectsFeature() {
         <div>
           <PageTitle>Projetos</PageTitle>
           <PageDescription>
-            Cadastre projetos e escolha se aparecem no portfolio, no curriculo ou em ambos.
+            Cadastre projetos e escolha se aparecem no portfolio, no currículo ou em ambos.
           </PageDescription>
         </div>
         <div className="flex items-center gap-2">
@@ -57,11 +57,11 @@ export function ProjectsFeature() {
       <ProjectsTable view={view} onEdit={openEdit} />
 
       <DrawerFormShell
-        description="Organize conteudo, imagem, links e publicacao com preview antes de salvar."
+        description="Organize conteúdo, imagem, links e publicação com preview antes de salvar."
         formId={PROJECT_FORM_ID}
         maxWidth="max-w-5xl"
         open={drawerOpen}
-        saveLabel={editingProject ? "Salvar alteracoes" : "Criar projeto"}
+        saveLabel={editingProject ? "Salvar alterações" : "Criar projeto"}
         saving={saving}
         title={editingProject ? "Editar projeto" : "Novo projeto"}
         onOpenChange={(open) => (open ? setDrawerOpen(true) : closeDrawer())}

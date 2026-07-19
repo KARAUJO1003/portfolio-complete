@@ -33,27 +33,27 @@ export function CustomSectionsFeature() {
     <>
       <PageHeader className="flex-row flex-wrap items-center justify-between gap-3">
         <div>
-          <PageTitle>Secoes customizadas</PageTitle>
+          <PageTitle>Seções customizadas</PageTitle>
           <PageDescription>
-            Crie blocos livres reutilizaveis no portfolio e em versoes do curriculo.
+            Crie blocos livres reutilizáveis no portfolio e em versões do currículo.
           </PageDescription>
         </div>
         <Button type="button" onClick={openCreate}>
           <PlusIcon className="size-4" />
-          Nova secao
+          Nova seção
         </Button>
       </PageHeader>
 
       <CustomSectionsTable onEdit={openEdit} />
 
       <DrawerFormShell
-        description="Titulo, chave unica, conteudo rico e controle de exibicao."
+        description="Título, chave única, conteúdo rico e controle de exibição."
         formId={CUSTOM_SECTION_FORM_ID}
         maxWidth="max-w-3xl"
         open={drawerOpen}
-        saveLabel={editing ? "Salvar alteracoes" : "Criar secao"}
+        saveLabel={editing ? "Salvar alterações" : "Criar seção"}
         saving={saving}
-        title={editing ? "Editar secao" : "Nova secao"}
+        title={editing ? "Editar seção" : "Nova seção"}
         onOpenChange={(open) => (open ? setDrawerOpen(true) : closeDrawer())}
       >
         <CustomSectionForm section={editing} onDone={closeDrawer} onPendingChange={setSaving} />

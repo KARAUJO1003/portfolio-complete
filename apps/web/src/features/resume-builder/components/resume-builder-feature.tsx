@@ -6,13 +6,10 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   BuilderEmptyState,
-  BuilderItem,
-  BuilderItemContent,
-  BuilderItemDescription,
-  BuilderItemTitle,
   BuilderLayout,
   BuilderPanel,
   BuilderPreview,
+  BuilderSectionCard,
   BuilderSectionItemsPicker,
   BuilderSortableList,
   BuilderStatus,
@@ -39,13 +36,13 @@ import { skillsListQueryOptions } from "@/features/skills/api/skills-queries";
 const defaultSections: ContentVersionSection[] = [
   section("profile", "Dados pessoais", 0),
   section("summary", "Resumo profissional", 1),
-  section("work", "Historico profissional", 2),
-  section("skills", "Competencias", 3),
-  section("achievements", "Conquistas e distincoes", 4),
-  section("certifications", "Certificacoes", 5),
-  section("education", "Formacao academica", 6),
+  section("work", "Histórico profissional", 2),
+  section("skills", "Competências", 3),
+  section("achievements", "Conquistas e distinções", 4),
+  section("certifications", "Certificações", 5),
+  section("education", "Formação acadêmica", 6),
   section("projects", "Projetos", 7, false),
-  section("custom-sections", "Secoes customizadas", 8, false),
+  section("custom-sections", "Seções customizadas", 8, false),
   section("objective", "Objetivo", 9),
 ];
 
@@ -86,7 +83,7 @@ export function ResumeBuilderFeature() {
   }), [skillsQuery.data, projectsQuery.data, experiences, customSectionsQuery.data]);
 
   async function persist() {
-    const input = { name: name.trim() || "Curriculo", slug: slugify(name) || "curriculo", template, sections };
+    const input = { name: name.trim() || "Currículo", slug: slugify(name) || "curriculo", template, sections };
     return versionId
       ? updateContentVersion(versionId, input)
       : createContentVersion({ ...input, kind: "resume" as const });
@@ -97,9 +94,9 @@ export function ResumeBuilderFeature() {
     onSuccess: async (version) => {
       setVersionId(version.id);
       await queryClient.invalidateQueries({ queryKey: contentVersionKeys.list("resume") });
-      toast.success("Versao do curriculo salva.");
+      toast.success("Versão do currículo salva.");
     },
-    onError: () => toast.error("Nao foi possivel salvar o curriculo."),
+    onError: () => toast.error("Não foi possível salvar o currículo."),
   });
 
   const publishMutation = useMutation({
@@ -107,9 +104,9 @@ export function ResumeBuilderFeature() {
     onSuccess: async (version) => {
       setVersionId(version.id);
       await queryClient.invalidateQueries({ queryKey: contentVersionKeys.list("resume") });
-      toast.success("Versao padrao do curriculo publicada.");
+      toast.success("Versão padrão do currículo publicada.");
     },
-    onError: () => toast.error("Nao foi possivel publicar o curriculo."),
+    onError: () => toast.error("Não foi possível publicar o currículo."),
   });
 
   const pdfMutation = useMutation({
@@ -139,7 +136,7 @@ export function ResumeBuilderFeature() {
 
   function newVersion() {
     setVersionId("");
-    setName("Nova versao");
+    setName("Nova versão");
     setSections(defaultSections.map((item) => ({ ...item, itemIds: [] })));
     setTemplate("classic-ats");
   }
@@ -167,8 +164,8 @@ export function ResumeBuilderFeature() {
   return (
     <>
       <PageHeader>
-        <PageTitle>Builder de curriculo</PageTitle>
-        <PageDescription>Monte versoes independentes, selecione itens e gere um PDF textual compativel com ATS.</PageDescription>
+        <PageTitle>Builder de currículo</PageTitle>
+        <PageDescription>Monte versões independentes, selecione itens e gere um PDF textual compatível com ATS.</PageDescription>
       </PageHeader>
       <BuilderLayout>
         <BuilderPanel>
@@ -179,7 +176,7 @@ export function ResumeBuilderFeature() {
             onNew={newVersion}
             onSelect={loadVersion}
           />
-          <Input aria-label="Nome da versao" value={name} onChange={(event) => setName(event.target.value)} />
+          <Input aria-label="Nome da versão" value={name} onChange={(event) => setName(event.target.value)} />
           <Select value={template} onValueChange={(next) => setTemplate(next as "classic-ats" | "compact-ats")}>
             <SelectTrigger>
               <SelectValue>{() => (template === "classic-ats" ? "Classic ATS" : "Compact ATS")}</SelectValue>
@@ -193,14 +190,12 @@ export function ResumeBuilderFeature() {
           <BuilderSortableList
             items={[...sections].sort((a, b) => a.order - b.order)}
             renderItem={(item) => (
-              <div className="rounded-md border border-border bg-background p-3">
-                <BuilderItem className="border-0 bg-transparent p-0">
-                  <input checked={item.enabled} className="mt-1 size-4" type="checkbox" onChange={() => updateSection(item.id, { enabled: !item.enabled })} />
-                  <BuilderItemContent>
-                    <BuilderItemTitle>{item.label}</BuilderItemTitle>
-                    <BuilderItemDescription>{items[item.id]?.length ? `${items[item.id].length} itens` : "Conteudo do perfil"}</BuilderItemDescription>
-                  </BuilderItemContent>
-                </BuilderItem>
+              <BuilderSectionCard
+                description={items[item.id]?.length ? `${items[item.id].length} itens` : "Conteudo do perfil"}
+                enabled={item.enabled}
+                label={item.label}
+                onToggleEnabled={() => updateSection(item.id, { enabled: !item.enabled })}
+              >
                 {items[item.id]?.length > 0 && (
                   <BuilderSectionItemsPicker
                     items={items[item.id]}
@@ -212,7 +207,7 @@ export function ResumeBuilderFeature() {
                     onToggleItem={(optionId) => toggleItem(item.id, optionId)}
                   />
                 )}
-              </div>
+              </BuilderSectionCard>
             )}
             onReorder={reorderSections}
           />
@@ -222,7 +217,7 @@ export function ResumeBuilderFeature() {
             <Button disabled={busy} variant="secondary" onClick={() => publishMutation.mutate()}>{publishMutation.isPending ? "Publicando..." : "Publicar"}</Button>
             <Button disabled={busy} variant="outline" onClick={() => pdfMutation.mutate()}>{pdfMutation.isPending ? "Gerando..." : "Baixar PDF"}</Button>
           </div>
-          <BuilderStatus>Resumo, objetivo e descricoes usam o editor rico (negrito, listas, titulos). O download salva a versao antes de gerar.</BuilderStatus>
+          <BuilderStatus>Resumo, objetivo e descrições usam o editor rico (negrito, listas, títulos). O download salva a versão antes de gerar.</BuilderStatus>
         </BuilderPanel>
 
         <BuilderPreview className="overflow-auto bg-surface-muted p-4">
@@ -255,7 +250,7 @@ const resumeSectionRegistry: Record<string, (config: ContentVersionSection, ctx:
   objective: (_config, { profile }) =>
     profile?.objective ? <ResumeBlock title="Objetivo"><HtmlContent html={profile.objective} /></ResumeBlock> : null,
   skills: (config, { skills, selected }) => (
-    <ResumeBlock title="Competencias">
+    <ResumeBlock title="Competências">
       <strong className="block text-sky-700">TECNICAS:</strong>
       <p className="font-semibold">{skills.filter((item) => !/pessoal|soft/i.test(item.category) && selected(config.id, item.id)).map((item) => item.title).join(", ")}</p>
       <strong className="mt-2 block text-sky-700">PESSOAIS:</strong>
@@ -315,7 +310,7 @@ function ResumePreview({ profile, skills, projects, experiences, customSections,
   if (!hasAnyContent) {
     return (
       <BuilderEmptyState
-        description="Preencha o perfil e cadastre skills, projetos ou experiencias para o curriculo comecar a tomar forma aqui."
+        description="Preencha o perfil e cadastre skills, projetos ou experiências para o currículo começar a tomar forma aqui."
         title="Nada cadastrado ainda"
       />
     );

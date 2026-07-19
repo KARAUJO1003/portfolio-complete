@@ -4,10 +4,12 @@ import type { ProjectDto } from "@portfolio/contracts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
+import { SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { DataTable } from "@/components/datatable/data-table";
 import { Badge } from "@/components/ds/badge";
+import { MiniBar } from "@/components/ds/chart";
 import { ConfirmDialog } from "@/components/ds/confirm-dialog";
 import { DataTableFrame } from "@/components/ds/data-table-frame";
 import { EmptyState, ErrorState, Toolbar } from "@/components/ds/admin-primitives";
@@ -39,6 +41,11 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
       setPendingDelete(null);
     },
   });
+
+  const maxLikes = useMemo(
+    () => Math.max(0, ...(projectsQuery.data ?? []).map((project) => project.likesCount ?? 0)),
+    [projectsQuery.data],
+  );
 
   const columns = useMemo<ColumnDef<ProjectDto, unknown>[]>(
     () => [
@@ -94,7 +101,7 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
           return (
             <div className="flex flex-wrap gap-2">
               {visibility.portfolio && <Badge>Portfolio</Badge>}
-              {visibility.resume && <Badge>Curriculo</Badge>}
+              {visibility.resume && <Badge>Currículo</Badge>}
               {!visibility.portfolio && !visibility.resume && <Badge tone="muted">Oculto</Badge>}
             </div>
           );
@@ -103,11 +110,16 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
       {
         accessorKey: "likesCount",
         header: "Curtidas",
-        cell: ({ row }) => <Badge tone="muted">{row.original.likesCount ?? 0}</Badge>,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            <Badge tone="muted">{row.original.likesCount ?? 0}</Badge>
+            {maxLikes > 0 ? <MiniBar max={maxLikes} value={row.original.likesCount ?? 0} /> : null}
+          </div>
+        ),
       },
       {
         id: "actions",
-        header: "Acoes",
+        header: "Ações",
         cell: ({ row }) => (
           <div className="flex gap-2">
             <Can can={[PROJECTS_PERMISSIONS.update]}>
@@ -128,7 +140,7 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
         ),
       },
     ],
-    [onEdit],
+    [onEdit, maxLikes],
   );
 
   const filteredProjects = useMemo(() => {
@@ -150,8 +162,8 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
   if (projectsQuery.isError) {
     return (
       <ErrorState
-        title="Nao foi possivel carregar projetos"
-        description="A listagem nao respondeu. Verifique a API e tente novamente."
+        title="Não foi possível carregar projetos"
+        description="A listagem não respondeu. Verifique a API e tente novamente."
       />
     );
   }
@@ -161,7 +173,7 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
   const emptyDescription =
     search || status !== "all"
       ? "Ajuste os filtros para ampliar a busca."
-      : "Crie o primeiro projeto pelo botao \"Novo projeto\".";
+      : "Crie o primeiro projeto pelo botão \"Novo projeto\".";
 
   const statusFilterLabel: Record<typeof status, string> = {
     all: "Todos os status",
@@ -189,12 +201,16 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
     {view === "grid" ? (
       <div className="grid gap-4">
         <Toolbar>
-          <Input
-            className="min-w-64 max-w-sm"
-            placeholder="Buscar por titulo, slug ou tecnologia..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
+          <InputGroup className="min-w-64 max-w-sm">
+            <InputGroupAddon>
+              <SearchIcon className="size-3.5" />
+            </InputGroupAddon>
+            <InputGroupInput
+              placeholder="Buscar por título, slug ou tecnologia..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </InputGroup>
           {statusFilter}
         </Toolbar>
         {isEmpty ? (
@@ -204,6 +220,7 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
             {filteredProjects.map((project) => (
               <ProjectCard
                 key={project.id}
+                maxLikes={maxLikes}
                 project={project}
                 onDelete={setPendingDelete}
                 onEdit={onEdit}
@@ -215,9 +232,9 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
     ) : (
       <DataTableFrame
         title="Projetos cadastrados"
-        description="Busque, filtre e ordene os projetos que alimentam o portfolio e o curriculo."
+        description="Busque, filtre e ordene os projetos que alimentam o portfolio e o currículo."
         search={search}
-        searchPlaceholder="Buscar por titulo, slug ou tecnologia..."
+        searchPlaceholder="Buscar por título, slug ou tecnologia..."
         onSearchChange={setSearch}
         empty={isEmpty}
         emptyTitle={emptyTitle}
@@ -235,7 +252,7 @@ export function ProjectsTable({ onEdit, view }: ProjectsTableProps) {
     <ConfirmDialog
       open={Boolean(pendingDelete)}
       title="Excluir projeto"
-      description={`Esta acao remove "${pendingDelete?.title}" definitivamente. Ele deixa de aparecer no portfolio e no curriculo.`}
+      description={`Esta ação remove "${pendingDelete?.title}" definitivamente. Ele deixa de aparecer no portfolio e no currículo.`}
       loading={deleteMutation.isPending}
       onConfirm={() => pendingDelete && deleteMutation.mutate(pendingDelete.id)}
       onOpenChange={(open) => !open && setPendingDelete(null)}

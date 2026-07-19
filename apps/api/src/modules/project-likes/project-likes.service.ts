@@ -1,6 +1,5 @@
-import crypto from "node:crypto";
-import { env } from "../../config/env";
 import { ApiError } from "../../shared/errors/api-error";
+import { hashVisitor } from "../../shared/security/visitor-hash";
 import * as repository from "./project-likes.repository";
 
 export async function likeProject(projectId: string, visitorId: string) {
@@ -40,13 +39,6 @@ export async function likeProject(projectId: string, visitorId: string) {
     liked,
     likesCount,
   };
-}
-
-function hashVisitor(visitorId: string) {
-  return crypto
-    .createHmac("sha256", env.jwtSecret)
-    .update(visitorId)
-    .digest("hex");
 }
 
 function isDuplicateKeyError(error: unknown) {

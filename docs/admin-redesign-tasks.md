@@ -2,7 +2,52 @@
 
 > Fonte de verdade operacional desta rodada. Decisoes visuais de longo prazo continuam em `docs/admin-visual-references.md`; aqui e so o checklist de execucao, pensado para sobreviver ao fim de uma sessao.
 
-**Proximo passo:** Fase 6 (task 17) - pesquisar blocks modernos (coss-particles/ReUI) para auth e conta. Builders (Fase 7+8) concluidos. Prioridade combinada com o usuario: Fase 6 (auth/conta) agora, depois Fase 3/4/5 (polimento visual do admin), Fase 11 (input-group/button-group) e Fase 9 (copy) por ultimo.
+**Proximo passo:** Todas as fases do arquivo estao concluidas. Unico item pendente e a "Decisao pendente de confirmar com o usuario" (fallback hardcoded do portfolio publico) registrada no final deste arquivo.
+
+## Analytics de visitantes + mais tipos de grafico (2026-07-19, fora da ordem das fases - pedido direto do usuario)
+
+Usuario pediu mais variedade de grafico (bklit tem barras, area, etc) e indicadores reais de visitantes (quem acessa agora, dispositivos, origem). Isso exigiu tracking de verdade, nao so componente visual novo:
+
+- **Backend**: novo modulo `apps/api/src/modules/analytics/` - `PageVisitModel` (mongoose, `visitorHash`/`path`/`referrerHost`/`deviceType`/`createdAt`, sem escopo de owner de proposito - portfolio publico ja e single-tenant, mesmo padrao de `public-portfolio.service.ts`). `POST /public/analytics/visit` (publico, sem auth) recebe `visitorId`/`path`/`referrer`, detecta `deviceType` via regex no User-Agent (`device-type.ts`, sem lib nova) e resolve `referrerHost` (dominio do referrer, ou "Direto" se vazio/mesmo host). `GET /analytics/overview` (autenticado) retorna `activeNow` (visitantes distintos nos ultimos 5 min - unico sinal de "presenca ao vivo" possivel sem sessao persistente/websocket), `deviceBreakdown`/`referrerBreakdown` (ultimos 30 dias) e `dailyVisits` (ultimos 14 dias, serie real por dia).
+- Extraido `hashVisitor` para `shared/security/visitor-hash.ts` (era duplicado inline em `project-likes.service.ts`) - mesmo hash HMAC usado por likes e agora por analytics.
+- **Frontend publico**: `features/portfolio/utils/visitor-id.ts` (extraido de `project-like-button.tsx`, mesmo id anonimo do localStorage reusado). Novo `VisitTracker` (`features/portfolio/components/visit-tracker.tsx`), montado em `PublicShell`: manda uma visita no mount + heartbeat a cada 60s enquanto a aba estiver visivel (pausa em `document.hidden`), sem cookie de terceiro.
+- **Novo tipo de grafico**: `AreaChart` em `components/ds/chart.tsx` - SVG area/linha monocromatica sem eixo (estilo bklit), gradiente com `useId()` (evita colisao de `id` de gradiente com multiplas instancias na mesma pagina), anima o desenho da linha (`pathLength`) e o fade da area. **Diferente da `BreakdownBars`**: este e o unico grafico do admin com serie temporal real (visitas tem timestamp de verdade), entao nao se aplica a ressalva de "sem historico" que vale pra projetos/skills.
+- **Dashboard**: nova secao "Visitantes do portfolio" com stat "Ativos agora" (refetch a cada 30s), `AreaChart` de visitas nos ultimos 14 dias, e duas `BreakdownBars` (Dispositivos, De onde vieram).
+- Testado no navegador de ponta a ponta: visitei o site publico (beacon disparou, 204 no network), voltei pro admin e confirmei "Ativos agora: 1", barra "Desktop" em Dispositivos e "Direto" em De onde vieram, todos com dado real (nao mockado). Sem erros de console em nenhuma das duas telas.
+
+## Bug de espacamento no admin inteiro (2026-07-19, achado revisando o dashboard a pedido do usuario)
+
+Usuario pediu pra revisar espacamentos no dashboard. Medindo via DOM (`getBoundingClientRect`), achei **0px de gap entre todos os blocos de toda pagina do admin** (PageHeader, StatGrid, cada Section) - nao so no dashboard, sistemico. Causa raiz: o `PageTransition` da Fase 5 (`components/ds/page-transition.tsx`) envolve `{children}` num `motion.div` extra dentro de `<Page>` (`components/ds/page.tsx`, que tem `flex flex-col gap-8`); esse `gap-8` so espaca **filhos diretos** de `Page` - com o wrapper novo, `Page` passou a ter um unico filho (o wrapper), e o `gap-8` original ficou sem efeito nenhum. **Corrigido**: `PageTransition` ganhou `className="flex flex-col gap-8"` (replica o layout do `Page`, comentario no arquivo explica o porque). Confirmado via DOM (antes: 0px entre todos os blocos; depois: 32px) e visualmente em `/admin` e `/admin/projects`. Sem erros de console.
+
+## Curtidas: indicador de tendencia (2026-07-19, pedido direto do usuario)
+
+Usuario pediu indicador de alta/queda no grafico de curtidas do dashboard. Investigacao: `ProjectLikeModel` (`apps/api/src/modules/project-likes/project-like.model.ts`) tem `timestamps: true` - **existe dado real de data de criacao por curtida**, ao contrario da suposicao anterior de "sem serie historica" (essa suposicao valia pra projetos/skills, nao pra curtidas). Descurtir apaga o registro, entao o dado reflete o saldo liquido de curtidas ativas por periodo, nao um historico completo de eventos - ainda assim e um sinal real, nao inventado.
+
+- Backend: `projects.repository.ts` ganhou `countLikesInRange(ownerId, from, to?)` (conta `ProjectLikeModel` por `createdAt`, escopado aos projetos do owner). `projects.service.ts` ganhou `getLikesTrend(ownerId)`: compara curtidas dos ultimos 7 dias com os 7 dias anteriores, retorna `{ recentCount, previousCount, trend: "up"|"down"|"stable", changePct, windowDays }`. Novo endpoint autenticado `GET /projects/likes-trend` (`projects.routes.ts`/`projects.controller.ts`, mesma permissao `PROJECTS_PERMISSIONS.view` da listagem).
+- Frontend: `getLikesTrend()` em `projects-api.ts`; novo `TrendIndicator` em `components/ds/chart.tsx` (icone TrendingUp/TrendingDown/Minus + label + `%` de variacao, cor semantica - verde/vermelho/neutro, mesmo principio ja usado no `deltaTone` do `Stat`). `ChartPanelHeader` ganhou prop `trailing` pra encaixar o indicador ao lado do titulo do painel. Integrado no painel "Projetos mais curtidos" do dashboard.
+- Testado: com a curtida real criada nesta sessao, o painel mostra "Em alta (+100%)" em verde (0 curtidas na janela anterior -> 1 na janela recente). Endpoint retornou 200 OK, sem erros de console.
+
+## Curtidas: contador publico + graficos (2026-07-19, fora da ordem das fases - pedido direto do usuario)
+
+Usuario reportou: falta exibir contador de curtidas nos projetos (admin e portfolio) e faltam graficos sobre curtidas no dashboard e minigraficos na listagem de projetos. Auditoria (via agente Explore) confirmou: admin ja tinha o numero (card em grade e coluna "Curtidas" na tabela); o que faltava de fato era (1) o numero visivel no **portfolio publico** - `ProjectLikeButton` em modo `compact` (usado nos 2 unicos lugares publicos: grid de projetos e drawer de detalhes) escondia o contador via `{compact ? null : <contagem>}`; e (2) nenhum grafico existia sobre curtidas em lugar nenhum.
+
+- `project-like-button.tsx`: modo `compact` ganhou um badge circular pequeno (`absolute -bottom-1 -right-1`, `border-border bg-background`, fonte mono) sobreposto ao botao de coracao, sempre visivel (mesmo com 0), com pequena animacao de entrada ao mudar o valor. Nao precisou de endpoint novo - o dado (`likesCount`) ja vinha do backend.
+- `components/ds/chart.tsx`: novo `MiniBar` (barra fina de uma linha, relativa ao maior valor do conjunto - mesmo principio da `BreakdownBars`, sem serie historica inventada) para caber em espacos pequenos (card, celula de tabela).
+- `project-card.tsx` (admin, visao grade) e `projects-table.tsx` (coluna "Curtidas" da tabela): `MiniBar` adicionado ao lado do numero existente, relativo ao maximo de curtidas entre os projetos carregados (`maxLikes`, calculado uma vez e passado como prop).
+- `admin-dashboard.tsx`: novo painel "Projetos mais curtidos" (`ChartPanel` full-width, `BreakdownBars` rankeando os 6 projetos com mais curtidas, filtrando os com 0).
+- Testado end-to-end no navegador: curti um projeto real no site publico (badge foi de "0" pra "1" com animacao, coracao ficou vermelho preenchido) e confirmei que o mesmo numero aparece com `MiniBar` correto no card admin, na tabela admin e no novo painel do dashboard. Sem erros de console em nenhuma das 4 telas.
+
+## Refino visual dos builders (2026-07-19, fora da ordem das fases - pedido direto do usuario)
+
+Usuario reportou objetivamente: builders "muito ruins", botoes/inputs/cards de D&D "feios simples", preview do Portfolio Builder nao fiel. Trabalho direto em `components/ds/builder.tsx` e nos dois builders:
+
+- `BuilderPanel` `p-5` -> `p-4` (density consistente com o resto do admin).
+- Criado `BuilderSectionCard` (checkbox real `Checkbox` + titulo/descricao que esmaecem quando a secao esta desativada + slot de children) substituindo a `<div><BuilderItem>` duplicada a mao nos dois builders (mesmo bloco copiado igual nos dois arquivos, incluindo um `<input type="checkbox">` **nativo sem estilo nenhum** - a causa mais literal do "feio simples"). Os dois `*-feature.tsx` migrados para o novo componente.
+- `BuilderSectionItemsPicker`: checkboxes nativos trocados pelo componente `Checkbox` real (checkbox "usar todos" + checkboxes por item).
+- `BuilderSortableRow` (grip de arrastar): de um icone solto sem feedback para um alvo de 24px com `hover:bg-muted` + `hover:text-foreground`, alinhado com o novo padding dos cards (`pl-8`).
+- **Bug real encontrado testando no navegador** (nao so lendo codigo): o `Checkbox` marcado (`checked=true`) renderizava **visualmente identico ao desmarcado** - o `data-[checked]:bg-primary`/`data-[checked]:border-primary` do componente nunca aparecia. Causa raiz: `themes/globals.css` tinha ~30 utilitarias de cor (`.bg-primary`, `.bg-background`, `.text-foreground` etc, linhas ~177-283) escritas a mao **fora de qualquer `@layer`**, 100% redundantes com o que `@theme inline` (topo do arquivo) ja gera automaticamente. Por spec do CSS Cascade Layers, regra sem layer sempre vence regra em layer, **independente de especificidade** - entao `.bg-background` (sem layer) vencia `data-[checked]:bg-primary` (Tailwind, em layer) mesmo com o atributo `data-checked` presente no DOM. Bloco inteiro removido (Tailwind gera as mesmas classes, corretamente, a partir do `@theme inline` que ja existia). Isso pode ter corrigido silenciosamente outras variantes condicionais (`hover:`, `data-*:`) que dependiam dessas mesmas propriedades de cor em outros componentes - testado sem regressao visual em: Projetos (grade), Dashboard, portfolio publico (`/`), Portfolio Builder, Resume Builder, checkbox no design system. Sem erros de console em nenhuma tela testada.
+- Portfolio Builder: preview agora renderiza `PortfolioBackground` (novo prop `variant="absolute"`, exportado de `portfolio-home.tsx` - era privado e so `fixed`, inadequado dentro de uma caixa pequena) atras do conteudo, deixando o preview com o mesmo gradiente/ambiente do site publico real em vez de fundo solido `bg-background` chapado - fidelidade visual maior, alem da fidelidade de dados ja resolvida na Fase 8.
+- Testado no navegador: Portfolio Builder e Resume Builder, toggle de secao, checkboxes marcados/desmarcados visualmente corretos, preview com fundo ambiente, sem erros de console.
 
 Plano completo (contexto, decisoes, verificacao por fase) em `C:\Users\saram\.claude\plans\valiant-hatching-tiger.md` - ler antes de retomar se o contexto tiver se perdido.
 
@@ -41,26 +86,27 @@ Rodado `pnpm build` (monorepo completo) antes do limite da sessao. Encontrados e
 
 **Cuidado de teste:** setar `.value` de um `NumberField` do Base UI via `dispatchEvent` manual não aciona o commit/clamp interno dele (fica com o texto “solto”, sem refletir o estado React real) — só testar via clique + teclado de verdade (`computer` tool) ou `requestSubmit()`/clique real em botão.
 
-## Fase 3 - Dashboard com graficos animados
+## Fase 3 - Dashboard com graficos animados (CONCLUIDA 2026-07-19)
 
-- [ ] 12. Criar `components/ds/chart.tsx` (sparkline/area SVG, sem lib nova, estilo bklit).
-- [ ] 13. Integrar no dashboard (composicao real: status de projetos, categorias de skills etc.).
+- [x] 12. Criado `components/ds/chart.tsx`: `BreakdownBars` (barras horizontais monocromaticas, animadas com Motion - crescem de 0 até o valor real no mount, `useReducedMotion` respeitado) e `ChartPanel`/`ChartPanelHeader` (painel com grid pontilhado sutil de fundo, estilo bklit, via `radial-gradient` de pontos usando `var(--border)` + mask pra sumir gradualmente - sem gradiente decorativo colorido, so o padrao de pontos). Decisao (ja registrada no plano): sem serie historica real no banco, os graficos mostram **composicao atual real**, nao uma tendencia inventada.
+- [x] 13. Integrado no dashboard (`admin-dashboard.tsx`), nova secao "Composicao do conteudo" entre o StatGrid e "Acoes principais": "Projetos por status" (agrupado de verdade por `project.status`, tons semanticos - published=success/verde, draft=warning, archived=neutro) e "Skills por categoria" (agrupado por `skill.category`, top 6, monocromatico). Empty state textual quando nao ha dados (`skills.length === 0` hoje no ambiente local). Testado: renderiza com 2 projetos reais (1 publicado), sem erros de console.
 
-## Fase 4 - Hover premium nas Acoes principais
+## Fase 4 - Hover premium nas Acoes principais (CONCLUIDA 2026-07-19)
 
-- [ ] 14. Microinteracao de hover sutil (Motion), mantendo monocromia.
+- [x] 14. `ActionCard` (Acoes principais do dashboard) ganhou lift sutil no hover (`whileHover={{ y: -2 }}`, Motion, `useReducedMotion` respeitado) + borda esquenta (`hover:border-foreground/25`) + o badge "Abrir" virou "Abrir" com `ArrowUpRightIcon` que desloca sutilmente na diagonal (`group-hover:translate-x-0.5 group-hover:-translate-y-0.5`). Descartada a ideia inicial de spotlight com gradiente seguindo o cursor - o principio "Nao Fazer" de `docs/admin-visual-references.md` proibe gradiente decorativo no admin (fica reservado ao portfolio publico); motion aqui e so feedback de estado (elevacao + seta), sem cor/gradiente novo. Testado via JS (`element.style.transform`) que o `translateY(-2px)` de fato aplica no hover real (mouse), sem erros de console.
 
-## Fase 5 - Transicao de paginas
+## Fase 5 - Transicao de paginas (CONCLUIDA 2026-07-19)
 
-- [ ] 15. `components/ds/page-transition.tsx` (crossfade via Motion + `usePathname`).
-- [ ] 16. Avaliar adaptar `PortfolioLoadingExperience` para loading states do admin.
+- [x] 15. Criado `components/ds/page-transition.tsx` (`PageTransition`): `AnimatePresence` + `motion.div` chaveado por `usePathname()`, fade+slide sutil (`opacity 0->1`, `y: 6->0`, 220ms), `useReducedMotion` respeitado. Usado em `AdminShell` (`components/layout/admin-shell.tsx`), envolvendo so o `{children}` dentro do `<Page>` (o header/nav nao re-anima a cada troca). **Limitacao encontrada**: cada `page.tsx` do admin monta o proprio `AdminShell` direto (nao ha `app/admin/layout.tsx` compartilhado) - o conteudo anterior desmonta antes de qualquer animacao de saida rodar, entao so a entrada anima de verdade (nao e um crossfade simetrico completo). Registrado no comentario do componente; resolve o "travado" reportado sem exigir a reestruturacao maior (converter as 12 paginas para layout compartilhado), que ficaria fora do escopo desta task. Testado: navegar Inicio -> Projetos via nav real, conteudo troca suave, sem erros de console.
+- [x] 16. **Avaliado e decidido nao adaptar** `PortfolioLoadingExperience` para o admin. Motivos: (1) o admin busca dados via TanStack Query no client (nao Suspense/RSC), entao um `loading.tsx` de rota so apareceria durante a troca de chunk da navegacao (quase instantanea, ja coberta pelo `PageTransition` acima), nunca durante o carregamento real dos dados; (2) o componente e deliberadamente cheio de cor/gradiente (`primary-accent`, blur colorido, SVG blueprint) - visual "premium do portfolio publico", batendo de frente com o principio "Nao Fazer: nao introduzir gradiente decorativo no admin" ja registrado em `docs/admin-visual-references.md`. Uma adaptacao fiel ao principio monocromatico deixaria de ser reconhecivel como "vindo" desse componente - seria, na pratica, um componente novo. Loading state do admin continua no padrao ja existente (skeleton/estado de carregamento local por feature via `isLoading` do TanStack Query), que e a abordagem correta pro tipo de fetch que o admin faz.
 
-## Fase 6 - Telas de auth e Minha conta
+## Fase 6 - Telas de auth e Minha conta (CONCLUIDA 2026-07-19)
 
-- [ ] 17. Pesquisar blocks modernos (coss-particles/ReUI) para auth e conta.
-- [ ] 18. Redesenhar forgot-password/reset-password no nivel do login.
-- [ ] 19. Avatar do GitHub em Minha conta (via `profile.avatarPath`/`profile.github`).
-- [ ] 20. Retrabalhar `account-feature.tsx`.
+- [x] 17. Pesquisado via skill `coss-particles` (indice local, `.agents/skills/coss-particles/SKILL.md` - precisou `pnpm setup:agents` pra linkar `.claude/skills`, symlink nao existia) + fetch do particle `p-card-2` ("Authentication card with actions") e `p-avatar-6` ("Avatar with user icon fallback"). Confirmado: o `Card` de auth ja usado em login/forgot/reset (`w-full max-w-md ... shadow-2xl`) ja segue o padrao do particle (header com titulo+descricao, form, botao full-width); o que faltava era o split-screen (marketing panel) nas 2 telas sem ele.
+- [x] 18. Extraido `components/layout/auth-shell.tsx` (`AuthShell`) do split-screen que so existia em `app/login/page.tsx` (painel de marketing + grid). `forgot-password/page.tsx` e `reset-password/page.tsx` migrados pra usar o mesmo shell - agora as 3 telas de auth tem o mesmo nivel visual. Login testado sem regressao.
+- [x] 19. Criado `components/ui/avatar.tsx` (`Avatar`/`AvatarImage`/`AvatarFallback`, adaptado do particle `p-avatar-6` - imagem com fallback via estado de erro, sem lib nova). Avatar do GitHub usa o endpoint publico real `https://github.com/<usuario>.png` (extraido de `profile.github`), com fallback pra `profile.avatarPath` (upload manual) e depois iniciais do nome. **Bug encontrado testando no navegador**: usei `GithubIcon` de `lucide-react`, que nao existe mais nessa versao da lib (logos de marca foram removidos) - `Element type is invalid`. Corrigido com um SVG local (mesmo path ja usado em `portfolio-home.tsx`).
+- [x] 20. `account-feature.tsx` reescrito: os 2 cards soltos ("Dados de acesso" + "Senha") viraram 1 `Card` com 2 secoes (identidade com avatar+link do GitHub, depois trocar senha, separadas por `border-t`) - mesmo principio "FormSection sem card" ja registrado em `docs/admin-visual-references.md`.
+- Testado no navegador: preenchi perfil de teste com um GitHub real (`github.com/octocat` primeiro, depois corrigido) e confirmei o avatar carregando de verdade em "Minha conta", com link "Perfil do GitHub" clicavel. Login/forgot-password/reset-password comparados lado a lado, mesmo nivel visual. Sem erros de console em nenhuma tela apos o fix do icone.
 
 ## Fase 7 - Builders: versionamento intuitivo + empty states (CONCLUIDA 2026-07-19)
 
@@ -75,21 +121,24 @@ Rodado `pnpm build` (monorepo completo) antes do limite da sessao. Encontrados e
 - [x] 24. Resume Builder: ja resolvido junto com a Fase 7 (mesmo `BuilderVersionSwitcher` e fix do bug de auto-load aplicados aos dois builders simultaneamente).
 - Testado: preview do Portfolio Builder reflete corretamente o filtro real (projeto de teste em draft nao aparece no preview, exatamente como nao apareceria no site publico - so a lista de selecao do painel mostra "1 item disponivel", a prova de que o preview usa o mesmo filtro `status=published`+`visibility.portfolio` do site real). Site publico (`/`) testado sem regressao apos as mudancas. Sem erros de console em nenhum dos dois.
 
-## Fase 9 - Copy e acentuacao
+## Fase 9 - Copy e acentuacao (CONCLUIDA 2026-07-19)
 
-- [ ] 25. Varredura por feature (copy de produto, sem acento -> com acento); checklist por pasta abaixo quando comecar:
-  - [ ] admin (dashboard)
-  - [ ] profile
-  - [ ] account
-  - [ ] projects
-  - [ ] skills
-  - [ ] experiences
-  - [ ] pages
-  - [ ] custom-sections
-  - [ ] users
-  - [ ] design-system
-  - [ ] portfolio-builder / resume-builder
-  - [ ] auth (login/forgot/reset)
+- [x] 25. Varredura por feature (copy de produto, sem acento -> com acento). Metodo: `Grep` por palavra sem acento (nao/sao/usuario/descricao/publicacao/acoes/secao/pagina/versao/curriculo/trajetoria/experiencia/formacao/certificacao/titulo/numero etc.) restrito a `.tsx`/`.ts` de cada pasta, revisando cada match pra distinguir copy real (JSX, `label=`, `description=`, `toast.*`, mensagens de validacao Zod) de identificadores de codigo/comentarios (nao tocados, por instrucao do AGENTS.md). Cobertas: labels de campo, titulos de secao, descricoes, placeholders, mensagens de erro/toast, empty states, badges de visibilidade ("Curriculo" -> "Currículo" em 4 tabelas), nomes de colunas de tabela ("Acoes" -> "Ações" em 6 tabelas), mensagens de validacao Zod (ex.: "Ordem nao pode ser negativa." -> "não pode ser negativa.", "As senhas nao coincidem." -> "não coincidem.").
+  - [x] admin (dashboard) - `admin-dashboard.tsx` (titulo, stats, acoes principais, composicao do conteudo, painel "Projetos mais curtidos").
+  - [x] profile - `profile-form.tsx`.
+  - [x] account - `account-feature.tsx`, `change-password-schema.ts`.
+  - [x] projects - `project-form.tsx`, `project-form-schema.ts`, `projects-table.tsx`, `project-card.tsx` (ja correto), `projects-feature.tsx`.
+  - [x] skills - `skill-form.tsx`, `skill-form-schema.ts`, `skills-table.tsx`, `skills-feature.tsx`.
+  - [x] experiences - `experience-form.tsx`, `experience-form-schema.ts`, `experiences-table.tsx`, `experiences-feature.tsx`.
+  - [x] pages - `page-form.tsx`, `pages-table.tsx`, `pages-feature.tsx`.
+  - [x] custom-sections - `custom-section-form.tsx`, `custom-section-form-schema.ts`, `custom-sections-table.tsx`, `custom-sections-feature.tsx`.
+  - [x] users - `users-feature.tsx`, `users-table.tsx`, `user-form.tsx`.
+  - [x] design-system - `design-system-feature.tsx` (vitrine inteira, badges/botoes/cards/tabelas/dialogs/menu/motion patterns).
+  - [x] portfolio-builder / resume-builder - `portfolio-builder-feature.tsx`, `resume-builder-feature.tsx` (labels de secao do curriculo, toasts, empty states).
+  - [x] auth (login/forgot/reset) - `login-form.tsx`, `forgot-password-form.tsx`, `reset-password-form.tsx`, `reset-password-schema.ts`.
+  - **Extra (nao listado no checklist original, achado pela varredura)**: `components/layout/admin-shell.tsx` (nav principal - todos os labels/descricoes dos grupos Base/Conteudo/Publicacao/Sistema, tagline "Conteudo, curriculo e publicacao" no header) e `components/layout/user-menu.tsx` ("Site publico"). Esses dois arquivos afetam TODAS as telas do admin (nav e menu de usuario compartilhados) - a correcao aqui tem o maior impacto visual de toda a fase, apesar de nao estarem na lista original de pastas.
+  - `components/ds/builder.tsx` e `components/ds/rich-text-editor.tsx` tambem corrigidos (compartilhados pelos dois builders): version switcher, toolbar do editor rico (Italico/Titulo/Citacao/Inserir variavel).
+  - Testado no navegador: `/admin`, `/admin/users`, `/admin/design-system` (acentos renderizando corretamente, sem mojibake), sem erros de console em nenhuma tela.
 
 ## Fase 10 - Portfolio publico: loading, scroll e rich-text (CONCLUIDA 2026-07-19)
 
@@ -100,9 +149,14 @@ Pedido direto do usuario fora da ordem das fases (feedback ao vivo testando o si
 - [x] 28. `project.description` ("Descricao longa"): trocado de `FormFields.RichTextField` (que apesar do nome so era Textarea) para `FormFields.HtmlEditor` (editor Tiptap de verdade). Seguro porque esse campo nao alimenta o gerador de PDF (so `project.summary` alimenta) e nao tem nenhum renderer publico hoje que espere o texto plano antigo.
 - [x] 29. **Decidido pelo usuario: atualizar o PDF tambem.** Criado `apps/api/src/modules/resume-pdf/html-to-pdf-lines.ts` (`htmlToPdfLines`/`htmlToPlainSpans`/`htmlToInlineSpans`) - conversor hand-rolled (sem lib nova, mesmo estilo do gerador de PDF existente) que le o HTML do Tiptap (p/h2/h3/ul/ol/li/blockquote/negrito/callout) e produz `PdfLine[]`. Adicionados `bulletSpans`/`numberedSpans` em `resume-pdf.generator.ts` (bullet/numbered com spans, nao so texto). `resume-pdf.service.ts` atualizado para usar o conversor em `profile.summary`, `profile.objective`, `experience.description`, `skill.description` (bullet de skill pessoal) **e** `custom-sections` content (bug latente que ja existia - conteudo HTML de secoes customizadas caia direto em `paragraph()` sem conversao, mesma causa raiz). Formularios trocados para `FormFields.HtmlEditor`: `profile-form.tsx` (Resumo/Objetivo), `experience-form.tsx`, `skill-form.tsx`. Portfolio publico corrigido para nao vazar tags: `experience.description` agora renderiza via `HtmlContent`; `skill.description` (usado como `title` de tooltip nativo) usa `stripHtmlToText()` novo. Testado via API direta: criei skill com `<strong>`/`<em>`/lista, gerei o PDF classic-ats e confirmei que o texto aparece decodificado (sem tags cruas) no conteudo do PDF. Build (api+web) limpo, UI do editor rico confirmada visualmente no form de Skill.
 
-## Fase 11 - Input group / Button group nos formularios (pedido do usuario, ainda nao iniciada)
+## Fase 11 - Input group / Button group nos formularios (CONCLUIDA 2026-07-19)
 
-- [ ] 30. Mapear quais campos de formulario (admin) fazem sentido virar `InputGroup`/`ButtonGroup` com addons (ex.: URL com prefixo `https://`, campos com unidade/sufixo, Demo URL/Repo URL do projeto, campo de busca com icone dentro do input). Pesquisar particle `@coss/input-group` e `@coss/button-group` (skill `coss-particles`) antes de implementar, seguindo o mesmo padrao de adaptacao ja usado em select/number-field/switch/toggle-group.
+- [x] 30. Mapeados os campos com sentido de virar `InputGroup` (todos URL ou busca, sem candidato real de `ButtonGroup` nesta rodada): Demo URL/Repo URL (Projetos), Website/GitHub/LinkedIn (Perfil), busca da listagem de Projetos (grade e tabela). Pesquisado particle `p-input-group-2` do Coss (`InputGroup`+`InputGroupAddon`+`InputGroupInput`) via `WebFetch` (skill `coss-particles` nao reconhecida pelo nome nesta sessao mesmo apos `pnpm setup:agents`; usei o indice local `.agents/skills/coss-particles/SKILL.md` + fetch direto do JSON do particle como fallback).
+  - Criado `components/ui/input-group.tsx` (`InputGroup`/`InputGroupAddon`/`InputGroupInput`/`InputGroupText`), mesma densidade/tokens de `input.tsx` (h-7, `bg-input/20`, `focus-within` no lugar de `focus`).
+  - Novo `FormFields.UrlField` (`components/ds/form-fields.tsx`) - campo com icone fixo + placeholder `https://`, usado em `project-form.tsx` (Demo URL = `LinkIcon`, Repo URL = `GitBranchIcon`) e `profile-form.tsx` (Website = `GlobeIcon`, GitHub/LinkedIn = icones custom).
+  - `DataTableFrame` e o `Toolbar` de busca da visao em grade de Projetos (`projects-table.tsx`, campo duplicado que nao passava pelo `DataTableFrame`) migrados pra `InputGroup` com `SearchIcon` - item que ja estava sinalizado em `docs/admin-visual-references.md` ("busca real deve montar o conteudo a partir de particles de busca/filtro") e nunca tinha sido implementado.
+  - **Achado**: `lucide-react` nao exporta mais icones de marca (`Github`, `Linkedin` - removidos por licenca/trademark). Criado `components/ds/brand-icons.tsx` (`GithubIcon`/`LinkedInIcon`, SVG inline, mesmo path ja usado em `portfolio-home.tsx`), reaproveitado tambem em `account-feature.tsx` (substituindo uma copia local que eu mesmo tinha acabado de criar na Fase 6).
+  - Testado no navegador: Projetos (grade e tabela, busca com icone), Drawer de edicao de projeto (Demo URL/Repo URL com icone), Perfil (Website/GitHub/LinkedIn com icone, salvo e confirmado via API). Sem erros de console em nenhuma tela.
 
 ## Backlog (nao agora, por pedido do usuario)
 

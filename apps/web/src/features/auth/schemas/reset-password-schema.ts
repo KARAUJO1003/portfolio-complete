@@ -6,7 +6,7 @@ export const resetPasswordFormSchema = z
     confirmPassword: z.string().min(8),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "As senhas nao coincidem.",
+    message: "As senhas não coincidem.",
     path: ["confirmPassword"],
   });
 
