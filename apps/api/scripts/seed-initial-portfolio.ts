@@ -12,14 +12,14 @@ const visibilityBoth = { portfolio: true, resume: true };
 const visibilityPortfolio = { portfolio: true, resume: false };
 
 const projectImages = {
-  financeFire: "https://portfolio.kaesyo.com/_next/static/media/finance-bg.4d620d2f.png",
-  portfolio: "https://portfolio.kaesyo.com/_next/static/media/portifolio-image01.a1f43567.png",
-  kanban: "https://portfolio.kaesyo.com/_next/static/media/ligth.ee121dc3.png",
-  orgChart: "https://portfolio.kaesyo.com/_next/static/media/org-light.414bb07a.jpeg",
-  buzzy: "https://portfolio.kaesyo.com/_next/static/media/banner-buzzy.c1fb7a40.jpg",
-  conversor: "https://portfolio.kaesyo.com/_next/static/media/conversor-app02.36efe9a1.png",
-  renomeador: "https://portfolio.kaesyo.com/_next/static/media/bannerLight2.jpeg.05ee2be7.png",
-  tasks: "https://portfolio.kaesyo.com/_next/static/media/orion-tasks01.cb1c5d2d.png",
+  financeFire: "https://www.kaesyo.com/_next/static/media/finance-bg.4d620d2f.png",
+  portfolio: "https://www.kaesyo.com/_next/static/media/portifolio-image01.a1f43567.png",
+  kanban: "https://www.kaesyo.com/_next/static/media/ligth.ee121dc3.png",
+  orgChart: "https://www.kaesyo.com/_next/static/media/org-light.414bb07a.jpeg",
+  buzzy: "https://www.kaesyo.com/_next/static/media/banner-buzzy.c1fb7a40.jpg",
+  conversor: "https://www.kaesyo.com/_next/static/media/conversor-app02.36efe9a1.png",
+  renomeador: "https://www.kaesyo.com/_next/static/media/bannerLight2.jpeg.05ee2be7.png",
+  tasks: "https://www.kaesyo.com/_next/static/media/orion-tasks01.cb1c5d2d.png",
 };
 
 async function seed() {

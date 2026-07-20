@@ -1,0 +1,25 @@
+[mcp_servers.beui]
+command = "npx"
+args = [
+    "-y",
+    "mcp-remote",
+    "https://mcp.beui.dev/mcp",
+]
+
+[mcp_servers.kibo-ui]
+command = "npx"
+args = [
+    "-y",
+    "mcp-remote",
+    "https://www.kibo-ui.com/api/mcp/mcp",
+]
+
+[mcp_servers.reui]
+url = "https://mcp.reui.io"
+
+[mcp_servers.shadcn]
+command = "npx"
+args = [
+    "shadcn@latest",
+    "mcp",
+]
