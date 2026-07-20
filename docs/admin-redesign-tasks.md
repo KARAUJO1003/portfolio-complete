@@ -4,6 +4,15 @@
 
 **Proximo passo:** Todas as fases e decisoes pendentes do arquivo estao concluidas/confirmadas (2026-07-19). Unico item em aberto e o Backlog (DND real), deliberadamente adiado - "nao agora" reconfirmado pelo usuario. Nao ha micro-task acionavel sem novo pedido do usuario.
 
+## Bug: botao "Curriculo" do site publico redirecionava pro admin (2026-07-19, fora da ordem das fases)
+
+Usuario reportou que "publicar" e "baixar PDF" nao funcionavam. Investigacao: as duas acoes DENTRO do admin (Portfolio Builder e Resume Builder) funcionavam perfeitamente (testado com clique real, network 200 OK) - a causa aparente era um processo zumbi preso na porta 3004 (`.next` corrompido de sessao anterior), resolvido reiniciando o servidor. Mas o usuario apontou o problema real na sequencia: o icone "Curriculo" do dock do site **publico** linkava pra `/admin/resume-builder` (`portfolio-home.tsx`) - uma rota autenticada. Um visitante anonimo clicando ali seria redirecionado pro login em vez de baixar o PDF.
+
+**Corrigido com um endpoint publico de verdade** (nao so trocar o link):
+- Backend: `resume-pdf.service.ts` ganhou `generatePublicResumePdf()` - resolve a versao de curriculo publicada (`ContentVersionModel.findOne({ kind: "resume", status: "published" })`, sem escopo de owner, mesmo padrao single-tenant do `public-portfolio.service.ts`), usa o `ownerId` **da propria versao encontrada** pra reaproveitar 100% da funcao `generateAts` ja existente (sem duplicar logica de montagem do PDF), e usa o template (`classic-ats`/`compact-ats`) que foi salvo na versao, nao um default fixo. Novo endpoint `GET /public/resume-pdf` (sem autenticacao, atras do mesmo feature flag `resume.pdf.enabled` do endpoint autenticado).
+- Frontend: `DockLink` (`portfolio-home.tsx`) ganhou modo `download` (sem `target="_blank"` - o `Content-Disposition: attachment` do backend ja faz o navegador baixar em vez de abrir aba nova). Icone "Curriculo" trocado de `internal` (Link pro admin) pra `download` (`${env.apiBaseUrl}/public/resume-pdf`).
+- Testado no navegador: clique no icone, `GET /public/resume-pdf` retornou 200 (marcado `ERR_ABORTED` no log de rede - comportamento esperado do Chrome quando aborta a navegacao pra entregar o arquivo ao gerenciador de downloads), aba continuou em `localhost:3004` sem navegar pro admin, `curl -I` confirmou `Content-Type: application/pdf` e `Content-Disposition: attachment; filename="kaesyo-felix-compact-ats.pdf"`. Sem erros de console.
+
 ## Analytics de visitantes + mais tipos de grafico (2026-07-19, fora da ordem das fases - pedido direto do usuario)
 
 Usuario pediu mais variedade de grafico (bklit tem barras, area, etc) e indicadores reais de visitantes (quem acessa agora, dispositivos, origem). Isso exigiu tracking de verdade, nao so componente visual novo:

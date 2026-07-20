@@ -16,7 +16,7 @@ import { profileRoutes } from "./modules/profile/profile.routes";
 import { projectLikesRoutes } from "./modules/project-likes/project-likes.routes";
 import { projectsRoutes } from "./modules/projects/projects.routes";
 import { publicPortfolioRoutes } from "./modules/public-portfolio/public-portfolio.routes";
-import { resumePdfRoutes } from "./modules/resume-pdf/resume-pdf.routes";
+import { publicResumePdfRoutes, resumePdfRoutes } from "./modules/resume-pdf/resume-pdf.routes";
 import { skillsRoutes } from "./modules/skills/skills.routes";
 import { uploadsRoutes } from "./modules/uploads/uploads.routes";
 import { usersRoutes } from "./modules/users/users.routes";
@@ -66,6 +66,7 @@ export function createApp() {
   app.use("/projects", projectsRoutes);
   app.use("/public/portfolio", publicPortfolioRoutes);
   app.use("/resume-pdf", resumePdfRoutes);
+  app.use("/public/resume-pdf", publicResumePdfRoutes);
   app.use("/skills", skillsRoutes);
   app.use("/uploads", uploadsRoutes);
   app.use("/users", usersRoutes);

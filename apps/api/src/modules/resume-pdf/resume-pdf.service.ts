@@ -32,6 +32,24 @@ export async function generateCompactAts(ownerId: string, options: ResumePdfOpti
   return generateAts(ownerId, options, true);
 }
 
+/**
+ * Versao publica (sem autenticacao) do PDF - usada pelo botao "Curriculo" do
+ * site publico. Resolve o owner a partir da propria versao publicada (o
+ * portfolio publico ja e single-tenant, mesmo padrao de
+ * `public-portfolio.service.ts`), em vez de exigir um usuario logado.
+ * Usa o template salvo na versao (`classic-ats`/`compact-ats`), nao um
+ * default fixo.
+ */
+export async function generatePublicResumePdf() {
+  const version = await ContentVersionModel.findOne({ kind: "resume", status: "published" }).sort({
+    publishedAt: -1,
+  });
+  if (!version) return null;
+
+  const compact = version.template === "compact-ats";
+  return generateAts(version.ownerId, { versionId: String(version._id) }, compact);
+}
+
 async function generateAts(ownerId: string, options: ResumePdfOptions, compact: boolean) {
   const version = options.versionId
     ? await ContentVersionModel.findOne({ _id: options.versionId, ownerId, kind: "resume" })

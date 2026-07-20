@@ -17,3 +17,6 @@ resumePdfRoutes.post(
   requireFeature("resume.pdf.templates"),
   controller.generateCompactAts,
 );
+
+export const publicResumePdfRoutes = Router();
+publicResumePdfRoutes.get("/", requireFeature("resume.pdf.enabled"), controller.generatePublicResumePdf);

@@ -11,6 +11,7 @@ import { GitHubContributionGraph } from "@/components/ds/github-contribution-gra
 import { HtmlContent } from "@/components/ds/html-content";
 import { ThemeToggle } from "@/components/ds/theme-toggle";
 import { PublicShell } from "@/components/layout/public-shell";
+import { env } from "@/core/config/env";
 import { resolveFileUrl } from "@/core/files/file-url";
 import { cn } from "@/lib/utils";
 import { AnimatedDisclosure } from "@/features/portfolio/components/animated-disclosure";
@@ -347,7 +348,7 @@ function SocialDock({ profile }: { profile: PortfolioProfile }) {
       <DockLink href={profile.instagram} label="Instagram">
         <InstagramIcon />
       </DockLink>
-      <DockLink href="/admin/resume-builder" internal label="Curriculo">
+      <DockLink download href={`${env.apiBaseUrl}/public/resume-pdf`} label="Curriculo">
         <DocumentIcon />
       </DockLink>
       <ThemeToggle className="bg-background hover:bg-muted border border-border text-muted-foreground hover:text-foreground" />
@@ -357,11 +358,13 @@ function SocialDock({ profile }: { profile: PortfolioProfile }) {
 
 function DockLink({
   children,
+  download,
   href,
   internal,
   label,
 }: {
   children: ReactNode;
+  download?: boolean;
   href: string;
   internal?: boolean;
   label: string;
@@ -374,6 +377,15 @@ function DockLink({
       <Link aria-label={label} className={className} href={href} title={label}>
         {children}
       </Link>
+    );
+  }
+
+  if (download) {
+    /* Sem target="_blank": o Content-Disposition: attachment do backend ja faz o navegador baixar em vez de navegar, sem precisar de aba nova. */
+    return (
+      <a aria-label={label} className={className} href={href} title={label}>
+        {children}
+      </a>
     );
   }
 

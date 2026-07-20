@@ -31,3 +31,16 @@ export const generateCompactAts: RequestHandler = async (request, response, next
     response.send(result.buffer);
   } catch (error) { next(error); }
 };
+
+export const generatePublicResumePdf: RequestHandler = async (_request, response, next) => {
+  try {
+    const result = await service.generatePublicResumePdf();
+    if (!result) throw new ApiError("Nenhum curriculo publicado ainda", 404);
+
+    response.setHeader("Content-Type", "application/pdf");
+    response.setHeader("Content-Disposition", `attachment; filename="${result.filename}"`);
+    response.send(result.buffer);
+  } catch (error) {
+    next(error);
+  }
+};

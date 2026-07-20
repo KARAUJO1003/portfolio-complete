@@ -191,7 +191,7 @@ export function ResumeBuilderFeature() {
             items={[...sections].sort((a, b) => a.order - b.order)}
             renderItem={(item) => (
               <BuilderSectionCard
-                description={items[item.id]?.length ? `${items[item.id].length} itens` : "Conteudo do perfil"}
+                description={items[item.id]?.length ? `${items[item.id].length} itens` : "Conteúdo do perfil"}
                 enabled={item.enabled}
                 label={item.label}
                 onToggleEnabled={() => updateSection(item.id, { enabled: !item.enabled })}
