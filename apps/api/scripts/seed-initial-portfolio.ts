@@ -11,15 +11,18 @@ import { ContentVersionModel } from "../src/modules/content-versions/content-ver
 const visibilityBoth = { portfolio: true, resume: true };
 const visibilityPortfolio = { portfolio: true, resume: false };
 
+const projectImagesBaseUrl =
+  "https://raw.githubusercontent.com/KARAUJO1003/portifolio.web.1.4.0/03789996fcb7a97e52324d1747d8398f772056b7/portifolio/public";
+
 const projectImages = {
-  financeFire: "https://www.kaesyo.com/_next/static/media/finance-bg.4d620d2f.png",
-  portfolio: "https://www.kaesyo.com/_next/static/media/portifolio-image01.a1f43567.png",
-  kanban: "https://www.kaesyo.com/_next/static/media/ligth.ee121dc3.png",
-  orgChart: "https://www.kaesyo.com/_next/static/media/org-light.414bb07a.jpeg",
-  buzzy: "https://www.kaesyo.com/_next/static/media/banner-buzzy.c1fb7a40.jpg",
-  conversor: "https://www.kaesyo.com/_next/static/media/conversor-app02.36efe9a1.png",
-  renomeador: "https://www.kaesyo.com/_next/static/media/bannerLight2.jpeg.05ee2be7.png",
-  tasks: "https://www.kaesyo.com/_next/static/media/orion-tasks01.cb1c5d2d.png",
+  financeFire: `${projectImagesBaseUrl}/finance-bg.png`,
+  portfolio: `${projectImagesBaseUrl}/portifolio-image01.png`,
+  kanban: `${projectImagesBaseUrl}/kanban/ligth.png`,
+  orgChart: `${projectImagesBaseUrl}/organograma/org-light.jpeg`,
+  buzzy: `${projectImagesBaseUrl}/buzzy/banner-buzzy.jpg`,
+  conversor: `${projectImagesBaseUrl}/conversor-app02.png`,
+  renomeador: `${projectImagesBaseUrl}/rename-files/bannerLight2.jpeg.png`,
+  tasks: `${projectImagesBaseUrl}/orion-tasks01.png`,
 };
 
 async function seed() {
