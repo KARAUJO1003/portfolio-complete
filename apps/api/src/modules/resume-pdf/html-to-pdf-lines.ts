@@ -68,6 +68,16 @@ export function htmlToInlineSpans(html: string | undefined | null): PdfSpan[] {
   return htmlToPdfLines(html).flatMap((line) => line.spans ?? (line.text ? [{ text: line.text, bold: line.bold }] : []));
 }
 
+/**
+ * O Tiptap salva campo "vazio" como HTML truthy (ex.: "<p></p>"), entao um
+ * simples `if (profile.summary)` deixa passar secoes sem conteudo visivel
+ * (heading renderiza, corpo fica em branco). Usar esta checagem antes de
+ * empurrar qualquer heading condicionado a um campo rich-text.
+ */
+export function hasVisibleText(html: string | undefined | null): boolean {
+  return htmlToPdfLines(html).length > 0;
+}
+
 function toSpans(innerHtml: string): PdfSpan[] {
   const withoutBreaks = innerHtml.replace(/<br\s*\/?>/gi, " ");
   const parts = withoutBreaks.split(boldTagRegex);

@@ -5,7 +5,7 @@ import { SkillModel } from "../skills/skills.model";
 import { ContentVersionModel } from "../content-versions/content-versions.model";
 import { CustomSectionModel } from "../custom-sections/custom-sections.model";
 import { bullet, bulletSpans, generateClassicAtsPdf, heading, numbered, paragraph, spans, subheading } from "./resume-pdf.generator";
-import { htmlToInlineSpans, htmlToPdfLines } from "./html-to-pdf-lines";
+import { hasVisibleText, htmlToInlineSpans, htmlToPdfLines } from "./html-to-pdf-lines";
 
 type ResumePdfOptions = {
   sections?: string[];
@@ -91,7 +91,7 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
   const customSections = allCustomSections.filter((item) => isSelected("custom-sections", item._id));
 
   const lines = [];
-  const name = profile?.name || "Curriculo";
+  const name = profile?.name || "Currículo";
 
   if (enabledSections.has("profile")) {
     lines.push({ text: name.toUpperCase(), size: 15, bold: true, color: "brand" as const });
@@ -107,13 +107,13 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
     if (metaParts.length) lines.push(paragraph(metaParts.join(" | ")));
   }
 
-  if (enabledSections.has("summary") && profile?.summary) {
+  if (enabledSections.has("summary") && hasVisibleText(profile?.summary)) {
     lines.push(heading("Resumo profissional"), ...htmlToPdfLines(profile.summary));
   }
 
   const workExperiences = experiences.filter((experience) => experience.type === "work");
   if (enabledSections.has("work") && workExperiences.length) {
-    lines.push(heading("Historico profissional"));
+    lines.push(heading("Histórico profissional"));
     for (const experience of workExperiences) {
       const dateRange = formatDateRange(experience.startDate, experience.endDate, experience.current);
       lines.push(bullet(`**${experience.title.toUpperCase()}**${dateRange ? ` - ${dateRange}` : ""}`));
@@ -132,14 +132,14 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
     const technicalSkills = skills.filter((skill) => !personalSkills.includes(skill));
 
     if (technicalSkills.length) {
-      lines.push(heading("Competencias"), subheading("Tecnicas:"));
+      lines.push(heading("Competências"), subheading("Técnicas:"));
       lines.push(bullet(`**${technicalSkills.map((skill) => skill.title).join(", ")}**`));
     }
 
     if (personalSkills.length) {
       lines.push(subheading("Pessoais:"));
       personalSkills.forEach((skill) =>
-        lines.push(bulletSpans(skill.description ? htmlToInlineSpans(skill.description) : [{ text: skill.title }])),
+        lines.push(bulletSpans(hasVisibleText(skill.description) ? htmlToInlineSpans(skill.description) : [{ text: skill.title }])),
       );
     }
   }
@@ -148,15 +148,15 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
     (experience) => experience.type === "link" && /conquista|distinc/i.test(experience.organization),
   );
   if (enabledSections.has("achievements") && achievements.length) {
-    lines.push(heading("Conquistas e distincoes"));
+    lines.push(heading("Conquistas e distinções"));
     achievements.forEach((achievement, index) =>
-      lines.push(numbered(achievement.description || achievement.title, index + 1, { pageBreakBefore: index === 3 })),
+      lines.push(numbered(achievement.description || achievement.title, index + 1)),
     );
   }
 
   const certifications = experiences.filter((experience) => experience.type === "certification");
   if (enabledSections.has("certifications") && certifications.length) {
-    lines.push(heading("Certificacoes"));
+    lines.push(heading("Certificações"));
     certifications.forEach((certification) =>
       lines.push(bullet(`**${certification.title}**${certification.organization ? ` (${certification.organization})` : ""}`)),
     );
@@ -164,7 +164,7 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
 
   const education = experiences.filter((experience) => experience.type === "education");
   if (enabledSections.has("education") && education.length) {
-    lines.push(heading("Formacao academica"));
+    lines.push(heading("Formação acadêmica"));
     education.forEach((item) => {
       const dateRange = formatDateRange(item.startDate, item.endDate, item.current);
       lines.push(
@@ -183,10 +183,12 @@ async function generateAts(ownerId: string, options: ResumePdfOptions, compact: 
   }
 
   if (enabledSections.has("custom-sections") && customSections.length) {
-    customSections.forEach((section) => lines.push(heading(section.title), ...htmlToPdfLines(section.content)));
+    customSections
+      .filter((section) => hasVisibleText(section.content))
+      .forEach((section) => lines.push(heading(section.title), ...htmlToPdfLines(section.content)));
   }
 
-  if (enabledSections.has("objective") && profile?.objective) {
+  if (enabledSections.has("objective") && hasVisibleText(profile?.objective)) {
     lines.push(heading("Objetivo"), ...htmlToPdfLines(profile.objective));
   }
 
