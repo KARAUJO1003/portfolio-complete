@@ -2,7 +2,7 @@
 
 > Fonte de verdade operacional desta rodada. Decisoes visuais de longo prazo continuam em `docs/admin-visual-references.md`; aqui e so o checklist de execucao, pensado para sobreviver ao fim de uma sessao.
 
-**Proximo passo:** Todas as fases do arquivo estao concluidas. Unico item pendente e a "Decisao pendente de confirmar com o usuario" (fallback hardcoded do portfolio publico) registrada no final deste arquivo.
+**Proximo passo:** Todas as fases e decisoes pendentes do arquivo estao concluidas/confirmadas (2026-07-19). Unico item em aberto e o Backlog (DND real), deliberadamente adiado - "nao agora" reconfirmado pelo usuario. Nao ha micro-task acionavel sem novo pedido do usuario.
 
 ## Analytics de visitantes + mais tipos de grafico (2026-07-19, fora da ordem das fases - pedido direto do usuario)
 
@@ -162,6 +162,6 @@ Pedido direto do usuario fora da ordem das fases (feedback ao vivo testando o si
 
 - [ ] DND real para ordenar itens do portfolio/curriculo (fica para depois de tudo acima).
 
-## Decisoes pendentes de confirmar com o usuario
+## Decisoes confirmadas com o usuario
 
-- [ ] Fallback hardcoded do portfolio publico (`portfolio-home.tsx:31-97`, achado na Fase 0): manter como esta (bom pra nao ficar feio sem conteudo) ou trocar por empty-state real quando nao houver versao publicada?
+- [x] Fallback hardcoded do portfolio publico (`portfolio-home.tsx:31-97`, achado na Fase 0): **decidido manter como esta** (2026-07-19) - evita o site parecer quebrado/vazio pra visitantes antes de ter conteudo real publicado. Nao mexer nisso sem novo pedido.
